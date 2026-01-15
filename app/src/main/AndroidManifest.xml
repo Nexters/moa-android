@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Moa">
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Moa">

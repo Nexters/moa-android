@@ -1,6 +1,5 @@
-package com.moa.app.presentation.ui.theme
+package com.moa.app.presentation.designsystem.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

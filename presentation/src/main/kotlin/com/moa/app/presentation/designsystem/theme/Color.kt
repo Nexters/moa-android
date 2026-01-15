@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.theme
+package com.moa.app.presentation.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
