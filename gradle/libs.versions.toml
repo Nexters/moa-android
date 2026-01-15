@@ -19,9 +19,11 @@ kotlinxCollectionsImmutable = "0.4.0"
 retrofit = "3.0.0"
 okhttp_bom = "5.3.2"
 ksp = "2.3.3"
+appcompat = "1.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -86,7 +88,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 [bundles]
 compose = [
    "androidx-activity-compose",
-    "androidx-compose-bom",
     "androidx-ui",
     "androidx-ui-graphics",
     "androidx-ui-tooling",
@@ -105,18 +106,4 @@ navigation = [
 lifecycle = [
     "androidx-lifecycle-runtime-ktx",
     "androidx-lifecycle-viewmodel-compose",
-]
-
-hilt = [
-    "hilt-android",
-    "hilt-compiler",
-    "hilt-navigation-compose",
-]
-
-network = [
-    "retrofit",
-    "retrofit_serialization",
-    "okhttp_bom",
-    "okhttp",
-    "okhttp_logging",
 ]
