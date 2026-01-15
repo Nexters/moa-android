@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "moa"
 include(":app")
 include(":core")
+include(":presentation")
