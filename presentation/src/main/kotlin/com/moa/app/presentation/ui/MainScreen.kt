@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -12,6 +14,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.Screen
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
@@ -20,8 +23,18 @@ import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val backstack = rememberNavBackStack(Screen.Splash)
+
+    LaunchedEffect(Unit) {
+        viewModel.moaSideEffects.collect {
+            when (it) {
+                is MoaSideEffect.Navigate -> {
+                    backstack.add(it.destination)
+                }
+            }
+        }
+    }
 
     Scaffold { innerPadding ->
         MainNavHost(
@@ -47,19 +60,19 @@ private fun MainNavHost(
         ),
         entryProvider = entryProvider {
             entry<Screen.Splash> {
-                SplashScreen(onClick = { backstack.add(Screen.Onboarding) })
+                SplashScreen()
             }
 
             entry<Screen.Onboarding> {
-                OnboardingScreen(onClick = { backstack.add(Screen.Home) })
+                OnboardingScreen()
             }
 
             entry<Screen.Home> {
-                HomeScreen(onClick = { backstack.add(Screen.History) })
+                HomeScreen()
             }
 
             entry<Screen.History> {
-                HistoryScreen(onClick = { backstack.add(Screen.Setting) })
+                HistoryScreen()
             }
 
             entry<Screen.Setting> {
