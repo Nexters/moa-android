@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding
+package com.moa.app.presentation.ui.onboarding.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

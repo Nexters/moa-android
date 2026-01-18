@@ -16,7 +16,8 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.Screen
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
-import com.moa.app.presentation.ui.onboarding.LoginScreen
+import com.moa.app.presentation.ui.onboarding.login.LoginScreen
+import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
 
@@ -28,7 +29,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
-                    backstack.add(it.destination)
+                    when (it.destination) {
+                        Screen.Back -> backstack.removeAt(backstack.size - 1)
+
+                        else -> backstack.add(it.destination)
+                    }
                 }
             }
         }
@@ -59,6 +64,10 @@ private fun MainNavHost(
 
             entry<Screen.Login> {
                 LoginScreen()
+            }
+
+            entry<Screen.Nickname> {
+                NickNameScreen()
             }
 
             entry<Screen.Home> {

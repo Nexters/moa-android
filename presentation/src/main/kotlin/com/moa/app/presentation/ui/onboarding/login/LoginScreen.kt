@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding
+package com.moa.app.presentation.ui.onboarding.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
