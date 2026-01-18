@@ -10,12 +10,25 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OnboardingViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    fun emit() {
+    fun onIntent(intent : LoginIntent) {
+        when(intent) {
+            LoginIntent.ClickApple -> loginWithApple()
+            LoginIntent.ClickKakao -> loginWithKakao()
+        }
+    }
+
+    private fun loginWithKakao() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Nickname))
+        }
+    }
+
+    private fun loginWithApple() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Nickname))
         }
     }
 }

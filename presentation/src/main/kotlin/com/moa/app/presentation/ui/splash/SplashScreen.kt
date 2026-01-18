@@ -37,7 +37,7 @@ private fun SplashScreen() {
             Spacer(Modifier.weight(3f))
 
             Image(
-                painter = painterResource(R.drawable.img_logo),
+                painter = painterResource(R.drawable.img_green_logo),
                 contentDescription = "App Logo",
             )
 

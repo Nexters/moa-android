@@ -16,7 +16,7 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.Screen
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
-import com.moa.app.presentation.ui.onboarding.OnboardingScreen
+import com.moa.app.presentation.ui.onboarding.LoginScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
 
@@ -57,8 +57,8 @@ private fun MainNavHost(
                 SplashScreen()
             }
 
-            entry<Screen.Onboarding> {
-                OnboardingScreen()
+            entry<Screen.Login> {
+                LoginScreen()
             }
 
             entry<Screen.Home> {

@@ -21,7 +21,7 @@ class SplashViewModel @Inject constructor(
             delay(3000)
 
             if (loginStatus) {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Onboarding))
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Login))
             } else {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
             }
