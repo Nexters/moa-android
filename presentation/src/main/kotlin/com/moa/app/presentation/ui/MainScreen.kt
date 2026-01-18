@@ -1,8 +1,6 @@
 package com.moa.app.presentation.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -36,14 +34,10 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         }
     }
 
-    Scaffold { innerPadding ->
-        MainNavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            backstack = backstack,
-        )
-    }
+    MainNavHost(
+        modifier = Modifier.fillMaxSize(),
+        backstack = backstack,
+    )
 }
 
 @Composable
