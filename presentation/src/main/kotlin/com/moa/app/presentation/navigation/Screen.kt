@@ -14,7 +14,7 @@ sealed interface Screen : NavKey {
     data object Nickname : Screen
 
     @Serializable
-    data object Workplace : Screen
+    data object WorkPlace : Screen
 
     @Serializable
     data object Salary : Screen

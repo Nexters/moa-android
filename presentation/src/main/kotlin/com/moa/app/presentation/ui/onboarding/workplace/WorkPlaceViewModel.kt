@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding.nickname
+package com.moa.app.presentation.ui.onboarding.workplace
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
@@ -11,16 +11,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NickNameViewModel @Inject constructor(
+class WorkPlaceViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    val nickNameTextFieldState = TextFieldState()
+    val workPlaceTextFieldState = TextFieldState()
 
-    fun onIntent(intent: NickNameIntent) {
+    fun onIntent(intent: WorkPlaceIntent) {
         when (intent) {
-            is NickNameIntent.ClickBack -> back()
-            is NickNameIntent.ClickRandom -> random()
-            is NickNameIntent.ClickNext -> next()
+            is WorkPlaceIntent.ClickBack -> back()
+            is WorkPlaceIntent.ClickNext -> next()
         }
     }
 
@@ -30,13 +29,9 @@ class NickNameViewModel @Inject constructor(
         }
     }
 
-    private fun random() {
-
-    }
-
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.WorkPlace))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Salary))
         }
     }
 }

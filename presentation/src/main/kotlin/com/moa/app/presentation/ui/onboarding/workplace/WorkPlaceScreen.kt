@@ -1,9 +1,6 @@
-package com.moa.app.presentation.ui.onboarding.nickname
+package com.moa.app.presentation.ui.onboarding.workplace
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -36,17 +28,17 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
-fun NickNameScreen(viewModel: NickNameViewModel = hiltViewModel()) {
-    NickNameScreen(
-        nickNameTextFieldState = viewModel.nickNameTextFieldState,
+fun WorkPlaceScreen(viewModel: WorkPlaceViewModel = hiltViewModel()) {
+    WorkPlaceScreen(
+        workPlaceTextFieldState = viewModel.workPlaceTextFieldState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
-private fun NickNameScreen(
-    nickNameTextFieldState: TextFieldState,
-    onIntent: (NickNameIntent) -> Unit,
+private fun WorkPlaceScreen(
+    workPlaceTextFieldState: TextFieldState,
+    onIntent: (WorkPlaceIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -54,7 +46,7 @@ private fun NickNameScreen(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(NickNameIntent.ClickBack) }) {
+                    IconButton(onClick = { onIntent(WorkPlaceIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_back),
                             contentDescription = "Back",
@@ -77,44 +69,13 @@ private fun NickNameScreen(
 
             MoaTextFieldWithDescription(
                 modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
-                description1 = "닉네임",
-                state = nickNameTextFieldState,
-                description2 = "로 가입할래요",
-                placeholder = "닉네임을 입력해주세요",
-                inputTransformation = InputTransformation.maxLength(10),
+                description1 = "근무지",
+                state = workPlaceTextFieldState,
+                description2 = "에서 일해요",
+                placeholder = "근무지를 입력해주세요",
             )
 
-            Spacer(Modifier.height(32.dp))
-
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = MoaTheme.colors.containerPrimary,
-                        shape = RoundedCornerShape(MoaTheme.radius.radius8),
-                    )
-                    .padding(
-                        vertical = MoaTheme.spacing.spacing8,
-                        horizontal = MoaTheme.spacing.spacing12,
-                    )
-                    .clickable { onIntent(NickNameIntent.ClickRandom) },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.icon_refresh),
-                    contentDescription = "Refresh",
-                    tint = MoaTheme.colors.textHighEmphasis,
-                )
-
-                Spacer(Modifier.width(4.dp))
-
-                Text(
-                    text = "랜덤변경",
-                    style = MoaTheme.typography.b2_500,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-            }
-
-            Spacer(Modifier.weight(227f))
+            Spacer(Modifier.weight(259f))
 
             MoaPrimaryButton(
                 modifier = Modifier
@@ -125,10 +86,10 @@ private fun NickNameScreen(
                         bottom = MoaTheme.spacing.spacing20,
                     )
                     .height(64.dp),
-                enabled = nickNameTextFieldState.text.isNotBlank(),
+                enabled = workPlaceTextFieldState.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
-                    onIntent(NickNameIntent.ClickNext)
+                    onIntent(WorkPlaceIntent.ClickNext)
                 },
             ) {
                 Text(
@@ -140,18 +101,17 @@ private fun NickNameScreen(
     }
 }
 
-sealed interface NickNameIntent {
-    data object ClickBack : NickNameIntent
-    data object ClickRandom : NickNameIntent
-    data object ClickNext : NickNameIntent
+sealed interface WorkPlaceIntent {
+    data object ClickBack : WorkPlaceIntent
+    data object ClickNext : WorkPlaceIntent
 }
 
 @Preview
 @Composable
-private fun NickNameScreenPreview() {
+private fun WorkPlaceScreenPreview() {
     MoaTheme {
-        NickNameScreen(
-            nickNameTextFieldState = rememberTextFieldState(),
+        WorkPlaceScreen(
+            workPlaceTextFieldState = TextFieldState(),
             onIntent = {},
         )
     }
