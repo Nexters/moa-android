@@ -19,6 +19,7 @@ import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
 import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
 import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
+import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
 import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
@@ -78,6 +79,10 @@ private fun MainNavHost(
 
             entry<Screen.Salary> {
                 SalaryScreen()
+            }
+
+            entry<Screen.WidgetGuide> {
+                WidgetGuideScreen()
             }
 
             entry<Screen.Home> {
