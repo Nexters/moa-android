@@ -114,7 +114,7 @@ private fun NickNameScreen(
                 )
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(2f))
 
             MoaPrimaryButton(
                 modifier = Modifier

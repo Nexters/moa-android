@@ -73,7 +73,7 @@ private fun WorkPlaceScreen(
                 placeholder = "근무지를 입력해주세요",
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(2f))
 
             MoaPrimaryButton(
                 modifier = Modifier
