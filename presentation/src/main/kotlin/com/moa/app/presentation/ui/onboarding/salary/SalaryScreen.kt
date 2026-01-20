@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.presentation.R
-import com.moa.app.presentation.designsystem.component.CurrencyOutputTransformation
+import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.component.MoaFilledTextField
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
-import com.moa.app.presentation.designsystem.component.SalaryInputTransformation
+import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable

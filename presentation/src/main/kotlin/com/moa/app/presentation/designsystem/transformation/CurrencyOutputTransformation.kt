@@ -1,4 +1,4 @@
-package com.moa.app.presentation.designsystem.component
+package com.moa.app.presentation.designsystem.transformation
 
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
