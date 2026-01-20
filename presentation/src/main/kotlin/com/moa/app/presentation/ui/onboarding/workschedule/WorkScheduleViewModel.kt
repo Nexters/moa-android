@@ -23,12 +23,16 @@ data class WorkScheduleUiState(
     val selectedWorkScheduleDays: ImmutableSet<WorkScheduleDay> = persistentSetOf(),
     val times: ImmutableList<Time> = persistentListOf(
         Time.Work(
-            startTime = "09:00",
-            endTime = "18:00",
+            startHour = 9,
+            startMinute = 0,
+            endHour = 18,
+            endMinute = 0,
         ),
         Time.Lunch(
-            startTime = "12:00",
-            endTime = "13:00",
+            startHour = 12,
+            startMinute = 0,
+            endHour = 13,
+            endMinute = 0,
         )
     ),
     val showTimeBottomSheet: Time? = null,
@@ -46,20 +50,26 @@ enum class WorkScheduleDay(val title: String) {
 
 sealed class Time(
     open val title: String,
-    open val startTime: String,
-    open val endTime: String,
+    open val startHour: Int,
+    open val startMinute: Int,
+    open val endHour: Int,
+    open val endMinute: Int,
 ) {
     data class Work(
         override val title: String = "근무 시간",
-        override val startTime: String,
-        override val endTime: String,
-    ) : Time(title, startTime, endTime)
+        override val startHour: Int,
+        override val startMinute: Int,
+        override val endHour: Int,
+        override val endMinute: Int,
+    ) : Time(title, startHour, startMinute, endHour, endMinute)
 
     data class Lunch(
         override val title: String = "점심 시간",
-        override val startTime: String,
-        override val endTime: String,
-    ) : Time(title, startTime, endTime)
+        override val startHour: Int,
+        override val startMinute: Int,
+        override val endHour: Int,
+        override val endMinute: Int,
+    ) : Time(title, startHour, startMinute, endHour, endMinute)
 }
 
 

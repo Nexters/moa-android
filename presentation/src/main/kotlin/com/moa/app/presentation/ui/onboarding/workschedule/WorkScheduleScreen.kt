@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
@@ -193,8 +194,8 @@ private fun WorkScheduleTimes(
         Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
         WorkScheduleTime(
-            startTime = time.startTime,
-            endTime = time.endTime,
+            startTime = makeTimeString(time.startHour, time.startMinute),
+            endTime = makeTimeString(time.endHour, time.endMinute),
             onClick = { onIntent(WorkScheduleIntent.ShowTimeBottomSheet(time)) }
         )
     }
