@@ -73,7 +73,7 @@ private fun NickNameScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.weight(156f))
+            Spacer(Modifier.weight(1f))
 
             MoaTextFieldWithDescription(
                 modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
@@ -114,7 +114,7 @@ private fun NickNameScreen(
                 )
             }
 
-            Spacer(Modifier.weight(227f))
+            Spacer(Modifier.weight(1f))
 
             MoaPrimaryButton(
                 modifier = Modifier

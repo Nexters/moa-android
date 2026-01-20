@@ -63,7 +63,7 @@ private fun WorkPlaceScreen(
                 .padding(innerPadding)
                 .fillMaxSize(),
         ) {
-            Spacer(Modifier.weight(156f))
+            Spacer(Modifier.weight(1f))
 
             MoaTextFieldWithDescription(
                 modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
@@ -73,7 +73,7 @@ private fun WorkPlaceScreen(
                 placeholder = "근무지를 입력해주세요",
             )
 
-            Spacer(Modifier.weight(259f))
+            Spacer(Modifier.weight(1f))
 
             MoaPrimaryButton(
                 modifier = Modifier
