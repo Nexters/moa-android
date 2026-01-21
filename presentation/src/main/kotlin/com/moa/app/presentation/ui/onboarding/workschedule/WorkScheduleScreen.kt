@@ -30,13 +30,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.core.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.model.Time
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf
-
 
 @Composable
 fun WorkScheduleScreen(viewModel: WorkScheduleViewModel = hiltViewModel()) {
@@ -45,6 +45,32 @@ fun WorkScheduleScreen(viewModel: WorkScheduleViewModel = hiltViewModel()) {
     WorkScheduleScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
+    )
+
+    MoaTimeBottomSheet(
+        visible = uiState.showTimeBottomSheet != null,
+        time = uiState.showTimeBottomSheet ?: return,
+        onClickButton = { startHour, startMinute, endHour, endMinute ->
+            val updateTime = when (uiState.showTimeBottomSheet) {
+                is Time.Work -> Time.Work(
+                    startHour = startHour,
+                    startMinute = startMinute,
+                    endHour = endHour,
+                    endMinute = endMinute,
+                )
+
+                is Time.Lunch -> Time.Lunch(
+                    startHour = startHour,
+                    startMinute = startMinute,
+                    endHour = endHour,
+                    endMinute = endMinute,
+                )
+
+                else -> return@MoaTimeBottomSheet
+            }
+            viewModel.onIntent(WorkScheduleIntent.SetTime(updateTime))
+        },
+        onDismissRequest = { viewModel.onIntent(WorkScheduleIntent.ShowTimeBottomSheet(null)) }
     )
 }
 

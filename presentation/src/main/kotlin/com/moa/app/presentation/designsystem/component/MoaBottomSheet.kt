@@ -23,6 +23,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -146,7 +147,11 @@ private fun MoaTimeBottomSheetContent(
                 .fillMaxWidth()
                 .padding(vertical = MoaTheme.spacing.spacing20)
                 .height(64.dp),
-            enabled = (startHour <= endHour) && (startMinute < endMinute),
+            enabled = if (selectedStartTime) {
+                true
+            } else {
+                (endHour > startHour) || (endHour == startHour && endMinute > startMinute)
+            },
             onClick = {
                 if (selectedStartTime) {
                     selectedStartTime = false
@@ -157,7 +162,11 @@ private fun MoaTimeBottomSheetContent(
             },
         ) {
             Text(
-                text = "다음",
+                text = if (selectedStartTime) {
+                    time.startButtonText
+                } else {
+                    time.endButtonText
+                },
                 style = MoaTheme.typography.t3_700,
             )
         }
@@ -284,27 +293,29 @@ private fun MoaTimeBottomSheetTimeContent(
         )
 
         Row {
-            MoaWheelPicker(
-                modifier = Modifier.width(120.dp),
-                items = (0..23).toList().toImmutableList(),
-                initialSelectedIndex = if (selectedStartTime) {
-                    startHour
-                } else {
-                    endHour
-                },
-                onItemSelected = onSelectedHour,
-            )
+            key(selectedStartTime) {
+                MoaWheelPicker(
+                    modifier = Modifier.width(120.dp),
+                    items = (0..23).toList().toImmutableList(),
+                    initialSelectedIndex = if (selectedStartTime) {
+                        startHour
+                    } else {
+                        endHour
+                    },
+                    onItemSelected = onSelectedHour,
+                )
 
-            MoaWheelPicker(
-                modifier = Modifier.width(120.dp),
-                items = (0..59).toList().toImmutableList(),
-                initialSelectedIndex = if (selectedStartTime) {
-                    startMinute
-                } else {
-                    endMinute
-                },
-                onItemSelected = onSelectedMinute,
-            )
+                MoaWheelPicker(
+                    modifier = Modifier.width(120.dp),
+                    items = (0..59).toList().toImmutableList(),
+                    initialSelectedIndex = if (selectedStartTime) {
+                        startMinute
+                    } else {
+                        endMinute
+                    },
+                    onItemSelected = onSelectedMinute,
+                )
+            }
         }
     }
 }

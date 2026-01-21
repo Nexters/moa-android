@@ -17,12 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun MoaWheelPicker(
@@ -39,8 +41,8 @@ fun MoaWheelPicker(
     val infiniteMultiplier = 10000
     val infiniteItemCount = itemCount * infiniteMultiplier
 
+    val halfVisibleCount = visibleItemCount / 2
     val middlePosition = (infiniteMultiplier / 2) * itemCount + initialSelectedIndex
-    val halfVisibleCount = 2
 
     val listState = rememberLazyListState(
         initialFirstVisibleItemIndex = middlePosition - halfVisibleCount
@@ -48,16 +50,29 @@ fun MoaWheelPicker(
 
     val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
-    val selectedIndex by remember {
+    val density = LocalDensity.current
+    val totalItemHeightPx = with(density) { (itemHeight + itemSpacing).toPx() }
+
+    val centerInfiniteIndex by remember {
         derivedStateOf {
             val firstVisibleIndex = listState.firstVisibleItemIndex
-            val centerIndex = firstVisibleIndex + halfVisibleCount
-            centerIndex % itemCount
+            val firstVisibleOffset = listState.firstVisibleItemScrollOffset
+
+            if (firstVisibleOffset > totalItemHeightPx / 2) {
+                firstVisibleIndex + halfVisibleCount + 1
+            } else {
+                firstVisibleIndex + halfVisibleCount
+            }
         }
+    }
+
+    val selectedIndex by remember {
+        derivedStateOf { centerInfiniteIndex % itemCount }
     }
 
     LaunchedEffect(Unit) {
         snapshotFlow { selectedIndex }
+            .distinctUntilChanged()
             .collect { index -> onItemSelected(items[index]) }
     }
 
@@ -73,11 +88,7 @@ fun MoaWheelPicker(
             val item = items[actualIndex]
 
             val isSelected by remember {
-                derivedStateOf {
-                    val firstVisible = listState.firstVisibleItemIndex
-                    val centerPosition = firstVisible + halfVisibleCount
-                    infiniteIndex == centerPosition
-                }
+                derivedStateOf { infiniteIndex == centerInfiniteIndex }
             }
 
             Box(
