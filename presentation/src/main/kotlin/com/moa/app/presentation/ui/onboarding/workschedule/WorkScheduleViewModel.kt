@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -47,31 +48,6 @@ enum class WorkScheduleDay(val title: String) {
     SATURDAY("토"),
     SUNDAY("일"),
 }
-
-sealed class Time(
-    open val title: String,
-    open val startHour: Int,
-    open val startMinute: Int,
-    open val endHour: Int,
-    open val endMinute: Int,
-) {
-    data class Work(
-        override val title: String = "근무 시간",
-        override val startHour: Int,
-        override val startMinute: Int,
-        override val endHour: Int,
-        override val endMinute: Int,
-    ) : Time(title, startHour, startMinute, endHour, endMinute)
-
-    data class Lunch(
-        override val title: String = "점심 시간",
-        override val startHour: Int,
-        override val startMinute: Int,
-        override val endHour: Int,
-        override val endMinute: Int,
-    ) : Time(title, startHour, startMinute, endHour, endMinute)
-}
-
 
 @HiltViewModel
 class WorkScheduleViewModel @Inject constructor(

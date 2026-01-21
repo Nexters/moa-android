@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,9 +35,11 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moa.app.core.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.ui.onboarding.workschedule.Time
+import com.moa.app.presentation.model.Time
+import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +79,7 @@ fun MoaBottomSheet(
 fun MoaTimeBottomSheet(
     time: Time,
     visible: Boolean,
+    onClickButton: (startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     MoaBottomSheet(
@@ -84,6 +89,7 @@ fun MoaTimeBottomSheet(
     ) {
         MoaTimeBottomSheetContent(
             time = time,
+            onClickButton = onClickButton,
             onDismissRequest = onDismissRequest,
         )
     }
@@ -92,9 +98,14 @@ fun MoaTimeBottomSheet(
 @Composable
 private fun MoaTimeBottomSheetContent(
     time: Time,
+    onClickButton: (startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var selectedStartTime by remember { mutableStateOf(true) }
+    var startHour by remember { mutableIntStateOf(time.startHour) }
+    var startMinute by remember { mutableIntStateOf(time.startMinute) }
+    var endHour by remember { mutableIntStateOf(time.endHour) }
+    var endMinute by remember { mutableIntStateOf(time.endMinute) }
 
     Column(
         modifier = Modifier
@@ -105,17 +116,29 @@ private fun MoaTimeBottomSheetContent(
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-        MoaTimeBottomSheetTimeTitleContent(
+        MoaTimeBottomSheetTimeContent(
             time = time,
             selectedStartTime = selectedStartTime,
+            startHour = startHour,
+            startMinute = startMinute,
+            endHour = endHour,
+            endMinute = endMinute,
+            onSelectedHour = { selectedHour ->
+                if (selectedStartTime) {
+                    startHour = selectedHour
+                } else {
+                    endHour = selectedHour
+                }
+            },
+            onSelectedMinute = { selectedMinute ->
+                if (selectedStartTime) {
+                    startMinute = selectedMinute
+                } else {
+                    endMinute = selectedMinute
+                }
+            },
             onClickStartTime = { selectedStartTime = true },
             onClickEndTime = { selectedStartTime = false },
-        )
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
-
-        MoaTimeBottomSheetTimeContent(
-
         )
 
         MoaPrimaryButton(
@@ -123,10 +146,12 @@ private fun MoaTimeBottomSheetContent(
                 .fillMaxWidth()
                 .padding(vertical = MoaTheme.spacing.spacing20)
                 .height(64.dp),
+            enabled = (startHour <= endHour) && (startMinute < endMinute),
             onClick = {
                 if (selectedStartTime) {
                     selectedStartTime = false
                 } else {
+                    onClickButton(startHour, startMinute, endHour, endMinute)
                     onDismissRequest()
                 }
             },
@@ -151,28 +176,31 @@ private fun MoaTimeBottomSheetTitleContent(
         style = MoaTheme.typography.t1_700,
         color = MoaTheme.colors.textHighEmphasis,
     )
+
+    if (time.description.isNotEmpty()) {
+        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+
+        Text(
+            text = time.description,
+            style = MoaTheme.typography.b1_400,
+            color = MoaTheme.colors.textMediumEmphasis,
+        )
+    }
 }
 
 @Composable
-private fun MoaTimeBottomSheetTimeTitleContent(
+private fun MoaTimeBottomSheetTimeContent(
     time: Time,
     selectedStartTime: Boolean,
+    startHour: Int,
+    startMinute: Int,
+    endHour: Int,
+    endMinute: Int,
+    onSelectedHour: (Int) -> Unit,
+    onSelectedMinute: (Int) -> Unit,
     onClickStartTime: () -> Unit,
     onClickEndTime: () -> Unit,
 ) {
-    var startHour by remember {
-        mutableStateOf(time.startHour.toString().padStart(2, '0'))
-    }
-    var startMinute by remember {
-        mutableStateOf(time.startMinute.toString().padStart(2, '0'))
-    }
-    var endHour by remember {
-        mutableStateOf(time.endHour.toString().padStart(2, '0'))
-    }
-    var endMinute by remember {
-        mutableStateOf(time.endMinute.toString().padStart(2, '0'))
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,16 +213,17 @@ private fun MoaTimeBottomSheetTimeTitleContent(
                 .clickable { onClickStartTime() },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (time is Time.Work) {
-                Text(
-                    text = "출근",
-                    style = MoaTheme.typography.b2_500,
-                    color = MoaTheme.colors.textLowEmphasis,
-                )
-            }
+            Text(
+                text = when (time) {
+                    is Time.Work -> "출근"
+                    is Time.Lunch -> "시작"
+                },
+                style = MoaTheme.typography.b2_500,
+                color = MoaTheme.colors.textLowEmphasis,
+            )
 
             Text(
-                text = "$startHour:$startMinute",
+                text = makeTimeString(startHour, startMinute),
                 style = if (selectedStartTime) MoaTheme.typography.t1_700 else MoaTheme.typography.t1_500,
                 color = if (selectedStartTime) MoaTheme.colors.textGreen else MoaTheme.colors.textLowEmphasis,
             )
@@ -213,27 +242,25 @@ private fun MoaTimeBottomSheetTimeTitleContent(
                 .clickable { onClickEndTime() },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (time is Time.Work) {
-                Text(
-                    text = "퇴근",
-                    style = MoaTheme.typography.b2_500,
-                    color = MoaTheme.colors.textLowEmphasis,
-                )
-            }
+            Text(
+                text = when (time) {
+                    is Time.Work -> "퇴근"
+                    is Time.Lunch -> "종료"
+                },
+                style = MoaTheme.typography.b2_500,
+                color = MoaTheme.colors.textLowEmphasis,
+            )
 
             Text(
-                text = "$endHour:$endMinute",
+                text = makeTimeString(endHour, endMinute),
                 style = if (!selectedStartTime) MoaTheme.typography.t1_700 else MoaTheme.typography.t1_500,
                 color = if (!selectedStartTime) MoaTheme.colors.textGreen else MoaTheme.colors.textLowEmphasis,
             )
         }
     }
-}
 
-@Composable
-private fun MoaTimeBottomSheetTimeContent(
+    Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -244,8 +271,41 @@ private fun MoaTimeBottomSheetTimeContent(
                 shape = RoundedCornerShape(MoaTheme.radius.radius16),
             )
             .padding(MoaTheme.spacing.spacing8),
+        contentAlignment = Alignment.Center,
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(
+                    color = MoaTheme.colors.containerPrimary,
+                    shape = RoundedCornerShape(MoaTheme.radius.radius12)
+                )
+        )
 
+        Row {
+            MoaWheelPicker(
+                modifier = Modifier.width(120.dp),
+                items = (0..23).toList().toImmutableList(),
+                initialSelectedIndex = if (selectedStartTime) {
+                    startHour
+                } else {
+                    endHour
+                },
+                onItemSelected = onSelectedHour,
+            )
+
+            MoaWheelPicker(
+                modifier = Modifier.width(120.dp),
+                items = (0..59).toList().toImmutableList(),
+                initialSelectedIndex = if (selectedStartTime) {
+                    startMinute
+                } else {
+                    endMinute
+                },
+                onItemSelected = onSelectedMinute,
+            )
+        }
     }
 }
 
@@ -266,6 +326,7 @@ private fun MoaBottomSheetPreview() {
                         endHour = 18,
                         endMinute = 0,
                     ),
+                    onClickButton = { _, _, _, _ -> },
                     onDismissRequest = { }
                 )
             }
