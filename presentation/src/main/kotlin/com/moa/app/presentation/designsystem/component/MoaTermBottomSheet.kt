@@ -30,15 +30,12 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun MoaTermBottomSheet(
     terms: ImmutableList<Term>,
-    visible: Boolean,
     onClickTerm: (Term) -> Unit,
     onClickArrow: (String) -> Unit,
-    onDismissRequest: () -> Unit,
     onClickButton: () -> Unit,
 ) {
     MoaBottomSheet(
-        visible = visible,
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = { },
         properties = ModalBottomSheetProperties(
             shouldDismissOnBackPress = false,
             shouldDismissOnClickOutside = false,
@@ -171,11 +168,9 @@ private fun TermBottomSheetPreview() {
                     checked = false,
                 ),
             ),
-            visible = true,
             onClickTerm = {},
             onClickArrow = {},
             onClickButton = {},
-            onDismissRequest = {},
         )
     }
 }

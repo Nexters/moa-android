@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -39,14 +38,11 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun MoaTimeBottomSheet(
     time: Time,
-    visible: Boolean,
     onClickButton: (startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     MoaBottomSheet(
-        visible = visible,
         onDismissRequest = onDismissRequest,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ) {
         MoaTimeBottomSheetContent(
             time = time,
@@ -292,7 +288,6 @@ private fun MoaTimeBottomSheetPreview() {
                     endHour = 18,
                     endMinute = 0,
                 ),
-                visible = true,
                 onClickButton = { _, _, _, _ -> },
                 onDismissRequest = {}
             )

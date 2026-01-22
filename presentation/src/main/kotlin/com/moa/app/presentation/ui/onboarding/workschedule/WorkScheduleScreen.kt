@@ -30,9 +30,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.core.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.app.presentation.designsystem.component.MoaTermBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -47,31 +49,44 @@ fun WorkScheduleScreen(viewModel: WorkScheduleViewModel = hiltViewModel()) {
         onIntent = viewModel::onIntent,
     )
 
-    MoaTimeBottomSheet(
-        visible = uiState.showTimeBottomSheet != null,
-        time = uiState.showTimeBottomSheet ?: return,
-        onClickButton = { startHour, startMinute, endHour, endMinute ->
-            val updateTime = when (uiState.showTimeBottomSheet) {
-                is Time.Work -> Time.Work(
-                    startHour = startHour,
-                    startMinute = startMinute,
-                    endHour = endHour,
-                    endMinute = endMinute,
-                )
+    uiState.showTimeBottomSheet?.let {
+        MoaTimeBottomSheet(
+            time = it,
+            onClickButton = { startHour, startMinute, endHour, endMinute ->
+                val updateTime = when (it) {
+                    is Time.Work -> Time.Work(
+                        startHour = startHour,
+                        startMinute = startMinute,
+                        endHour = endHour,
+                        endMinute = endMinute,
+                    )
 
-                is Time.Lunch -> Time.Lunch(
-                    startHour = startHour,
-                    startMinute = startMinute,
-                    endHour = endHour,
-                    endMinute = endMinute,
-                )
+                    is Time.Lunch -> Time.Lunch(
+                        startHour = startHour,
+                        startMinute = startMinute,
+                        endHour = endHour,
+                        endMinute = endMinute,
+                    )
 
-                else -> return@MoaTimeBottomSheet
-            }
-            viewModel.onIntent(WorkScheduleIntent.SetTime(updateTime))
-        },
-        onDismissRequest = { viewModel.onIntent(WorkScheduleIntent.ShowTimeBottomSheet(null)) }
-    )
+                    else -> return@MoaTimeBottomSheet
+                }
+                viewModel.onIntent(WorkScheduleIntent.SetTime(updateTime))
+            },
+            onDismissRequest = { viewModel.onIntent(WorkScheduleIntent.ShowTimeBottomSheet(null)) }
+        )
+    }
+
+    if (uiState.showTermBottomSheet) {
+        MoaTermBottomSheet(
+            terms = uiState.terms,
+            onClickTerm = { viewModel.onIntent(WorkScheduleIntent.ClickTerm(it)) },
+            onClickArrow = { viewModel.onIntent(WorkScheduleIntent.ClickArrow(it)) },
+            onClickButton = {
+                viewModel.onIntent(WorkScheduleIntent.ShowTermBottomSheet(false))
+                viewModel.onIntent(WorkScheduleIntent.ClickNext)
+            },
+        )
+    }
 }
 
 @Composable
@@ -137,7 +152,7 @@ private fun WorkScheduleScreen(
                     .padding(bottom = MoaTheme.spacing.spacing20)
                     .height(64.dp),
                 enabled = uiState.selectedWorkScheduleDays.isNotEmpty(),
-                onClick = { onIntent(WorkScheduleIntent.ClickNext) },
+                onClick = { onIntent(WorkScheduleIntent.ShowTermBottomSheet(true)) },
             ) {
                 Text(
                     text = "다음",
@@ -285,6 +300,16 @@ sealed interface WorkScheduleIntent {
 
     @JvmInline
     value class SetTime(val time: Time) : WorkScheduleIntent
+
+    @JvmInline
+    value class ShowTermBottomSheet(val visible: Boolean) : WorkScheduleIntent
+
+    @JvmInline
+    value class ClickTerm(val term: Term) : WorkScheduleIntent
+
+    @JvmInline
+    value class ClickArrow(val url: String) : WorkScheduleIntent
+
     data object ClickNext : WorkScheduleIntent
 }
 

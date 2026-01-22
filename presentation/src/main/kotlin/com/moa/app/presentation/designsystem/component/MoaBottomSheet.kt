@@ -12,7 +12,6 @@ import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -23,7 +22,6 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoaBottomSheet(
-    visible: Boolean,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     shape: Shape = RoundedCornerShape(
         topStart = 24.dp,
@@ -34,14 +32,6 @@ fun MoaBottomSheet(
     properties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    LaunchedEffect(visible) {
-        if (visible) {
-            sheetState.show()
-        } else {
-            sheetState.hide()
-        }
-    }
-
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         shape = shape,
@@ -61,7 +51,6 @@ private fun MoaBottomSheetPreview() {
     MoaTheme {
         Column(Modifier.fillMaxSize()) {
             MoaBottomSheet(
-                visible = true,
                 onDismissRequest = {}
             ) {
                 Box(Modifier.size(300.dp))

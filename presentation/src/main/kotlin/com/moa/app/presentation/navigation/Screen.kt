@@ -34,5 +34,10 @@ sealed interface Screen : NavKey {
     @Serializable
     data object Setting : Screen
 
+    // TODO 추후 Webview
+    @Serializable
+    @JvmInline
+    value class Webview(val url: String) : Screen
+
     data object Back : Screen
 }

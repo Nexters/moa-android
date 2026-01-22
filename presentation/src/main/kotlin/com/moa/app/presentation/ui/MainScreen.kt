@@ -27,7 +27,7 @@ import com.moa.app.presentation.ui.splash.SplashScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(Screen.Splash)
+    val backstack = rememberNavBackStack(Screen.WorkSchedule)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {

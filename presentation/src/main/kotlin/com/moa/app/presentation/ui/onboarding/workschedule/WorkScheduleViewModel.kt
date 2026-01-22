@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +37,35 @@ data class WorkScheduleUiState(
             endMinute = 0,
         )
     ),
+    val terms: ImmutableList<Term> = persistentListOf(
+        Term.All(
+            title = "전체 동의하기",
+            url = "",
+            checked = false,
+        ),
+        Term.Required(
+            title = "(필수) 서비스 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Required(
+            title = "(필수) 테스트 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Optional(
+            title = "(선택) 서비스 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Optional(
+            title = "(선택) 테스트 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+    ),
     val showTimeBottomSheet: Time? = null,
+    val showTermBottomSheet: Boolean = false,
 )
 
 enum class WorkScheduleDay(val title: String) {
@@ -62,6 +91,9 @@ class WorkScheduleViewModel @Inject constructor(
             is WorkScheduleIntent.ClickWorkScheduleDay -> clickWorkScheduleDay(intent.day)
             is WorkScheduleIntent.ShowTimeBottomSheet -> showTimeBottomSheet(intent.time)
             is WorkScheduleIntent.SetTime -> setTime(intent.time)
+            is WorkScheduleIntent.ShowTermBottomSheet -> showTermBottomSheet(intent.visible)
+            is WorkScheduleIntent.ClickTerm -> clickTerm(intent.term)
+            is WorkScheduleIntent.ClickArrow -> clickArrow(intent.url)
             WorkScheduleIntent.ClickNext -> next()
         }
     }
@@ -98,6 +130,58 @@ class WorkScheduleViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 times = currentTimes.toImmutableList(),
             )
+        }
+    }
+
+    private fun showTermBottomSheet(visible: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            showTermBottomSheet = visible,
+        )
+    }
+
+    private fun clickTerm(term: Term) {
+        val currentTerms = _uiState.value.terms.toMutableList()
+
+        when (term) {
+            is Term.All -> {
+                val newChecked = !term.checked
+                currentTerms.replaceAll {
+                    when (it) {
+                        is Term.All -> it.copy(checked = newChecked)
+                        is Term.Required -> it.copy(checked = newChecked)
+                        is Term.Optional -> it.copy(checked = newChecked)
+                    }
+                }
+            }
+
+            is Term.Required, is Term.Optional -> {
+                val index = currentTerms.indexOfFirst { it == term }
+                if (index != -1) {
+                    val newTerm = when (term) {
+                        is Term.Required -> term.copy(checked = !term.checked)
+                        is Term.Optional -> term.copy(checked = !term.checked)
+                        else -> term
+                    }
+                    currentTerms[index] = newTerm
+
+                    val allChecked = currentTerms.drop(1).all { it.checked }
+                    val allIndex = currentTerms.indexOfFirst { it is Term.All }
+                    if (allIndex != -1) {
+                        currentTerms[allIndex] =
+                            (currentTerms[allIndex] as Term.All).copy(checked = allChecked)
+                    }
+                }
+            }
+        }
+
+        _uiState.value = _uiState.value.copy(
+            terms = currentTerms.toImmutableList(),
+        )
+    }
+
+    private fun clickArrow(url: String) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Webview(url)))
         }
     }
 
