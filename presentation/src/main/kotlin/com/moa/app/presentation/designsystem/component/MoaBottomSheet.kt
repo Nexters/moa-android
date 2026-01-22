@@ -24,7 +24,7 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 @Composable
 fun MoaBottomSheet(
     visible: Boolean,
-    sheetState: SheetState = rememberModalBottomSheetState(),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     shape: Shape = RoundedCornerShape(
         topStart = 24.dp,
         topEnd = 24.dp,
