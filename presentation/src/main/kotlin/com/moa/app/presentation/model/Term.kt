@@ -1,0 +1,37 @@
+package com.moa.app.presentation.model
+
+sealed class Term(
+    open val title: String,
+    open val url: String,
+    open val checked: Boolean,
+) {
+    data class All(
+        override val title: String,
+        override val url: String = "",
+        override val checked: Boolean,
+    ) : Term(
+        title = title,
+        url = url,
+        checked = checked,
+    )
+
+    data class Required(
+        override val title: String,
+        override val url: String,
+        override val checked: Boolean,
+    ) : Term(
+        title = title,
+        url = url,
+        checked = checked,
+    )
+
+    data class Optional(
+        override val title: String,
+        override val url: String,
+        override val checked: Boolean,
+    ) : Term(
+        title = title,
+        url = url,
+        checked = checked,
+    )
+}
