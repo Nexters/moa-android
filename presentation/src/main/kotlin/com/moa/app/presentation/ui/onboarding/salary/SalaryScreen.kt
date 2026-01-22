@@ -82,7 +82,7 @@ private fun SalaryScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             Text(
-                text = "얼마씩 받나요?",
+                text = "얼마씩 받고 있나요?",
                 color = MoaTheme.colors.textHighEmphasis,
                 style = MoaTheme.typography.t1_700,
             )
