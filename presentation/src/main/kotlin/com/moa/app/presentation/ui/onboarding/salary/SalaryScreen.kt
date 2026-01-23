@@ -135,7 +135,7 @@ private fun SalaryScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing20)
+                    .padding(bottom = MoaTheme.spacing.spacing24)
                     .height(64.dp),
                 enabled = uiState.salaryTextField.text.isNotBlank(),
                 onClick = {

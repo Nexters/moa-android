@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding.widgetguide
+package com.moa.app.presentation.ui.onboarding.notification
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -25,21 +25,21 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
-fun WidgetGuideScreen(viewModel: WidgetGuideViewModel = hiltViewModel()) {
-    WidgetGuideScreen(
-        onIntent = viewModel::onIntent
+fun NotificationScreen(viewModel: NotificationViewModel = hiltViewModel()) {
+    NotificationScreen(
+        onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
-private fun WidgetGuideScreen(
-    onIntent: (WidgetGuideIntent) -> Unit,
+private fun NotificationScreen(
+    onIntent: (NotificationIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(WidgetGuideIntent.ClickBack) }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_back),
                             contentDescription = "Back",
@@ -60,18 +60,9 @@ private fun WidgetGuideScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             Text(
-                text = "홈 화면에 위젯을 추가할까요?",
+                text = "근무 시간에 맞춰\n알림을 보내드릴게요!",
                 color = MoaTheme.colors.textHighEmphasis,
                 style = MoaTheme.typography.t1_700,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-            Text(
-                text = "앱을 열지 않아도 홈 화면에서 오늘 번 돈을\n" +
-                        "실시간으로 확인할 수 있어요.",
-                color = MoaTheme.colors.textMediumEmphasis,
-                style = MoaTheme.typography.b2_400,
             )
 
             Spacer(Modifier.weight(1f))
@@ -81,21 +72,21 @@ private fun WidgetGuideScreen(
                     .fillMaxWidth()
                     .height(64.dp),
                 onClick = {
-                    // TODO 위젯 추가 로직
+                    // TODO 알림 권한 요청
                 },
             ) {
                 Text(
-                    text = "위젯 추가하기",
+                    text = "알림 받을게요",
                     style = MoaTheme.typography.t3_700,
                 )
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onIntent(WidgetGuideIntent.ClickNext) }
+                    .clickable { onIntent(NotificationIntent.ClickNext) }
                     .padding(bottom = MoaTheme.spacing.spacing24),
                 text = "다음에 할게요",
                 style = MoaTheme.typography.t3_700.copy(textDecoration = TextDecoration.Underline),
@@ -106,17 +97,15 @@ private fun WidgetGuideScreen(
     }
 }
 
-sealed interface WidgetGuideIntent {
-    data object ClickBack : WidgetGuideIntent
-    data object ClickNext : WidgetGuideIntent
+sealed interface NotificationIntent {
+    data object ClickBack : NotificationIntent
+    data object ClickNext : NotificationIntent
 }
 
 @Preview
 @Composable
-private fun WidgetGuideScreenPreview() {
+private fun NotificationScreenPreview() {
     MoaTheme {
-        WidgetGuideScreen(
-            onIntent = {},
-        )
+        NotificationScreen(onIntent = {})
     }
 }

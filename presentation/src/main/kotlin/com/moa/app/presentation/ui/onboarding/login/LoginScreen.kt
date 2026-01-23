@@ -84,7 +84,7 @@ private fun LoginScreen(onIntent: (LoginIntent) -> Unit) {
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
         }
     }
 }

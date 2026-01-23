@@ -18,6 +18,7 @@ import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
 import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
+import com.moa.app.presentation.ui.onboarding.notification.NotificationScreen
 import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
 import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
 import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
@@ -27,7 +28,7 @@ import com.moa.app.presentation.ui.splash.SplashScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(Screen.WorkSchedule)
+    val backstack = rememberNavBackStack(Screen.Splash)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
@@ -88,6 +89,10 @@ private fun MainNavHost(
 
             entry<Screen.WidgetGuide> {
                 WidgetGuideScreen()
+            }
+
+            entry<Screen.Notification>{
+                NotificationScreen()
             }
 
             entry<Screen.Home> {

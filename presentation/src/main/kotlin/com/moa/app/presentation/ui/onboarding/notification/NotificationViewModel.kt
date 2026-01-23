@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding.widgetguide
+package com.moa.app.presentation.ui.onboarding.notification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WidgetGuideViewModel @Inject constructor(
-    private val moaSideEffectBus: MoaSideEffectBus,
+class NotificationViewModel @Inject constructor(
+    private val moaSideEffectBus: MoaSideEffectBus
 ) : ViewModel() {
-    fun onIntent(intent: WidgetGuideIntent) {
+    fun onIntent(intent: NotificationIntent) {
         when (intent) {
-            WidgetGuideIntent.ClickBack -> back()
-            WidgetGuideIntent.ClickNext -> next()
+            is NotificationIntent.ClickBack -> back()
+            is NotificationIntent.ClickNext -> next()
         }
     }
 
@@ -28,7 +28,7 @@ class WidgetGuideViewModel @Inject constructor(
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Notification))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
         }
     }
 }

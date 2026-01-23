@@ -26,6 +26,9 @@ sealed interface Screen : NavKey {
     data object WidgetGuide : Screen
 
     @Serializable
+    data object Notification : Screen
+
+    @Serializable
     data object Home : Screen
 
     @Serializable
