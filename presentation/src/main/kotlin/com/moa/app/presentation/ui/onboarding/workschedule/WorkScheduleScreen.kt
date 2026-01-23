@@ -67,8 +67,6 @@ fun WorkScheduleScreen(viewModel: WorkScheduleViewModel = hiltViewModel()) {
                         endHour = endHour,
                         endMinute = endMinute,
                     )
-
-                    else -> return@MoaTimeBottomSheet
                 }
                 viewModel.onIntent(WorkScheduleIntent.SetTime(updateTime))
             },
