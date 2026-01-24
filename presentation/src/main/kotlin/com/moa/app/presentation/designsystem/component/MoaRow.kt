@@ -1,6 +1,7 @@
 package com.moa.app.presentation.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,12 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun MoaRow(
-    contentPadding : PaddingValues = PaddingValues(16.dp),
-    leadingContent : @Composable () -> Unit,
-    subTrailingContent : @Composable () -> Unit,
-    trailingContent : @Composable () -> Unit,
-){
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    leadingContent: @Composable () -> Unit = {},
+    subTrailingContent: @Composable () -> Unit = {},
+    trailingContent: @Composable () -> Unit = {},
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,6 +34,7 @@ fun MoaRow(
                 color = MoaTheme.colors.containerPrimary,
                 shape = RoundedCornerShape(MoaTheme.radius.radius12),
             )
+            .then(modifier)
             .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -52,14 +55,24 @@ fun MoaRow(
 private fun MoaRowPreview() {
     MoaTheme {
         MoaRow(
+            modifier = Modifier.clickable {},
             leadingContent = {
-                Text(text = "Leading Content")
+                Text(
+                    text = "Leading Content",
+                    color = MoaTheme.colors.textHighEmphasis,
+                )
             },
             subTrailingContent = {
-                Text(text = "Sub Trailing")
+                Text(
+                    text = "Sub Trailing",
+                    color = MoaTheme.colors.textHighEmphasis,
+                )
             },
             trailingContent = {
-                Text(text = "Trailing")
+                Text(
+                    text = "Trailing",
+                    color = MoaTheme.colors.textHighEmphasis,
+                )
             }
         )
     }
