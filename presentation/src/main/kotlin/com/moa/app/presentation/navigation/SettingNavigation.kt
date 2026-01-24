@@ -7,7 +7,10 @@ sealed interface SettingNavigation : RootNavigation {
     data object SettingMenu : SettingNavigation
 
     @Serializable
-    data object MyInfo : SettingNavigation
+    data object WorkInfo : SettingNavigation
+
+    @Serializable
+    data object Notification : SettingNavigation
 
     @Serializable
     data object Terms : SettingNavigation

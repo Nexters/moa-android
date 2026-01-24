@@ -19,7 +19,7 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickBack -> back()
             SettingMenuIntent.ClickNickName -> nickName()
             SettingMenuIntent.ClickWorkInfo -> workInfo()
-            SettingMenuIntent.ClickNotificationSetting -> notificationSetting()
+            SettingMenuIntent.ClickNotification -> notification()
             SettingMenuIntent.ClickTerms -> terms()
             SettingMenuIntent.ClickLogout -> logout()
             SettingMenuIntent.ClickWithdraw -> withdraw()
@@ -37,15 +37,21 @@ class SettingMenuViewModel @Inject constructor(
     }
 
     private fun workInfo() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WorkInfo))
+        }
     }
 
-    private fun notificationSetting() {
-
+    private fun notification() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Notification))
+        }
     }
 
     private fun terms() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Terms))
+        }
     }
 
     private fun logout() {

@@ -43,6 +43,13 @@ private fun SettingMenuScreen(
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    Text(
+                        text = "설정",
+                        style = MoaTheme.typography.t3_500,
+                        color = MoaTheme.colors.textHighEmphasis,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(SettingMenuIntent.ClickBack) }) {
                         Icon(
@@ -148,7 +155,7 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNotificationSetting) },
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNotification) },
         leadingContent = {
             Text(
                 text = "알림 설정",
@@ -263,7 +270,7 @@ sealed interface SettingMenuIntent {
     data object ClickBack : SettingMenuIntent
     data object ClickNickName : SettingMenuIntent
     data object ClickWorkInfo : SettingMenuIntent
-    data object ClickNotificationSetting : SettingMenuIntent
+    data object ClickNotification : SettingMenuIntent
     data object ClickTerms : SettingMenuIntent
     data object ClickLogout : SettingMenuIntent
     data object ClickWithdraw : SettingMenuIntent

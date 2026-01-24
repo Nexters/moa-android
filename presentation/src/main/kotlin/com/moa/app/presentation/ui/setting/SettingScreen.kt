@@ -15,6 +15,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.SettingNavigation
 import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
+import com.moa.app.presentation.ui.setting.notification.NotificationScreen
+import com.moa.app.presentation.ui.setting.terms.TermsScreen
+import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
 
 @Composable
 fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
@@ -63,6 +66,18 @@ private fun SettingNavHost(
         entryProvider = entryProvider {
             entry<SettingNavigation.SettingMenu> {
                 SettingMenuScreen()
+            }
+
+            entry<SettingNavigation.WorkInfo> {
+                WorkInfoScreen()
+            }
+
+            entry<SettingNavigation.Notification> {
+                NotificationScreen()
+            }
+
+            entry<SettingNavigation.Terms> {
+                TermsScreen()
             }
         }
     )
