@@ -22,28 +22,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
-fun SettingMenuScreen() {
+fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
 
     SettingMenuScreen(
-        onIntent = {},
+        onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 private fun SettingMenuScreen(
-   onIntent: (SettingMenuIntent) -> Unit,
+    onIntent: (SettingMenuIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = {onIntent(SettingMenuIntent.ClickBack) }) {
+                    IconButton(onClick = { onIntent(SettingMenuIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_back),
                             contentDescription = "Back",
@@ -91,7 +92,7 @@ private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
     Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
     Row(
-            modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickNickName)},
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNickName) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -119,7 +120,7 @@ private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickWorkInfo)},
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickWorkInfo) },
         leadingContent = {
             Text(
                 text = "월급 · 근무 정보 ",
@@ -147,7 +148,7 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickNotificationSetting)},
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNotificationSetting) },
         leadingContent = {
             Text(
                 text = "알림 설정",
@@ -190,7 +191,7 @@ private fun SettingMenuAppInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
     Spacer(Modifier.height(10.dp))
 
     MoaRow(
-        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickTerms)},
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickTerms) },
         leadingContent = {
             Text(
                 text = "약관 및 정책",
@@ -229,14 +230,14 @@ private fun SettingMenuAppInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
 }
 
 @Composable
-private fun SettingMenuButtonContent(onIntent : (SettingMenuIntent) -> Unit) {
+private fun SettingMenuButtonContent(onIntent: (SettingMenuIntent) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
-            modifier  = Modifier.clickable{ onIntent(SettingMenuIntent.ClickLogout) },
+            modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickLogout) },
             text = "로그아웃",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
@@ -250,7 +251,7 @@ private fun SettingMenuButtonContent(onIntent : (SettingMenuIntent) -> Unit) {
         )
 
         Text(
-            modifier  = Modifier.clickable{ onIntent(SettingMenuIntent.ClickWithdraw) },
+            modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickWithdraw) },
             text = "회원탈퇴",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,

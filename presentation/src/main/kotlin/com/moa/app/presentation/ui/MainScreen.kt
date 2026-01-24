@@ -15,6 +15,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
+import com.moa.app.presentation.navigation.SettingNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
@@ -30,9 +31,16 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        RootNavigation.Back -> backstack.removeAt(backstack.size - 1)
+                        is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
+
+                        is RootNavigation.Onboarding -> {
+                            backstack.clear()
+                            backstack.add(it.destination)
+                        }
 
                         is OnboardingNavigation -> Unit
+
+                        is SettingNavigation -> Unit
 
                         else -> backstack.add(it.destination)
                     }

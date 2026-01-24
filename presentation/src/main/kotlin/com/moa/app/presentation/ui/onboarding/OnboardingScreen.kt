@@ -31,7 +31,7 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        OnboardingNavigation.Back -> backstack.removeAt(backstack.size - 1)
+                        OnboardingNavigation.Back -> backstack.removeAt(backstack.lastIndex)
 
                         is OnboardingNavigation -> backstack.add(it.destination)
 

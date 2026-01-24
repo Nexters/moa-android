@@ -14,8 +14,8 @@ class SettingMenuViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
 
-    fun onIntent(intent : SettingMenuIntent) {
-        when(intent) {
+    fun onIntent(intent: SettingMenuIntent) {
+        when (intent) {
             SettingMenuIntent.ClickBack -> back()
             SettingMenuIntent.ClickNickName -> nickName()
             SettingMenuIntent.ClickWorkInfo -> workInfo()
@@ -32,7 +32,7 @@ class SettingMenuViewModel @Inject constructor(
         }
     }
 
-    private fun nickName () {
+    private fun nickName() {
 
     }
 

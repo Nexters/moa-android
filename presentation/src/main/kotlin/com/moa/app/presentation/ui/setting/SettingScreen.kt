@@ -14,6 +14,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
 
 @Composable
 fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
@@ -24,7 +25,13 @@ fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        SettingNavigation.Back -> backStack.removeAt(backStack.size - 1)
+                        SettingNavigation.Back -> {
+                            if (backStack.size == 1) {
+                                viewModel.onIntent(SettingIntent.RootBack)
+                            } else {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                        }
 
                         is SettingNavigation -> backStack.add(it.destination)
 
@@ -54,7 +61,13 @@ private fun SettingNavHost(
             rememberViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = entryProvider {
-
+            entry<SettingNavigation.SettingMenu> {
+                SettingMenuScreen()
+            }
         }
     )
+}
+
+sealed interface SettingIntent {
+    data object RootBack : SettingIntent
 }
