@@ -5,13 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.OnboardingScreen
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class WorkPlaceViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = WorkPlaceViewModel.Factory::class)
+class WorkPlaceViewModel @AssistedInject constructor(
+    @Assisted private val args: OnboardingNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     val workPlaceTextFieldState = TextFieldState()
@@ -25,13 +29,24 @@ class WorkPlaceViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.Back))
         }
     }
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Salary))
+            moaSideEffectBus.emit(
+                sideEffect = MoaSideEffect.Navigate(
+                    destination = OnboardingScreen.Salary(
+                        args = args.copy(workPlace = workPlaceTextFieldState.text.toString())
+                    )
+                )
+            )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: OnboardingNavigationArgs): WorkPlaceViewModel
     }
 }

@@ -6,12 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.model.SalaryType
+import com.moa.app.presentation.navigation.OnboardingScreen
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Stable
 data class SalaryUiState(
@@ -19,13 +23,9 @@ data class SalaryUiState(
     val salaryTextField: TextFieldState = TextFieldState(),
 )
 
-enum class SalaryType(val title: String) {
-    Monthly("월급"),
-    Yearly("연봉")
-}
-
-@HiltViewModel
-class SalaryViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SalaryViewModel.Factory::class)
+class SalaryViewModel @AssistedInject constructor(
+    @Assisted private val args: OnboardingNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SalaryUiState())
@@ -41,7 +41,7 @@ class SalaryViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.Back))
         }
     }
 
@@ -53,7 +53,21 @@ class SalaryViewModel @Inject constructor(
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.WorkSchedule))
+            moaSideEffectBus.emit(
+                sideEffect = MoaSideEffect.Navigate(
+                    destination = OnboardingScreen.WorkSchedule(
+                        args = args.copy(
+                            salaryType = _uiState.value.selectedSalaryType,
+                            salary = _uiState.value.salaryTextField.text.toString()
+                        )
+                    )
+                )
+            )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: OnboardingNavigationArgs): SalaryViewModel
     }
 }

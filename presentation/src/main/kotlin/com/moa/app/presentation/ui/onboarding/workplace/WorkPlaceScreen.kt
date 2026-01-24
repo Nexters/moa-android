@@ -25,9 +25,17 @@ import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 
 @Composable
-fun WorkPlaceScreen(viewModel: WorkPlaceViewModel = hiltViewModel()) {
+fun WorkPlaceScreen(
+    args: OnboardingNavigationArgs,
+    viewModel: WorkPlaceViewModel = hiltViewModel(
+        creationCallback = { factory: WorkPlaceViewModel.Factory ->
+            factory.create(args)
+        }
+    ),
+) {
     WorkPlaceScreen(
         workPlaceTextFieldState = viewModel.workPlaceTextFieldState,
         onIntent = viewModel::onIntent,
