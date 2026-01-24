@@ -16,6 +16,7 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.SettingNavigation
 import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
 import com.moa.app.presentation.ui.setting.notification.NotificationSettingScreen
+import com.moa.app.presentation.ui.setting.salarydate.SalaryDateScreen
 import com.moa.app.presentation.ui.setting.terms.TermsScreen
 import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
 
@@ -70,6 +71,10 @@ private fun SettingNavHost(
 
             entry<SettingNavigation.WorkInfo> {
                 WorkInfoScreen()
+            }
+
+            entry<SettingNavigation.SalaryDate> {
+                SalaryDateScreen()
             }
 
             entry<SettingNavigation.NotificationSetting> {

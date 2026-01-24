@@ -35,7 +35,9 @@ class WorkInfoViewModel @Inject constructor(
     }
 
     private fun salaryDate() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.SalaryDate))
+        }
     }
 
     private fun workSchedule() {
