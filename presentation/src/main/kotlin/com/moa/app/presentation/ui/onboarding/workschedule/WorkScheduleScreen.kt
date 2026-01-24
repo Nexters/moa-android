@@ -36,12 +36,21 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
+import com.moa.app.presentation.model.WorkScheduleDay
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf
 
 @Composable
-fun WorkScheduleScreen(viewModel: WorkScheduleViewModel = hiltViewModel()) {
+fun WorkScheduleScreen(
+    args: OnboardingNavigationArgs,
+    viewModel: WorkScheduleViewModel = hiltViewModel(
+        creationCallback = { factory: WorkScheduleViewModel.Factory ->
+            factory.create(args)
+        }
+    ),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     WorkScheduleScreen(

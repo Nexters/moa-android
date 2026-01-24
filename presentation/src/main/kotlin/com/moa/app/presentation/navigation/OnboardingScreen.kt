@@ -1,8 +1,9 @@
 package com.moa.app.presentation.navigation
 
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import kotlinx.serialization.Serializable
 
-sealed interface OnboardingScreen : Screen{
+sealed interface OnboardingScreen : Screen {
     @Serializable
     data object Login : OnboardingScreen
 
@@ -10,13 +11,16 @@ sealed interface OnboardingScreen : Screen{
     data object Nickname : OnboardingScreen
 
     @Serializable
-    data object WorkPlace : OnboardingScreen
+    @JvmInline
+    value class WorkPlace(val args: OnboardingNavigationArgs) : OnboardingScreen
 
     @Serializable
-    data object Salary : OnboardingScreen
+    @JvmInline
+    value class Salary(val args: OnboardingNavigationArgs) : OnboardingScreen
 
     @Serializable
-    data object WorkSchedule : OnboardingScreen
+    @JvmInline
+    value class WorkSchedule(val args: OnboardingNavigationArgs) : OnboardingScreen
 
     @Serializable
     data object WidgetGuide : OnboardingScreen

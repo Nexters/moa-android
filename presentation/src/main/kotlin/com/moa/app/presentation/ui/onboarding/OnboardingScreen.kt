@@ -69,16 +69,16 @@ private fun OnboardingNavHost(
                 NickNameScreen()
             }
 
-            entry<OnboardingScreen.WorkPlace> {
-                WorkPlaceScreen()
+            entry<OnboardingScreen.WorkPlace> { key ->
+                WorkPlaceScreen(args = key.args)
             }
 
-            entry<OnboardingScreen.Salary> {
-                SalaryScreen()
+            entry<OnboardingScreen.Salary> { key ->
+                SalaryScreen(args = key.args)
             }
 
-            entry<OnboardingScreen.WorkSchedule> {
-                WorkScheduleScreen()
+            entry<OnboardingScreen.WorkSchedule> { key ->
+                WorkScheduleScreen(args = key.args)
             }
 
             entry<OnboardingScreen.WidgetGuide> {

@@ -7,8 +7,13 @@ import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
+import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingScreen
 import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -19,7 +24,6 @@ import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Stable
 data class WorkScheduleUiState(
@@ -69,18 +73,9 @@ data class WorkScheduleUiState(
     val showTermBottomSheet: Boolean = false,
 )
 
-enum class WorkScheduleDay(val title: String) {
-    MONDAY("월"),
-    TUESDAY("화"),
-    WEDNESDAY("수"),
-    THURSDAY("목"),
-    FRIDAY("금"),
-    SATURDAY("토"),
-    SUNDAY("일"),
-}
-
-@HiltViewModel
-class WorkScheduleViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = WorkScheduleViewModel.Factory::class)
+class WorkScheduleViewModel @AssistedInject constructor(
+    @Assisted private val args: OnboardingNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(WorkScheduleUiState())
@@ -188,7 +183,13 @@ class WorkScheduleViewModel @Inject constructor(
 
     private fun next() {
         viewModelScope.launch {
+            // TODO args 서버로 넘기고 이동시키기
             moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.WidgetGuide))
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: OnboardingNavigationArgs): WorkScheduleViewModel
     }
 }

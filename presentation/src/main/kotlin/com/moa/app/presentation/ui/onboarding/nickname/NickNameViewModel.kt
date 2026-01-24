@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingScreen
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +37,13 @@ class NickNameViewModel @Inject constructor(
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.WorkPlace))
+            moaSideEffectBus.emit(
+                sideEffect = MoaSideEffect.Navigate(
+                    destination = OnboardingScreen.WorkPlace(
+                        args = OnboardingNavigationArgs().copy(nickName = nickNameTextFieldState.text.toString())
+                    )
+                )
+            )
         }
     }
 }
