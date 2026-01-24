@@ -34,7 +34,11 @@ fun SalaryDateScreen(viewModel: SalaryDateViewModel = hiltViewModel()) {
     )
 
     if (uiState.showSalaryDateBottomSheet) {
-
+        SalaryDateBottomSheet(
+            salaryDate = uiState.salaryDate,
+            onConfirm = { viewModel.onIntent(SalaryDateIntent.SetSalaryDate(it)) },
+            onDismissRequest = { viewModel.onIntent(SalaryDateIntent.ShowSalaryDateBottomSheet(false)) }
+        )
     }
 }
 

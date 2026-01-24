@@ -49,7 +49,6 @@ class SalaryDateViewModel @Inject constructor(
     private fun setSalaryDate(date: Int) {
         _uiState.value = _uiState.value.copy(
             salaryDate = date,
-            showSalaryDateBottomSheet = false,
         )
     }
 }
