@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.navigation.OnboardingScreen
 import com.moa.app.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,7 @@ class SalaryViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.Back))
         }
     }
 
@@ -53,7 +54,7 @@ class SalaryViewModel @Inject constructor(
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.WorkSchedule))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.WorkSchedule))
         }
     }
 }

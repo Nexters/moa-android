@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui
+package com.moa.app.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,41 +14,42 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingScreen
-import com.moa.app.presentation.navigation.Screen
-import com.moa.app.presentation.ui.history.HistoryScreen
-import com.moa.app.presentation.ui.home.HomeScreen
-import com.moa.app.presentation.ui.onboarding.OnboardingScreen
-import com.moa.app.presentation.ui.setting.SettingScreen
-import com.moa.app.presentation.ui.splash.SplashScreen
+import com.moa.app.presentation.ui.onboarding.login.LoginScreen
+import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
+import com.moa.app.presentation.ui.onboarding.notification.NotificationScreen
+import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
+import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
+import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
+import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
 
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(Screen.Splash)
+fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
+    val backstack = rememberNavBackStack(OnboardingScreen.Login)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        Screen.Back -> backstack.removeAt(backstack.size - 1)
+                        OnboardingScreen.Back -> backstack.removeAt(backstack.size - 1)
 
-                        is OnboardingScreen -> Unit
+                        is OnboardingScreen -> backstack.add(it.destination)
 
-                        else -> backstack.add(it.destination)
+                        else -> Unit
                     }
                 }
             }
         }
     }
 
-    MainNavHost(
+    OnboardingNavHost(
         modifier = Modifier.fillMaxSize(),
         backstack = backstack,
     )
 }
 
 @Composable
-private fun MainNavHost(
+private fun OnboardingNavHost(
     modifier: Modifier,
     backstack: NavBackStack<NavKey>,
 ) {
@@ -60,24 +61,32 @@ private fun MainNavHost(
             rememberViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = entryProvider {
-            entry<Screen.Splash> {
-                SplashScreen()
+            entry<OnboardingScreen.Login> {
+                LoginScreen()
             }
 
-            entry<Screen.Onboarding> {
-                OnboardingScreen()
+            entry<OnboardingScreen.Nickname> {
+                NickNameScreen()
             }
 
-            entry<Screen.Home> {
-                HomeScreen()
+            entry<OnboardingScreen.WorkPlace> {
+                WorkPlaceScreen()
             }
 
-            entry<Screen.History> {
-                HistoryScreen()
+            entry<OnboardingScreen.Salary> {
+                SalaryScreen()
             }
 
-            entry<Screen.Setting> {
-                SettingScreen()
+            entry<OnboardingScreen.WorkSchedule> {
+                WorkScheduleScreen()
+            }
+
+            entry<OnboardingScreen.WidgetGuide> {
+                WidgetGuideScreen()
+            }
+
+            entry<OnboardingScreen.Notification> {
+                NotificationScreen()
             }
         }
     )
