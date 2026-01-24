@@ -30,17 +30,20 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 @Composable
 fun SettingMenuScreen() {
 
+    SettingMenuScreen(
+        onIntent = {},
+    )
 }
 
 @Composable
 private fun SettingMenuScreen(
-    test: String
+   onIntent: (SettingMenuIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {onIntent(SettingMenuIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_back),
                             contentDescription = "Back",
@@ -60,25 +63,25 @@ private fun SettingMenuScreen(
         ) {
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-            SettingMenuUserInfoContent()
+            SettingMenuUserInfoContent(onIntent = onIntent)
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            SettingMenuAppSettingContent()
+            SettingMenuAppSettingContent(onIntent = onIntent)
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            SettingMenuAppInfoContent()
+            SettingMenuAppInfoContent(onIntent = onIntent)
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            SettingMenuButtonContent()
+            SettingMenuButtonContent(onIntent = onIntent)
         }
     }
 }
 
 @Composable
-private fun SettingMenuUserInfoContent() {
+private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
     Text(
         text = "카카오 계정 회원",
         style = MoaTheme.typography.b2_400,
@@ -87,7 +90,10 @@ private fun SettingMenuUserInfoContent() {
 
     Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+            modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickNickName)},
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             text = "집계사장",
             style = MoaTheme.typography.t1_700,
@@ -113,7 +119,7 @@ private fun SettingMenuUserInfoContent() {
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable {},
+        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickWorkInfo)},
         leadingContent = {
             Text(
                 text = "월급 · 근무 정보 ",
@@ -131,7 +137,7 @@ private fun SettingMenuUserInfoContent() {
 }
 
 @Composable
-private fun SettingMenuAppSettingContent() {
+private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) {
     Text(
         text = "앱 설정",
         style = MoaTheme.typography.b2_500,
@@ -141,7 +147,7 @@ private fun SettingMenuAppSettingContent() {
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable {},
+        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickNotificationSetting)},
         leadingContent = {
             Text(
                 text = "알림 설정",
@@ -159,7 +165,7 @@ private fun SettingMenuAppSettingContent() {
 }
 
 @Composable
-private fun SettingMenuAppInfoContent() {
+private fun SettingMenuAppInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
     Text(
         text = "앱 정보 및 도움말",
         style = MoaTheme.typography.b2_500,
@@ -168,8 +174,8 @@ private fun SettingMenuAppInfoContent() {
 
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
+    // TODO 서버랑 로컬 버전 비교
     MoaRow(
-        modifier = Modifier.clickable {},
         leadingContent = {
             Text(
                 text = "버전 정보",
@@ -177,18 +183,14 @@ private fun SettingMenuAppInfoContent() {
                 color = MoaTheme.colors.textHighEmphasis,
             )
         },
-        trailingContent = {
-            Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
-                contentDescription = "Chevron Right",
-            )
-        }
+        subTrailingContent = {},
+        trailingContent = {}
     )
 
     Spacer(Modifier.height(10.dp))
 
     MoaRow(
-        modifier = Modifier.clickable {},
+        modifier = Modifier.clickable {onIntent(SettingMenuIntent.ClickTerms)},
         leadingContent = {
             Text(
                 text = "약관 및 정책",
@@ -207,7 +209,9 @@ private fun SettingMenuAppInfoContent() {
     Spacer(Modifier.height(10.dp))
 
     MoaRow(
-        modifier = Modifier.clickable {},
+        modifier = Modifier.clickable {
+            // TODO 이메일 앱 띄우기
+        },
         leadingContent = {
             Text(
                 text = "문의하기",
@@ -225,13 +229,14 @@ private fun SettingMenuAppInfoContent() {
 }
 
 @Composable
-private fun SettingMenuButtonContent() {
+private fun SettingMenuButtonContent(onIntent : (SettingMenuIntent) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
+            modifier  = Modifier.clickable{ onIntent(SettingMenuIntent.ClickLogout) },
             text = "로그아웃",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
@@ -245,6 +250,7 @@ private fun SettingMenuButtonContent() {
         )
 
         Text(
+            modifier  = Modifier.clickable{ onIntent(SettingMenuIntent.ClickWithdraw) },
             text = "회원탈퇴",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
@@ -252,10 +258,20 @@ private fun SettingMenuButtonContent() {
     }
 }
 
+sealed interface SettingMenuIntent {
+    data object ClickBack : SettingMenuIntent
+    data object ClickNickName : SettingMenuIntent
+    data object ClickWorkInfo : SettingMenuIntent
+    data object ClickNotificationSetting : SettingMenuIntent
+    data object ClickTerms : SettingMenuIntent
+    data object ClickLogout : SettingMenuIntent
+    data object ClickWithdraw : SettingMenuIntent
+}
+
 @Preview
 @Composable
 private fun SettingMenuScreenPreview() {
     MoaTheme {
-        SettingMenuScreen(test = "")
+        SettingMenuScreen(onIntent = {})
     }
 }
