@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.navigation.OnboardingScreen
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -41,7 +41,7 @@ class SalaryViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
@@ -55,7 +55,7 @@ class SalaryViewModel @AssistedInject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 sideEffect = MoaSideEffect.Navigate(
-                    destination = OnboardingScreen.WorkSchedule(
+                    destination = OnboardingNavigation.WorkSchedule(
                         args = args.copy(
                             salaryType = _uiState.value.selectedSalaryType,
                             salary = _uiState.value.salaryTextField.text.toString()
