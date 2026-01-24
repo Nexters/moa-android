@@ -1,0 +1,193 @@
+package com.moa.app.presentation.ui.onboarding.workschedule
+
+import androidx.compose.runtime.Stable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.model.Term
+import com.moa.app.presentation.model.Time
+import com.moa.app.presentation.navigation.Screen
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@Stable
+data class WorkScheduleUiState(
+    val selectedWorkScheduleDays: ImmutableSet<WorkScheduleDay> = persistentSetOf(),
+    val times: ImmutableList<Time> = persistentListOf(
+        Time.Work(
+            startHour = 9,
+            startMinute = 0,
+            endHour = 18,
+            endMinute = 0,
+        ),
+        Time.Lunch(
+            startHour = 12,
+            startMinute = 0,
+            endHour = 13,
+            endMinute = 0,
+        )
+    ),
+    val terms: ImmutableList<Term> = persistentListOf(
+        Term.All(
+            title = "전체 동의하기",
+            url = "",
+            checked = false,
+        ),
+        Term.Required(
+            title = "(필수) 서비스 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Required(
+            title = "(필수) 테스트 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Optional(
+            title = "(선택) 서비스 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+        Term.Optional(
+            title = "(선택) 테스트 이용 약관 동의",
+            url = "https://www.naver.com",
+            checked = false,
+        ),
+    ),
+    val showTimeBottomSheet: Time? = null,
+    val showTermBottomSheet: Boolean = false,
+)
+
+enum class WorkScheduleDay(val title: String) {
+    MONDAY("월"),
+    TUESDAY("화"),
+    WEDNESDAY("수"),
+    THURSDAY("목"),
+    FRIDAY("금"),
+    SATURDAY("토"),
+    SUNDAY("일"),
+}
+
+@HiltViewModel
+class WorkScheduleViewModel @Inject constructor(
+    private val moaSideEffectBus: MoaSideEffectBus,
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(WorkScheduleUiState())
+    val uiState = _uiState.asStateFlow()
+
+    fun onIntent(intent: WorkScheduleIntent) {
+        when (intent) {
+            WorkScheduleIntent.ClickBack -> back()
+            is WorkScheduleIntent.ClickWorkScheduleDay -> clickWorkScheduleDay(intent.day)
+            is WorkScheduleIntent.ShowTimeBottomSheet -> showTimeBottomSheet(intent.time)
+            is WorkScheduleIntent.SetTime -> setTime(intent.time)
+            is WorkScheduleIntent.ShowTermBottomSheet -> showTermBottomSheet(intent.visible)
+            is WorkScheduleIntent.ClickTerm -> clickTerm(intent.term)
+            is WorkScheduleIntent.ClickArrow -> clickArrow(intent.url)
+            WorkScheduleIntent.ClickNext -> next()
+        }
+    }
+
+    private fun back() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Back))
+        }
+    }
+
+    private fun clickWorkScheduleDay(day: WorkScheduleDay) {
+        val currentSet = _uiState.value.selectedWorkScheduleDays.toMutableSet()
+        if (currentSet.contains(day)) {
+            currentSet.remove(day)
+        } else {
+            currentSet.add(day)
+        }
+        _uiState.value = _uiState.value.copy(
+            selectedWorkScheduleDays = currentSet.toImmutableSet(),
+        )
+    }
+
+    private fun showTimeBottomSheet(time: Time?) {
+        _uiState.value = _uiState.value.copy(
+            showTimeBottomSheet = time,
+        )
+    }
+
+    private fun setTime(time: Time) {
+        val currentTimes = _uiState.value.times.toMutableList()
+        val index = currentTimes.indexOfFirst { it::class == time::class }
+        if (index != -1) {
+            currentTimes[index] = time
+            _uiState.value = _uiState.value.copy(
+                times = currentTimes.toImmutableList(),
+            )
+        }
+    }
+
+    private fun showTermBottomSheet(visible: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            showTermBottomSheet = visible,
+        )
+    }
+
+    private fun clickTerm(term: Term) {
+        val currentTerms = _uiState.value.terms.toMutableList()
+
+        when (term) {
+            is Term.All -> {
+                val newChecked = !term.checked
+                currentTerms.replaceAll {
+                    when (it) {
+                        is Term.All -> it.copy(checked = newChecked)
+                        is Term.Required -> it.copy(checked = newChecked)
+                        is Term.Optional -> it.copy(checked = newChecked)
+                    }
+                }
+            }
+
+            is Term.Required, is Term.Optional -> {
+                val index = currentTerms.indexOfFirst { it == term }
+                if (index != -1) {
+                    val newTerm = when (term) {
+                        is Term.Required -> term.copy(checked = !term.checked)
+                        is Term.Optional -> term.copy(checked = !term.checked)
+                        else -> term
+                    }
+                    currentTerms[index] = newTerm
+
+                    val allChecked = currentTerms.drop(1).all { it.checked }
+                    val allIndex = currentTerms.indexOfFirst { it is Term.All }
+                    if (allIndex != -1) {
+                        currentTerms[allIndex] =
+                            (currentTerms[allIndex] as Term.All).copy(checked = allChecked)
+                    }
+                }
+            }
+        }
+
+        _uiState.value = _uiState.value.copy(
+            terms = currentTerms.toImmutableList(),
+        )
+    }
+
+    private fun clickArrow(url: String) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Webview(url)))
+        }
+    }
+
+    private fun next() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.WidgetGuide))
+        }
+    }
+}

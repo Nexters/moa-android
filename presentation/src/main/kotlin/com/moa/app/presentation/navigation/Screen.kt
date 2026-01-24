@@ -8,7 +8,25 @@ sealed interface Screen : NavKey {
     data object Splash : Screen
 
     @Serializable
-    data object Onboarding : Screen
+    data object Login : Screen
+
+    @Serializable
+    data object Nickname : Screen
+
+    @Serializable
+    data object WorkPlace : Screen
+
+    @Serializable
+    data object Salary : Screen
+
+    @Serializable
+    data object WorkSchedule : Screen
+
+    @Serializable
+    data object WidgetGuide : Screen
+
+    @Serializable
+    data object Notification : Screen
 
     @Serializable
     data object Home : Screen
@@ -18,4 +36,11 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object Setting : Screen
+
+    // TODO 추후 Webview
+    @Serializable
+    @JvmInline
+    value class Webview(val url: String) : Screen
+
+    data object Back : Screen
 }

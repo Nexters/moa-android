@@ -6,6 +6,7 @@ import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -13,9 +14,17 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    fun emit() {
+    fun checkLoginStatus() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Onboarding))
+            // TODO : Implement actual login status check
+            val loginStatus = true
+            delay(3000)
+
+            if (loginStatus) {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Login))
+            } else {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
+            }
         }
     }
 }

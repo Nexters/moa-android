@@ -1,8 +1,6 @@
 package com.moa.app.presentation.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -18,7 +16,13 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.Screen
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
-import com.moa.app.presentation.ui.onboarding.OnboardingScreen
+import com.moa.app.presentation.ui.onboarding.login.LoginScreen
+import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
+import com.moa.app.presentation.ui.onboarding.notification.NotificationScreen
+import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
+import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
+import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
+import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
 
@@ -30,20 +34,20 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
-                    backstack.add(it.destination)
+                    when (it.destination) {
+                        Screen.Back -> backstack.removeAt(backstack.size - 1)
+
+                        else -> backstack.add(it.destination)
+                    }
                 }
             }
         }
     }
 
-    Scaffold { innerPadding ->
-        MainNavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            backstack = backstack,
-        )
-    }
+    MainNavHost(
+        modifier = Modifier.fillMaxSize(),
+        backstack = backstack,
+    )
 }
 
 @Composable
@@ -63,8 +67,32 @@ private fun MainNavHost(
                 SplashScreen()
             }
 
-            entry<Screen.Onboarding> {
-                OnboardingScreen()
+            entry<Screen.Login> {
+                LoginScreen()
+            }
+
+            entry<Screen.Nickname> {
+                NickNameScreen()
+            }
+
+            entry<Screen.WorkPlace> {
+                WorkPlaceScreen()
+            }
+
+            entry<Screen.Salary> {
+                SalaryScreen()
+            }
+
+            entry<Screen.WorkSchedule> {
+                WorkScheduleScreen()
+            }
+
+            entry<Screen.WidgetGuide> {
+                WidgetGuideScreen()
+            }
+
+            entry<Screen.Notification>{
+                NotificationScreen()
             }
 
             entry<Screen.Home> {
