@@ -10,10 +10,13 @@ sealed interface SettingNavigation : RootNavigation {
     data object WorkInfo : SettingNavigation
 
     @Serializable
-    data object Notification : SettingNavigation
+    data object NotificationSetting : SettingNavigation
 
     @Serializable
     data object Terms : SettingNavigation
+
+    @Serializable
+    data object SalaryDate : SettingNavigation
 
     data object Back : SettingNavigation
 }

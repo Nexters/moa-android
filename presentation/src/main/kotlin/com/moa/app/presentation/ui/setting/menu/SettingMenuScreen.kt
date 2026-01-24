@@ -155,7 +155,7 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNotification) },
+        modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNotificationSetting) },
         leadingContent = {
             Text(
                 text = "알림 설정",
@@ -270,7 +270,7 @@ sealed interface SettingMenuIntent {
     data object ClickBack : SettingMenuIntent
     data object ClickNickName : SettingMenuIntent
     data object ClickWorkInfo : SettingMenuIntent
-    data object ClickNotification : SettingMenuIntent
+    data object ClickNotificationSetting : SettingMenuIntent
     data object ClickTerms : SettingMenuIntent
     data object ClickLogout : SettingMenuIntent
     data object ClickWithdraw : SettingMenuIntent
