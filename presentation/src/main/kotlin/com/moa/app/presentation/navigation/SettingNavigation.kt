@@ -11,4 +11,6 @@ sealed interface SettingNavigation : RootNavigation {
 
     @Serializable
     data object Terms : SettingNavigation
+
+    data object Back : SettingNavigation
 }
