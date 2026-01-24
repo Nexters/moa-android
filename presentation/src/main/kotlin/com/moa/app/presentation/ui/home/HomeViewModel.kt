@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,7 +15,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     fun emit() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.History))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History))
         }
     }
 }

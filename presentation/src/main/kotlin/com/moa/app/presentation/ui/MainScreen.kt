@@ -13,8 +13,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingScreen
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
@@ -23,16 +23,16 @@ import com.moa.app.presentation.ui.splash.SplashScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(Screen.Splash)
+    val backstack = rememberNavBackStack(RootNavigation.Splash)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        Screen.Back -> backstack.removeAt(backstack.size - 1)
+                        RootNavigation.Back -> backstack.removeAt(backstack.size - 1)
 
-                        is OnboardingScreen -> Unit
+                        is OnboardingNavigation -> Unit
 
                         else -> backstack.add(it.destination)
                     }
@@ -60,23 +60,23 @@ private fun MainNavHost(
             rememberViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = entryProvider {
-            entry<Screen.Splash> {
+            entry<RootNavigation.Splash> {
                 SplashScreen()
             }
 
-            entry<Screen.Onboarding> {
+            entry<RootNavigation.Onboarding> {
                 OnboardingScreen()
             }
 
-            entry<Screen.Home> {
+            entry<RootNavigation.Home> {
                 HomeScreen()
             }
 
-            entry<Screen.History> {
+            entry<RootNavigation.History> {
                 HistoryScreen()
             }
 
-            entry<Screen.Setting> {
+            entry<RootNavigation.Setting> {
                 SettingScreen()
             }
         }

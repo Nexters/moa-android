@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,9 +21,9 @@ class SplashViewModel @Inject constructor(
             delay(3000)
 
             if (loginStatus) {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Onboarding))
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Onboarding))
             } else {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Home))
             }
         }
     }

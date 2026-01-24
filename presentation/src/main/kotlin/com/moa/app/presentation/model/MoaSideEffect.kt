@@ -1,8 +1,8 @@
 package com.moa.app.presentation.model
 
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.RootNavigation
 
 sealed interface MoaSideEffect {
     @JvmInline
-    value class Navigate(val destination: Screen) : MoaSideEffect
+    value class Navigate(val destination: RootNavigation) : MoaSideEffect
 }

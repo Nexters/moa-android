@@ -13,7 +13,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingScreen
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
 import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
 import com.moa.app.presentation.ui.onboarding.notification.NotificationScreen
@@ -24,16 +24,16 @@ import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
 
 @Composable
 fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(OnboardingScreen.Login)
+    val backstack = rememberNavBackStack(OnboardingNavigation.Login)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        OnboardingScreen.Back -> backstack.removeAt(backstack.size - 1)
+                        OnboardingNavigation.Back -> backstack.removeAt(backstack.size - 1)
 
-                        is OnboardingScreen -> backstack.add(it.destination)
+                        is OnboardingNavigation -> backstack.add(it.destination)
 
                         else -> Unit
                     }
@@ -61,31 +61,31 @@ private fun OnboardingNavHost(
             rememberViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = entryProvider {
-            entry<OnboardingScreen.Login> {
+            entry<OnboardingNavigation.Login> {
                 LoginScreen()
             }
 
-            entry<OnboardingScreen.Nickname> {
+            entry<OnboardingNavigation.Nickname> {
                 NickNameScreen()
             }
 
-            entry<OnboardingScreen.WorkPlace> { key ->
+            entry<OnboardingNavigation.WorkPlace> { key ->
                 WorkPlaceScreen(args = key.args)
             }
 
-            entry<OnboardingScreen.Salary> { key ->
+            entry<OnboardingNavigation.Salary> { key ->
                 SalaryScreen(args = key.args)
             }
 
-            entry<OnboardingScreen.WorkSchedule> { key ->
+            entry<OnboardingNavigation.WorkSchedule> { key ->
                 WorkScheduleScreen(args = key.args)
             }
 
-            entry<OnboardingScreen.WidgetGuide> {
+            entry<OnboardingNavigation.WidgetGuide> {
                 WidgetGuideScreen()
             }
 
-            entry<OnboardingScreen.Notification> {
+            entry<OnboardingNavigation.Notification> {
                 NotificationScreen()
             }
         }

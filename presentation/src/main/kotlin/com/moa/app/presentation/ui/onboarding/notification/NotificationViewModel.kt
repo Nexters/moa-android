@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingScreen
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,13 +23,13 @@ class NotificationViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
     private fun next() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Home))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Home))
         }
     }
 }

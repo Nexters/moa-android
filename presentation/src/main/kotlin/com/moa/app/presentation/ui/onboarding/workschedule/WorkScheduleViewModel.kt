@@ -8,8 +8,8 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.model.WorkScheduleDay
-import com.moa.app.presentation.navigation.OnboardingScreen
-import com.moa.app.presentation.navigation.Screen
+import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -96,7 +96,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
         }
     }
 
@@ -177,14 +177,14 @@ class WorkScheduleViewModel @AssistedInject constructor(
 
     private fun clickArrow(url: String) {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(Screen.Webview(url)))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Webview(url)))
         }
     }
 
     private fun next() {
         viewModelScope.launch {
             // TODO args 서버로 넘기고 이동시키기
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingScreen.WidgetGuide))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WidgetGuide))
         }
     }
 
