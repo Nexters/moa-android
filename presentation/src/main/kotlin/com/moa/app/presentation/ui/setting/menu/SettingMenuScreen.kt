@@ -130,7 +130,7 @@ private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
         modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickWorkInfo) },
         leadingContent = {
             Text(
-                text = "월급 · 근무 정보 ",
+                text = "월급 · 근무 정보",
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
