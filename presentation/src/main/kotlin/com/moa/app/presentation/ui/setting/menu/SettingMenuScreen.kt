@@ -17,12 +17,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.presentation.BuildConfig
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
@@ -30,14 +33,17 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingMenuScreen(
+        uiState = uiState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 private fun SettingMenuScreen(
+    uiState: SettingUiState,
     onIntent: (SettingMenuIntent) -> Unit,
 ) {
     Scaffold(
@@ -71,7 +77,11 @@ private fun SettingMenuScreen(
         ) {
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-            SettingMenuUserInfoContent(onIntent = onIntent)
+            SettingMenuUserInfoContent(
+                oauthType = uiState.settingInfo.userInfo.oauthType,
+                nickName = uiState.settingInfo.userInfo.nickName,
+                onIntent = onIntent,
+            )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
@@ -79,7 +89,10 @@ private fun SettingMenuScreen(
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            SettingMenuAppInfoContent(onIntent = onIntent)
+            SettingMenuAppInfoContent(
+                latestAppVersion = uiState.settingInfo.latestAppVersion,
+                onIntent = onIntent,
+            )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
@@ -89,9 +102,13 @@ private fun SettingMenuScreen(
 }
 
 @Composable
-private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
+private fun SettingMenuUserInfoContent(
+    oauthType: String,
+    nickName: String,
+    onIntent: (SettingMenuIntent) -> Unit
+) {
     Text(
-        text = "카카오 계정 회원",
+        text = "$oauthType 계정 회원",
         style = MoaTheme.typography.b2_400,
         color = MoaTheme.colors.textMediumEmphasis,
     )
@@ -103,7 +120,7 @@ private fun SettingMenuUserInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "집계사장",
+            text = nickName,
             style = MoaTheme.typography.t1_700,
             color = MoaTheme.colors.textGreen,
         )
@@ -173,7 +190,13 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
 }
 
 @Composable
-private fun SettingMenuAppInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
+private fun SettingMenuAppInfoContent(
+    latestAppVersion: String,
+    onIntent: (SettingMenuIntent) -> Unit,
+) {
+    val currentAppVersion = BuildConfig.APP_VERSION_NAME
+    val isLatest = currentAppVersion == latestAppVersion
+
     Text(
         text = "앱 정보 및 도움말",
         style = MoaTheme.typography.b2_500,
@@ -182,17 +205,48 @@ private fun SettingMenuAppInfoContent(onIntent: (SettingMenuIntent) -> Unit) {
 
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
-    // TODO 서버랑 로컬 버전 비교
     MoaRow(
+        modifier = Modifier.clickable {
+            // TODO 플레이스토어
+        },
         leadingContent = {
             Text(
                 text = "버전 정보",
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
+
+            Spacer(Modifier.width(6.dp))
+
+            Text(
+                text = "v$currentAppVersion",
+                style = MoaTheme.typography.b1_400,
+                color = MoaTheme.colors.textMediumEmphasis,
+            )
         },
-        subTrailingContent = {},
-        trailingContent = {}
+        subTrailingContent = {
+            if (!isLatest) {
+                Text(
+                    text = "업데이트 필요",
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textGreen,
+                )
+            }
+        },
+        trailingContent = {
+            if (isLatest) {
+                Text(
+                    text = "최신 버전",
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textGreen,
+                )
+            } else {
+                Image(
+                    painter = painterResource(R.drawable.icon_chevron_right),
+                    contentDescription = "Chevron Right",
+                )
+            }
+        }
     )
 
     Spacer(Modifier.height(10.dp))
@@ -280,6 +334,9 @@ sealed interface SettingMenuIntent {
 @Composable
 private fun SettingMenuScreenPreview() {
     MoaTheme {
-        SettingMenuScreen(onIntent = {})
+        SettingMenuScreen(
+            uiState = SettingUiState(),
+            onIntent = {},
+        )
     }
 }

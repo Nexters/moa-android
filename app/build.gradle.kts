@@ -13,8 +13,8 @@ android {
         applicationId = "com.moa.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = property("APP_VERSION_CODE").toString().toInt()
+        versionName = property("APP_VERSION_NAME").toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
