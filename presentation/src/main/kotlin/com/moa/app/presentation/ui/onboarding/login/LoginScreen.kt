@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -37,20 +38,13 @@ private fun LoginScreen(onIntent: (LoginIntent) -> Unit) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.weight(2f))
-
             Image(
-                painter = painterResource(R.drawable.img_white_logo),
+                modifier = Modifier.widthIn(max = 400.dp),
+                painter = painterResource(R.drawable.img_login_logo),
                 contentDescription = "Login Image",
             )
 
-            Text(
-                text = "실시간으로 월급이 쌓이는 경험!",
-                style = MoaTheme.typography.b1_400,
-                color = MoaTheme.colors.textMediumEmphasis,
-            )
-
-            Spacer(Modifier.weight(2.5f))
+            Spacer(Modifier.weight(1f))
 
             Button(
                 modifier = Modifier
