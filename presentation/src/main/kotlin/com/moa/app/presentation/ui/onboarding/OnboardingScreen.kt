@@ -16,7 +16,6 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
 import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
-import com.moa.app.presentation.ui.onboarding.notification.NotificationScreen
 import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
 import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
 import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
@@ -83,10 +82,6 @@ private fun OnboardingNavHost(
 
             entry<OnboardingNavigation.WidgetGuide> {
                 WidgetGuideScreen()
-            }
-
-            entry<OnboardingNavigation.Notification> {
-                NotificationScreen()
             }
         }
     )

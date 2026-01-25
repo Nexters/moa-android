@@ -25,8 +25,5 @@ sealed interface OnboardingNavigation : RootNavigation {
     @Serializable
     data object WidgetGuide : OnboardingNavigation
 
-    @Serializable
-    data object Notification : OnboardingNavigation
-
     data object Back : OnboardingNavigation
 }

@@ -8,12 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -26,6 +30,7 @@ import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescripti
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
 fun WorkPlaceScreen(
@@ -48,6 +53,7 @@ private fun WorkPlaceScreen(
     onIntent: (WorkPlaceIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    val isKeyboardOpen by rememberIsKeyboardOpen()
 
     Scaffold(
         topBar = {
@@ -70,6 +76,7 @@ private fun WorkPlaceScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.weight(1f))
 
@@ -79,9 +86,20 @@ private fun WorkPlaceScreen(
                 state = workPlaceTextFieldState,
                 description2 = "에서 일해요",
                 placeholder = "근무지를 입력해주세요",
+                inputTransformation = InputTransformation.maxLength(20)
             )
 
             Spacer(Modifier.weight(2f))
+
+            if(isKeyboardOpen){
+                Text(
+                    text = "20자까지 입력할 수 있어요",
+                    style = MoaTheme.typography.b2_500,
+                    color = MoaTheme.colors.textLowEmphasis,
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing12))
+            }
 
             MoaPrimaryButton(
                 modifier = Modifier
