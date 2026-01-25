@@ -73,7 +73,24 @@ class SettingMenuViewModel @Inject constructor(
 
     private fun workInfo() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WorkInfo))
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = SettingNavigation.WorkInfo(
+                        args = SettingNavigation.WorkInfo.WorkInfoArgs(
+                            oauthType = _uiState.value.settingInfo.userInfo.oauthType,
+                            salaryType = _uiState.value.settingInfo.userInfo.salaryType,
+                            salary = _uiState.value.settingInfo.userInfo.salary,
+                            salaryDate = _uiState.value.settingInfo.userInfo.salaryDate,
+                            workPlace = _uiState.value.settingInfo.userInfo.workPlace,
+                            workScheduleDays = _uiState.value.settingInfo.userInfo.workScheduleDays,
+                            workStartTime = _uiState.value.settingInfo.userInfo.workStartTime,
+                            workEndTime = _uiState.value.settingInfo.userInfo.workEndTime,
+                            lunchStartTime = _uiState.value.settingInfo.userInfo.lunchStartTime,
+                            lunchEndTime = _uiState.value.settingInfo.userInfo.lunchEndTime,
+                        )
+                    )
+                )
+            )
         }
     }
 
