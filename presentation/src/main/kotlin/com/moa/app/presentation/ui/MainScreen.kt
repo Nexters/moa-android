@@ -33,7 +33,8 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     when (it.destination) {
                         is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
 
-                        is RootNavigation.Onboarding -> {
+                        is RootNavigation.Onboarding,
+                        is RootNavigation.Home -> {
                             backstack.clear()
                             backstack.add(it.destination)
                         }
