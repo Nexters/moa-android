@@ -77,7 +77,21 @@ class WorkInfoViewModel @Inject constructor(
     }
 
     private fun salary() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = RootNavigation.Onboarding(
+                        startDestination = OnboardingNavigation.Salary(
+                            args = OnboardingNavigationArgs(
+                                salary = _uiState.value.salary,
+                                salaryType = _uiState.value.salaryType,
+                                isOnboarding = false,
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 
     private fun salaryDate() {
