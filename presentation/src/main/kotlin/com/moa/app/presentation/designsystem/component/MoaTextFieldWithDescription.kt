@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,10 +46,13 @@ fun MoaTextFieldWithDescription(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(70.dp)
                 .background(
                     color = MoaTheme.colors.containerPrimary,
                     shape = RoundedCornerShape(MoaTheme.radius.radius16),
+                )
+                .padding(
+                    horizontal = MoaTheme.spacing.spacing20,
+                    vertical = MoaTheme.spacing.spacing16,
                 ),
             contentAlignment = Alignment.Center,
         ) {
@@ -63,7 +65,6 @@ fun MoaTextFieldWithDescription(
                     color = MoaTheme.colors.textGreen,
                     textAlign = TextAlign.Center,
                 ),
-                lineLimits = TextFieldLineLimits.SingleLine,
                 cursorBrush = SolidColor(Color.White),
                 inputTransformation = inputTransformation,
                 decorator = { innerTextField ->
