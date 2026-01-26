@@ -6,42 +6,30 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.SettingNavigation
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @Stable
 data class WorkInfoUiState(
-    val oauthType: String,
-    val salary: String,
-    val salaryDate: String,
-    val workPlace: String,
-    val workScheduleDays: String,
-    val workTime: String,
-    val lunchTime: String,
+    val oauthType: String = "카카오",
+    val salary: String = "월급 · 400만원",
+    val salaryDate: String = "25일",
+    val workPlace: String = "집계리아",
+    val workScheduleDays: String = "월, 화, 수, 목, 금",
+    val workTime: String = "09:00~18:00",
+    val lunchTime: String = "12:00~13:00",
 )
 
-@HiltViewModel(assistedFactory = WorkInfoViewModel.Factory::class)
-class WorkInfoViewModel @AssistedInject constructor(
-    @Assisted private val args: SettingNavigation.WorkInfo.WorkInfoArgs,
+@HiltViewModel
+class WorkInfoViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        WorkInfoUiState(
-            oauthType = args.oauthType,
-            salary = "${args.salaryType.title} · ${args.salary}",
-            salaryDate = "${args.salaryDate}일",
-            workPlace = args.workPlace,
-            workScheduleDays = args.workScheduleDays.joinToString(", ") { it.title },
-            workTime = "${args.workStartTime}~${args.workEndTime}",
-            lunchTime = "${args.lunchStartTime}~${args.lunchEndTime}",
-        )
-    )
+    private val _uiState = MutableStateFlow(WorkInfoUiState())
     val uiState = _uiState.asStateFlow()
 
     fun onIntent(intent: WorkInfoIntent) {
@@ -76,10 +64,5 @@ class WorkInfoViewModel @AssistedInject constructor(
 
     private fun workPlace() {
 
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(args: SettingNavigation.WorkInfo.WorkInfoArgs): WorkInfoViewModel
     }
 }

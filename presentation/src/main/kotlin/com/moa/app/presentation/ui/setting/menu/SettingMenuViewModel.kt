@@ -4,41 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.model.SettingInfo
-import com.moa.app.presentation.model.UserInfo
-import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingUiState(
-    val settingInfo: SettingInfo = SettingInfo(
-        userInfo = UserInfo(
-            oauthType = "카카오",
-            nickName = "집계사장",
-            salaryType = SalaryType.Monthly,
-            salary = "300만원",
-            salaryDate = 25,
-            workPlace = "집계리아",
-            workScheduleDays = persistentSetOf(
-                WorkScheduleDay.MONDAY,
-                WorkScheduleDay.TUESDAY,
-                WorkScheduleDay.WEDNESDAY,
-                WorkScheduleDay.THURSDAY,
-                WorkScheduleDay.FRIDAY,
-            ),
-            workStartTime = "09:00",
-            workEndTime = "18:00",
-            lunchStartTime = "12:00",
-            lunchEndTime = "13:00",
-        ),
-        latestAppVersion = "1.0.0",
-    ),
+    val oauthType: String = "카카오",
+    val nickName: String = "집계사장",
+    val latestAppVersion: String = "1.0.0",
 )
 
 @HiltViewModel
@@ -73,24 +49,7 @@ class SettingMenuViewModel @Inject constructor(
 
     private fun workInfo() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    destination = SettingNavigation.WorkInfo(
-                        args = SettingNavigation.WorkInfo.WorkInfoArgs(
-                            oauthType = _uiState.value.settingInfo.userInfo.oauthType,
-                            salaryType = _uiState.value.settingInfo.userInfo.salaryType,
-                            salary = _uiState.value.settingInfo.userInfo.salary,
-                            salaryDate = _uiState.value.settingInfo.userInfo.salaryDate,
-                            workPlace = _uiState.value.settingInfo.userInfo.workPlace,
-                            workScheduleDays = _uiState.value.settingInfo.userInfo.workScheduleDays,
-                            workStartTime = _uiState.value.settingInfo.userInfo.workStartTime,
-                            workEndTime = _uiState.value.settingInfo.userInfo.workEndTime,
-                            lunchStartTime = _uiState.value.settingInfo.userInfo.lunchStartTime,
-                            lunchEndTime = _uiState.value.settingInfo.userInfo.lunchEndTime,
-                        )
-                    )
-                )
-            )
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WorkInfo))
         }
     }
 

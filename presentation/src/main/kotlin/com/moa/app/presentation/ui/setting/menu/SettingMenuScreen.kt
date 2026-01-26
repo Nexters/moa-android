@@ -78,8 +78,8 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             SettingMenuUserInfoContent(
-                oauthType = uiState.settingInfo.userInfo.oauthType,
-                nickName = uiState.settingInfo.userInfo.nickName,
+                oauthType = uiState.oauthType,
+                nickName = uiState.nickName,
                 onIntent = onIntent,
             )
 
@@ -90,7 +90,7 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             SettingMenuAppInfoContent(
-                latestAppVersion = uiState.settingInfo.latestAppVersion,
+                latestAppVersion = uiState.latestAppVersion,
                 onIntent = onIntent,
             )
 

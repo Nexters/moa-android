@@ -69,8 +69,8 @@ private fun SettingNavHost(
                 SettingMenuScreen()
             }
 
-            entry<SettingNavigation.WorkInfo> { key ->
-                WorkInfoScreen(args = key.args)
+            entry<SettingNavigation.WorkInfo> {
+                WorkInfoScreen()
             }
 
             entry<SettingNavigation.SalaryDate> {
