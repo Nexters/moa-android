@@ -5,11 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.model.SalaryType
+import com.moa.app.presentation.model.Time
+import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.navigation.SettingNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,12 +25,31 @@ import javax.inject.Inject
 @Stable
 data class WorkInfoUiState(
     val oauthType: String = "카카오",
-    val salary: String = "월급 · 400만원",
+    val salaryType: SalaryType = SalaryType.Monthly,
+    val salary: String = "4000000",
     val salaryDate: String = "25일",
     val workPlace: String = "집계리아",
-    val workScheduleDays: String = "월, 화, 수, 목, 금",
-    val workTime: String = "09:00~18:00",
-    val lunchTime: String = "12:00~13:00",
+    val workScheduleDays: ImmutableSet<WorkScheduleDay> = persistentSetOf(
+        WorkScheduleDay.MONDAY,
+        WorkScheduleDay.TUESDAY,
+        WorkScheduleDay.WEDNESDAY,
+        WorkScheduleDay.THURSDAY,
+        WorkScheduleDay.FRIDAY,
+    ),
+    val times: ImmutableList<Time> = persistentListOf(
+        Time.Work(
+            startHour = 9,
+            startMinute = 0,
+            endHour = 18,
+            endMinute = 0,
+        ),
+        Time.Lunch(
+            startHour = 12,
+            startMinute = 0,
+            endHour = 13,
+            endMinute = 0,
+        )
+    )
 )
 
 @HiltViewModel

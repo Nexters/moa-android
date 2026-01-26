@@ -1,5 +1,9 @@
 package com.moa.app.presentation.model
 
+import com.moa.app.core.makeTimeString
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed class Time(
     open val title: String,
     open val description: String,
@@ -49,4 +53,8 @@ sealed class Time(
         startButtonText = startButtonText,
         endButtonText = endButtonText
     )
+
+    fun getFormattedTimeRange() : String {
+        return "${makeTimeString(startHour, startMinute)}~${makeTimeString(endHour, endMinute)}"
+    }
 }

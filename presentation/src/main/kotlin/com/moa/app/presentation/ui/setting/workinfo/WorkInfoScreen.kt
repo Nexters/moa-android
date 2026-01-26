@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.makePriceString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
@@ -75,7 +76,7 @@ private fun WorkInfoScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             WorkInfoSalaryContent(
-                salary = uiState.salary,
+                salary = "${uiState.salaryType.title} · ${uiState.salary.makePriceString()}",
                 salaryDate = uiState.salaryDate,
                 onIntent = onIntent,
             )
@@ -84,9 +85,9 @@ private fun WorkInfoScreen(
 
             WorkInfoContent(
                 workPlace = uiState.workPlace,
-                workScheduleDays = uiState.workScheduleDays,
-                workTime = uiState.workTime,
-                lunchTime = uiState.lunchTime,
+                workScheduleDays = uiState.workScheduleDays.joinToString { it.title },
+                workTime = uiState.times[0].getFormattedTimeRange(),
+                lunchTime = uiState.times[1].getFormattedTimeRange(),
                 onIntent = onIntent,
             )
         }
@@ -317,15 +318,7 @@ sealed interface WorkInfoIntent {
 private fun WorkInfoScreenPreview() {
     MoaTheme {
         WorkInfoScreen(
-            uiState = WorkInfoUiState(
-                oauthType = "카카오",
-                salary = "월급 · 300만원",
-                salaryDate = "25일",
-                workPlace = "카카오모빌리티",
-                workScheduleDays = "월, 화, 수, 목, 금",
-                workTime = "09:00~18:00",
-                lunchTime = "12:00~13:00",
-            ),
+            uiState = WorkInfoUiState(),
             onIntent = {},
         )
     }
