@@ -16,18 +16,15 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Stable
 data class WorkScheduleUiState(
-    val selectedWorkScheduleDays: ImmutableSet<WorkScheduleDay> = persistentSetOf(),
+    val selectedWorkScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(),
     val times: ImmutableList<Time> = persistentListOf(
         Time.Work(
             startHour = 9,
@@ -78,7 +75,12 @@ class WorkScheduleViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(WorkScheduleUiState())
+    private val _uiState = MutableStateFlow(
+        WorkScheduleUiState(
+            selectedWorkScheduleDays = args.workScheduleDays,
+            times = args.times,
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     fun onIntent(intent: WorkScheduleIntent) {
@@ -101,14 +103,14 @@ class WorkScheduleViewModel @AssistedInject constructor(
     }
 
     private fun clickWorkScheduleDay(day: WorkScheduleDay) {
-        val currentSet = _uiState.value.selectedWorkScheduleDays.toMutableSet()
+        val currentSet = _uiState.value.selectedWorkScheduleDays.toMutableList()
         if (currentSet.contains(day)) {
             currentSet.remove(day)
         } else {
             currentSet.add(day)
         }
         _uiState.value = _uiState.value.copy(
-            selectedWorkScheduleDays = currentSet.toImmutableSet(),
+            selectedWorkScheduleDays = currentSet.toImmutableList(),
         )
     }
 
@@ -184,7 +186,15 @@ class WorkScheduleViewModel @AssistedInject constructor(
     private fun next() {
         viewModelScope.launch {
             // TODO args 서버로 넘기고 이동시키기
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WidgetGuide))
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = if (args.isOnboarding) {
+                        OnboardingNavigation.WidgetGuide
+                    } else {
+                        RootNavigation.Back
+                    }
+                )
+            )
         }
     }
 

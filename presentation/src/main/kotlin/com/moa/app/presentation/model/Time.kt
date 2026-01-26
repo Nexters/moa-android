@@ -4,16 +4,17 @@ import com.moa.app.core.makeTimeString
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Time(
-    open val title: String,
-    open val description: String,
-    open val startHour: Int,
-    open val startMinute: Int,
-    open val endHour: Int,
-    open val endMinute: Int,
-    open val startButtonText: String,
-    open val endButtonText: String
-) {
+sealed interface Time {
+    val title: String
+    val description: String
+    val startHour: Int
+    val startMinute: Int
+    val endHour: Int
+    val endMinute: Int
+    val startButtonText: String
+    val endButtonText: String
+
+    @Serializable
     data class Work(
         override val title: String = "근무 시간",
         override val description: String = "",
@@ -23,17 +24,9 @@ sealed class Time(
         override val endMinute: Int,
         override val startButtonText: String = "확인",
         override val endButtonText: String = "확인",
-    ) : Time(
-        title = title,
-        description = description,
-        startHour = startHour,
-        startMinute = startMinute,
-        endHour = endHour,
-        endMinute = endMinute,
-        startButtonText = startButtonText,
-        endButtonText = endButtonText
-    )
+    ) : Time
 
+    @Serializable
     data class Lunch(
         override val title: String = "점심 시간",
         override val description: String = "",
@@ -43,18 +36,9 @@ sealed class Time(
         override val endMinute: Int,
         override val startButtonText: String = "확인",
         override val endButtonText: String = "확인",
-    ) : Time(
-        title = title,
-        description = description,
-        startHour = startHour,
-        startMinute = startMinute,
-        endHour = endHour,
-        endMinute = endMinute,
-        startButtonText = startButtonText,
-        endButtonText = endButtonText
-    )
+    ) : Time
 
-    fun getFormattedTimeRange() : String {
+    fun getFormattedTimeRange(): String {
         return "${makeTimeString(startHour, startMinute)}~${makeTimeString(endHour, endMinute)}"
     }
 }

@@ -14,9 +14,7 @@ import com.moa.app.presentation.navigation.SettingNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,7 +27,7 @@ data class WorkInfoUiState(
     val salary: String = "4000000",
     val salaryDate: String = "25일",
     val workPlace: String = "집계리아",
-    val workScheduleDays: ImmutableSet<WorkScheduleDay> = persistentSetOf(
+    val workScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(
         WorkScheduleDay.MONDAY,
         WorkScheduleDay.TUESDAY,
         WorkScheduleDay.WEDNESDAY,
@@ -118,6 +116,20 @@ class WorkInfoViewModel @Inject constructor(
     }
 
     private fun workSchedule() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = RootNavigation.Onboarding(
+                        startDestination = OnboardingNavigation.WorkSchedule(
+                            args = OnboardingNavigationArgs(
+                                workScheduleDays = _uiState.value.workScheduleDays,
+                                times = _uiState.value.times,
+                                isOnboarding = false,
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 }
