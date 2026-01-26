@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OnboardingNavigationArgs(
+    val isOnboarding: Boolean = true,
     val nickName: String = "",
     val workPlace: String = "",
     val salaryType: SalaryType = SalaryType.Monthly,

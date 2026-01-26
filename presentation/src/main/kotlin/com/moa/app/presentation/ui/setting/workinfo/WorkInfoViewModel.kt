@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,8 +39,8 @@ class WorkInfoViewModel @Inject constructor(
             WorkInfoIntent.ClickBack -> back()
             WorkInfoIntent.ClickSalary -> salary()
             WorkInfoIntent.ClickSalaryDate -> salaryDate()
-            WorkInfoIntent.ClickWorkSchedule -> workSchedule()
             WorkInfoIntent.ClickWorkplace -> workPlace()
+            WorkInfoIntent.ClickWorkSchedule -> workSchedule()
         }
     }
 
@@ -57,11 +60,24 @@ class WorkInfoViewModel @Inject constructor(
         }
     }
 
-    private fun workSchedule() {
-
+    private fun workPlace() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = RootNavigation.Onboarding(
+                        startDestination = OnboardingNavigation.WorkPlace(
+                            args = OnboardingNavigationArgs(
+                                workPlace = _uiState.value.workPlace,
+                                isOnboarding = false,
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 
-    private fun workPlace() {
+    private fun workSchedule() {
 
     }
 }
