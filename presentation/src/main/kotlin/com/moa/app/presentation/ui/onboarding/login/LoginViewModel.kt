@@ -13,8 +13,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    fun onIntent(intent : LoginIntent) {
-        when(intent) {
+    fun onIntent(intent: LoginIntent) {
+        when (intent) {
             LoginIntent.ClickApple -> loginWithApple()
             LoginIntent.ClickKakao -> loginWithKakao()
         }
@@ -22,13 +22,13 @@ class LoginViewModel @Inject constructor(
 
     private fun loginWithKakao() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
         }
     }
 
     private fun loginWithApple() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
         }
     }
 }

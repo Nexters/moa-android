@@ -33,7 +33,13 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     when (it.destination) {
                         is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
 
-                        is RootNavigation.Onboarding,
+                        is RootNavigation.Onboarding -> {
+                            if (it.destination.startDestination is OnboardingNavigation.Login) {
+                                backstack.clear()
+                            }
+                            backstack.add(it.destination)
+                        }
+
                         is RootNavigation.Home -> {
                             backstack.clear()
                             backstack.add(it.destination)
@@ -73,8 +79,8 @@ private fun MainNavHost(
                 SplashScreen()
             }
 
-            entry<RootNavigation.Onboarding> {
-                OnboardingScreen()
+            entry<RootNavigation.Onboarding> { key ->
+                OnboardingScreen(key.startDestination)
             }
 
             entry<RootNavigation.Home> {

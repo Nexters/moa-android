@@ -22,9 +22,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,10 +39,18 @@ import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
-fun NickNameScreen(viewModel: NickNameViewModel = hiltViewModel()) {
+fun NickNameScreen(
+    args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
+    viewModel: NickNameViewModel = hiltViewModel(
+        creationCallback = { factory: NickNameViewModel.Factory ->
+            factory.create(args)
+        }
+    )
+) {
     NickNameScreen(
         nickNameTextFieldState = viewModel.nickNameTextFieldState,
         onIntent = viewModel::onIntent,
@@ -51,7 +63,12 @@ private fun NickNameScreen(
     onIntent: (NickNameIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
     val isKeyboardOpen by rememberIsKeyboardOpen()
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     Scaffold(
         topBar = {
@@ -79,7 +96,9 @@ private fun NickNameScreen(
             Spacer(Modifier.weight(1f))
 
             MoaTextFieldWithDescription(
-                modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .padding(horizontal = MoaTheme.spacing.spacing20),
                 description1 = "닉네임",
                 state = nickNameTextFieldState,
                 description2 = "로 가입할래요",
@@ -119,7 +138,7 @@ private fun NickNameScreen(
 
             Spacer(Modifier.weight(2f))
 
-            if(isKeyboardOpen){
+            if (isKeyboardOpen) {
                 Text(
                     text = "10자까지 입력할 수 있어요",
                     style = MoaTheme.typography.b2_500,

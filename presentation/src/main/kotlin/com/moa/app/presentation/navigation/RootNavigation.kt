@@ -8,7 +8,10 @@ sealed interface RootNavigation : NavKey {
     data object Splash : RootNavigation
 
     @Serializable
-    data object Onboarding : RootNavigation
+    @JvmInline
+    value class Onboarding(
+        val startDestination: OnboardingNavigation = OnboardingNavigation.Login
+    ) : RootNavigation
 
     @Serializable
     data object Home : RootNavigation

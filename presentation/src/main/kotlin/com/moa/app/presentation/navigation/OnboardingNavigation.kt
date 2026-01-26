@@ -3,12 +3,22 @@ package com.moa.app.presentation.navigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface OnboardingNavigation : RootNavigation {
     @Serializable
     data object Login : OnboardingNavigation
 
     @Serializable
-    data object Nickname : OnboardingNavigation
+    @JvmInline
+    value class Nickname(
+        val args: NicknameNavigationArgs = NicknameNavigationArgs()
+    ) : OnboardingNavigation {
+        @Serializable
+        data class NicknameNavigationArgs(
+            val isOnboarding: Boolean = true,
+            val nickName: String = "",
+        )
+    }
 
     @Serializable
     @JvmInline

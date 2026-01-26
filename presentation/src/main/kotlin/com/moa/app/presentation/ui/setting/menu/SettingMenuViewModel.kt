@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.navigation.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +46,20 @@ class SettingMenuViewModel @Inject constructor(
     }
 
     private fun nickName() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    destination = RootNavigation.Onboarding(
+                        startDestination = OnboardingNavigation.Nickname(
+                            args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                nickName = uiState.value.nickName,
+                                isOnboarding = false,
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 
     private fun workInfo() {
