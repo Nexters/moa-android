@@ -3,6 +3,7 @@ package com.moa.app.presentation.ui.setting.menu
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.designsystem.component.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
@@ -17,6 +18,7 @@ data class SettingUiState(
     val oauthType: String = "카카오",
     val nickName: String = "집계사장",
     val latestAppVersion: String = "1.0.0",
+    val dialog: MoaDialogProperties? = null,
 )
 
 @HiltViewModel
@@ -34,6 +36,7 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickWorkInfo -> workInfo()
             SettingMenuIntent.ClickNotificationSetting -> notificationSetting()
             SettingMenuIntent.ClickTerms -> terms()
+            is SettingMenuIntent.SetDialog -> setDialog(intent.dialog)
             SettingMenuIntent.ClickLogout -> logout()
             SettingMenuIntent.ClickWithdraw -> withdraw()
         }
@@ -80,8 +83,16 @@ class SettingMenuViewModel @Inject constructor(
         }
     }
 
-    private fun logout() {
+    private fun setDialog(dialog: MoaDialogProperties?) {
+        _uiState.value = uiState.value.copy(
+            dialog = dialog
+        )
+    }
 
+    private fun logout() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Onboarding()))
+        }
     }
 
     private fun withdraw() {

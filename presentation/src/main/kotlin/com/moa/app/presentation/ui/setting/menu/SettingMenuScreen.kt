@@ -27,6 +27,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.presentation.BuildConfig
 import com.moa.app.presentation.R
+import com.moa.app.presentation.designsystem.component.MoaDialog
+import com.moa.app.presentation.designsystem.component.MoaDialogProperties
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
@@ -39,6 +41,13 @@ fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
+
+    uiState.dialog?.let {
+        MoaDialog(
+            properties = it,
+            onDismissRequest = { viewModel.onIntent(SettingMenuIntent.SetDialog(null)) }
+        )
+    }
 }
 
 @Composable
@@ -298,7 +307,19 @@ private fun SettingMenuButtonContent(onIntent: (SettingMenuIntent) -> Unit) {
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
-            modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickLogout) },
+            modifier = Modifier.clickable {
+                onIntent(
+                    SettingMenuIntent.SetDialog(
+                        MoaDialogProperties.Confirm(
+                            title = "로그아웃 하시겠어요?",
+                            message = "로그아웃 시 앱이 재시작됩니다.",
+                            onPositive = {
+                                onIntent(SettingMenuIntent.ClickLogout)
+                            },
+                        )
+                    )
+                )
+            },
             text = "로그아웃",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
@@ -326,6 +347,9 @@ sealed interface SettingMenuIntent {
     data object ClickWorkInfo : SettingMenuIntent
     data object ClickNotificationSetting : SettingMenuIntent
     data object ClickTerms : SettingMenuIntent
+
+    @JvmInline
+    value class SetDialog(val dialog: MoaDialogProperties?) : SettingMenuIntent
     data object ClickLogout : SettingMenuIntent
     data object ClickWithdraw : SettingMenuIntent
 }
