@@ -17,6 +17,7 @@ data class MoaColors(
     val textGreen: Color,
     val textBlue: Color,
     val textError: Color,
+    val textErrorLight: Color,
     val dividerPrimary: Color,
     val dividerSecondary: Color,
     val dimPrimary: Color,
