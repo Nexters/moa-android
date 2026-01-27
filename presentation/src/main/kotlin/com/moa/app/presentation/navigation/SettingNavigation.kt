@@ -18,5 +18,8 @@ sealed interface SettingNavigation : RootNavigation {
     @Serializable
     data object SalaryDate : SettingNavigation
 
+    @Serializable
+    data object WithDraw : SettingNavigation
+
     data object Back : SettingNavigation
 }

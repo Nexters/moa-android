@@ -96,6 +96,8 @@ class SettingMenuViewModel @Inject constructor(
     }
 
     private fun withdraw() {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WithDraw))
+        }
     }
 }
