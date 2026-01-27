@@ -61,9 +61,15 @@ fun MoaTheme(
         dividerSecondary = Gray70,
         dimPrimary = Color(0x99000000),
         dimSecondary = Color(0x66000000),
-        btnEnable = Green40Main,
-        btnPressed = Green50,
-        btnDisabled = Gray70,
+        btnPrimaryEnable = Green40Main,
+        btnPrimaryPressed = Green50,
+        btnPrimaryDisabled = Gray70,
+        btnSecondaryEnable = Gray60,
+        btnSecondaryPressed = Gray70,
+        btnSecondaryDisabled = Gray70,
+        btnTertiaryEnable = Gray0,
+        btnTertiaryPressed = Gray20,
+        btnTertiaryDisabled = Gray70,
     )
 
     val typography = MoaTypography(
