@@ -21,6 +21,7 @@ import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
+import com.moa.app.presentation.ui.webview.WebViewScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
@@ -93,6 +94,10 @@ private fun MainNavHost(
 
             entry<RootNavigation.Setting> {
                 SettingScreen()
+            }
+
+            entry<RootNavigation.Webview> { key ->
+                WebViewScreen(url = key.url)
             }
         }
     )

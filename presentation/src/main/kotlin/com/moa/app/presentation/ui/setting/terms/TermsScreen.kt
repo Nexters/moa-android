@@ -1,6 +1,7 @@
 package com.moa.app.presentation.ui.setting.terms
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -66,6 +67,7 @@ private fun TermsScreen(
 
             Terms.entries.forEachIndexed { index, term ->
                 MoaRow(
+                    modifier = Modifier.clickable { onIntent(TermsIntent.ClickTerm(term)) },
                     leadingContent = {
                         Text(
                             text = term.title,
@@ -91,6 +93,9 @@ private fun TermsScreen(
 
 sealed interface TermsIntent {
     data object ClickBack : TermsIntent
+
+    @JvmInline
+    value class ClickTerm(val term: Terms) : TermsIntent
 }
 
 @Preview
