@@ -25,7 +25,7 @@ import com.moa.app.presentation.ui.webview.WebViewScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(RootNavigation.Home)
+    val backstack = rememberNavBackStack(RootNavigation.Splash)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
