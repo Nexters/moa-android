@@ -18,5 +18,18 @@ data class OnboardingNavigationArgs(
     @Serializable(with = ImmutableListSerializer::class)
     val workScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(),
     @Serializable(with = ImmutableListSerializer::class)
-    val times: ImmutableList<Time> = persistentListOf(),
+    val times: ImmutableList<Time> = persistentListOf(
+        Time.Work(
+            startHour = 9,
+            startMinute = 0,
+            endHour = 18,
+            endMinute = 0,
+        ),
+        Time.Lunch(
+            startHour = 12,
+            startMinute = 0,
+            endHour = 13,
+            endMinute = 0,
+        )
+    ),
 )
