@@ -28,11 +28,11 @@ data class WorkInfoUiState(
     val salaryDate: String = "25일",
     val workPlace: String = "집계리아",
     val workScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(
-        WorkScheduleDay.MONDAY,
-        WorkScheduleDay.TUESDAY,
-        WorkScheduleDay.WEDNESDAY,
-        WorkScheduleDay.THURSDAY,
-        WorkScheduleDay.FRIDAY,
+        WorkScheduleDay.Monday,
+        WorkScheduleDay.Tuesday,
+        WorkScheduleDay.Wednesday,
+        WorkScheduleDay.Thursday,
+        WorkScheduleDay.Friday,
     ),
     val times: ImmutableList<Time> = persistentListOf(
         Time.Work(

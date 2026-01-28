@@ -326,9 +326,9 @@ private fun WorkScheduleScreenPreview() {
         WorkScheduleScreen(
             uiState = WorkScheduleUiState(
                 selectedWorkScheduleDays = persistentListOf(
-                    WorkScheduleDay.MONDAY,
-                    WorkScheduleDay.WEDNESDAY,
-                    WorkScheduleDay.FRIDAY,
+                    WorkScheduleDay.Monday,
+                    WorkScheduleDay.Wednesday,
+                    WorkScheduleDay.Friday,
                 ),
             ),
             onIntent = {},
