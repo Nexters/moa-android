@@ -22,7 +22,6 @@ sealed interface RootNavigation : NavKey {
     @Serializable
     data object Setting : RootNavigation
 
-    // TODO 추후 Webview
     @Serializable
     @JvmInline
     value class Webview(val url: String) : RootNavigation
