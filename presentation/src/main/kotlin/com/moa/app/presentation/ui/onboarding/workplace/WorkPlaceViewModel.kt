@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -18,7 +19,7 @@ class WorkPlaceViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    val workPlaceTextFieldState = TextFieldState()
+    val workPlaceTextFieldState = TextFieldState(args.workPlace)
 
     fun onIntent(intent: WorkPlaceIntent) {
         when (intent) {
@@ -37,9 +38,13 @@ class WorkPlaceViewModel @AssistedInject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 sideEffect = MoaSideEffect.Navigate(
-                    destination = OnboardingNavigation.Salary(
-                        args = args.copy(workPlace = workPlaceTextFieldState.text.toString())
-                    )
+                    destination = if (args.isOnboarding) {
+                        OnboardingNavigation.Salary(
+                            args = args.copy(workPlace = workPlaceTextFieldState.text.toString())
+                        )
+                    } else {
+                        RootNavigation.Back
+                    }
                 )
             )
         }

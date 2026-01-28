@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,9 +23,9 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 fun MoaRow(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
-    leadingContent: @Composable () -> Unit = {},
-    subTrailingContent: @Composable () -> Unit = {},
-    trailingContent: @Composable () -> Unit = {},
+    leadingContent: @Composable RowScope.() -> Unit = {},
+    subTrailingContent: @Composable RowScope.() -> Unit = {},
+    trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         modifier = Modifier

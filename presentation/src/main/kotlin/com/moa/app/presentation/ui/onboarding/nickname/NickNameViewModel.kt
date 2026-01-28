@@ -6,16 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class NickNameViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NickNameViewModel.Factory::class)
+class NickNameViewModel @AssistedInject constructor(
+    @Assisted private val args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    val nickNameTextFieldState = TextFieldState()
+    val nickNameTextFieldState = TextFieldState(args.nickName)
 
     fun onIntent(intent: NickNameIntent) {
         when (intent) {
@@ -39,11 +43,20 @@ class NickNameViewModel @Inject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 sideEffect = MoaSideEffect.Navigate(
-                    destination = OnboardingNavigation.WorkPlace(
-                        args = OnboardingNavigationArgs().copy(nickName = nickNameTextFieldState.text.toString())
-                    )
+                    destination = if (args.isOnboarding) {
+                        OnboardingNavigation.WorkPlace(
+                            args = OnboardingNavigationArgs().copy(nickName = nickNameTextFieldState.text.toString())
+                        )
+                    } else {
+                        RootNavigation.Back
+                    }
                 )
             )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: OnboardingNavigation.Nickname.NicknameNavigationArgs): NickNameViewModel
     }
 }

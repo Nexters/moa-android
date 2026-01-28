@@ -22,15 +22,24 @@ import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
 import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
 
 @Composable
-fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
-    val backstack = rememberNavBackStack(OnboardingNavigation.Login)
+fun OnboardingScreen(
+    startDestination: OnboardingNavigation,
+    viewModel: OnboardingViewModel = hiltViewModel()
+) {
+    val backstack = rememberNavBackStack(startDestination)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        OnboardingNavigation.Back -> backstack.removeAt(backstack.lastIndex)
+                        OnboardingNavigation.Back -> {
+                            if (backstack.size == 1) {
+                                viewModel.onIntent(OnboardingIntent.RootBack)
+                            } else {
+                                backstack.removeAt(backstack.lastIndex)
+                            }
+                        }
 
                         is OnboardingNavigation -> backstack.add(it.destination)
 
@@ -64,8 +73,8 @@ private fun OnboardingNavHost(
                 LoginScreen()
             }
 
-            entry<OnboardingNavigation.Nickname> {
-                NickNameScreen()
+            entry<OnboardingNavigation.Nickname> { key ->
+                NickNameScreen(args = key.args)
             }
 
             entry<OnboardingNavigation.WorkPlace> { key ->
@@ -85,4 +94,8 @@ private fun OnboardingNavHost(
             }
         }
     )
+}
+
+sealed interface OnboardingIntent {
+    data object RootBack : OnboardingIntent
 }

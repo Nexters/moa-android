@@ -39,8 +39,7 @@ import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WorkScheduleScreen(
@@ -172,7 +171,7 @@ private fun WorkScheduleScreen(
 
 @Composable
 private fun WorkScheduleDays(
-    selectedDays: ImmutableSet<WorkScheduleDay>,
+    selectedDays: ImmutableList<WorkScheduleDay>,
     onIntent: (WorkScheduleIntent) -> Unit,
 ) {
     Row(
@@ -326,10 +325,10 @@ private fun WorkScheduleScreenPreview() {
     MoaTheme {
         WorkScheduleScreen(
             uiState = WorkScheduleUiState(
-                selectedWorkScheduleDays = persistentSetOf(
-                    WorkScheduleDay.MONDAY,
-                    WorkScheduleDay.WEDNESDAY,
-                    WorkScheduleDay.FRIDAY,
+                selectedWorkScheduleDays = persistentListOf(
+                    WorkScheduleDay.Monday,
+                    WorkScheduleDay.Wednesday,
+                    WorkScheduleDay.Friday,
                 ),
             ),
             onIntent = {},

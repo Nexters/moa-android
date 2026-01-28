@@ -12,11 +12,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.makePriceString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
@@ -24,14 +27,17 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun WorkInfoScreen(viewModel: WorkInfoViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     WorkInfoScreen(
+        uiState = uiState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 private fun WorkInfoScreen(
+    uiState: WorkInfoUiState,
     onIntent: (WorkInfoIntent) -> Unit,
 ) {
     Scaffold(
@@ -65,23 +71,33 @@ private fun WorkInfoScreen(
         ) {
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-            WorkInfoAccountContent()
+            WorkInfoAccountContent(oauthType = uiState.oauthType)
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            WorkInfoSalaryContent(onIntent = onIntent)
+            WorkInfoSalaryContent(
+                salary = "${uiState.salaryType.title} · ${uiState.salary.makePriceString()}",
+                salaryDate = uiState.salaryDate,
+                onIntent = onIntent,
+            )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            WorkInfoContent(onIntent = onIntent)
+            WorkInfoContent(
+                workPlace = uiState.workPlace,
+                workScheduleDays = uiState.workScheduleDays.joinToString { it.title },
+                workTime = uiState.times[0].getFormattedTimeRange(),
+                lunchTime = uiState.times[1].getFormattedTimeRange(),
+                onIntent = onIntent,
+            )
         }
     }
 }
 
 @Composable
-private fun WorkInfoAccountContent() {
+private fun WorkInfoAccountContent(oauthType: String) {
     Text(
-        text = "앱 설정",
+        text = "가입 계정",
         style = MoaTheme.typography.b2_500,
         color = MoaTheme.colors.textMediumEmphasis,
     )
@@ -91,7 +107,7 @@ private fun WorkInfoAccountContent() {
     MoaRow(
         leadingContent = {
             Text(
-                text = "카카오 계정으로 가입",
+                text = "$oauthType 계정으로 가입",
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
@@ -106,7 +122,11 @@ private fun WorkInfoAccountContent() {
 }
 
 @Composable
-private fun WorkInfoSalaryContent(onIntent: (WorkInfoIntent) -> Unit) {
+private fun WorkInfoSalaryContent(
+    salary: String,
+    salaryDate: String,
+    onIntent: (WorkInfoIntent) -> Unit,
+) {
     Text(
         text = "월급 정보",
         style = MoaTheme.typography.b2_500,
@@ -126,7 +146,7 @@ private fun WorkInfoSalaryContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "월급 · 400만원",
+                text = salary,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -152,7 +172,7 @@ private fun WorkInfoSalaryContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "25일",
+                text = salaryDate,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -167,7 +187,13 @@ private fun WorkInfoSalaryContent(onIntent: (WorkInfoIntent) -> Unit) {
 }
 
 @Composable
-private fun WorkInfoContent(onIntent: (WorkInfoIntent) -> Unit) {
+private fun WorkInfoContent(
+    workPlace: String,
+    workScheduleDays: String,
+    workTime: String,
+    lunchTime: String,
+    onIntent: (WorkInfoIntent) -> Unit,
+) {
     Text(
         text = "근무 정보",
         style = MoaTheme.typography.b2_500,
@@ -187,7 +213,7 @@ private fun WorkInfoContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "집계리아",
+                text = workPlace,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -213,7 +239,7 @@ private fun WorkInfoContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "월, 화, 수, 목, 금",
+                text = workScheduleDays,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -239,7 +265,7 @@ private fun WorkInfoContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "09:00 ~ 18:00",
+                text = workTime,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -265,7 +291,7 @@ private fun WorkInfoContent(onIntent: (WorkInfoIntent) -> Unit) {
         },
         subTrailingContent = {
             Text(
-                text = "12:00 ~ 13:00",
+                text = lunchTime,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
@@ -291,6 +317,9 @@ sealed interface WorkInfoIntent {
 @Composable
 private fun WorkInfoScreenPreview() {
     MoaTheme {
-        WorkInfoScreen(onIntent = {})
+        WorkInfoScreen(
+            uiState = WorkInfoUiState(),
+            onIntent = {},
+        )
     }
 }

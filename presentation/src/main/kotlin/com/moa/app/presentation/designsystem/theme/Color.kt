@@ -17,13 +17,20 @@ data class MoaColors(
     val textGreen: Color,
     val textBlue: Color,
     val textError: Color,
+    val textErrorLight: Color,
     val dividerPrimary: Color,
     val dividerSecondary: Color,
     val dimPrimary: Color,
     val dimSecondary: Color,
-    val btnEnable: Color,
-    val btnPressed: Color,
-    val btnDisabled: Color,
+    val btnPrimaryEnable: Color,
+    val btnPrimaryPressed: Color,
+    val btnPrimaryDisabled: Color,
+    val btnSecondaryEnable: Color,
+    val btnSecondaryPressed: Color,
+    val btnSecondaryDisabled: Color,
+    val btnTertiaryEnable : Color,
+    val btnTertiaryPressed : Color,
+    val btnTertiaryDisabled : Color,
 )
 
 val Green70 = Color(0xFF0A4B30)

@@ -18,6 +18,7 @@ import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
 import com.moa.app.presentation.ui.setting.notification.NotificationSettingScreen
 import com.moa.app.presentation.ui.setting.salarydate.SalaryDateScreen
 import com.moa.app.presentation.ui.setting.terms.TermsScreen
+import com.moa.app.presentation.ui.setting.withdraw.WithDrawScreen
 import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
 
 @Composable
@@ -83,6 +84,10 @@ private fun SettingNavHost(
 
             entry<SettingNavigation.Terms> {
                 TermsScreen()
+            }
+
+            entry<SettingNavigation.WithDraw> {
+                WithDrawScreen()
             }
         }
     )

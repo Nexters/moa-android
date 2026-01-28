@@ -21,6 +21,7 @@ import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
+import com.moa.app.presentation.ui.webview.WebViewScreen
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
@@ -33,7 +34,13 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     when (it.destination) {
                         is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
 
-                        is RootNavigation.Onboarding,
+                        is RootNavigation.Onboarding -> {
+                            if (it.destination.startDestination is OnboardingNavigation.Login) {
+                                backstack.clear()
+                            }
+                            backstack.add(it.destination)
+                        }
+
                         is RootNavigation.Home -> {
                             backstack.clear()
                             backstack.add(it.destination)
@@ -73,8 +80,8 @@ private fun MainNavHost(
                 SplashScreen()
             }
 
-            entry<RootNavigation.Onboarding> {
-                OnboardingScreen()
+            entry<RootNavigation.Onboarding> { key ->
+                OnboardingScreen(key.startDestination)
             }
 
             entry<RootNavigation.Home> {
@@ -87,6 +94,10 @@ private fun MainNavHost(
 
             entry<RootNavigation.Setting> {
                 SettingScreen()
+            }
+
+            entry<RootNavigation.Webview> { key ->
+                WebViewScreen(url = key.url)
             }
         }
     )
