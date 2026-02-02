@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.designsystem.component.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
@@ -31,7 +32,25 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            if (nickNameTextFieldState.text.isNotBlank()) {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Dialog(
+                        MoaDialogProperties.Confirm(
+                            title = "정말 그만 작성하실 건가요?",
+                            message = "뒤로 돌아가기를 누르면\n" +
+                                    "지금까지 작성한 정보가 사라져요",
+                            positiveText = "아니오",
+                            negativeText = "네",
+                            onPositive = {},
+                            onNegative = {
+                                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+                            },
+                        )
+                    )
+                )
+            } else {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            }
         }
     }
 

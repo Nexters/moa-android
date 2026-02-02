@@ -36,7 +36,11 @@ fun SalaryDateBottomSheet(
     var date by remember { mutableIntStateOf(salaryDate) }
 
     MoaBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoaTheme.spacing.spacing20)
+        ) {
             Text(
                 text = "월급일을 선택해주세요",
                 style = MoaTheme.typography.t1_700,

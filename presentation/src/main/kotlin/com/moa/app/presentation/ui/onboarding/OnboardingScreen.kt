@@ -46,6 +46,8 @@ fun OnboardingScreen(
                         else -> Unit
                     }
                 }
+
+                else -> Unit
             }
         }
     }

@@ -3,8 +3,11 @@ package com.moa.app.presentation.ui
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -12,6 +15,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.moa.app.presentation.designsystem.component.MoaDialog
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
@@ -26,11 +30,15 @@ import com.moa.app.presentation.ui.webview.WebViewScreen
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val backstack = rememberNavBackStack(RootNavigation.Splash)
+    val dialog by viewModel.dialog.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
+                    focusManager.clearFocus()
+
                     when (it.destination) {
                         is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
 
@@ -53,6 +61,10 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                         else -> backstack.add(it.destination)
                     }
                 }
+
+                is MoaSideEffect.Dialog -> {
+                    viewModel.setDialog(it.dialog)
+                }
             }
         }
     }
@@ -61,6 +73,13 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         modifier = Modifier.fillMaxSize(),
         backstack = backstack,
     )
+
+    dialog?.let {
+        MoaDialog(
+            properties = it,
+            onDismissRequest = { viewModel.setDialog(null) },
+        )
+    }
 }
 
 @Composable
