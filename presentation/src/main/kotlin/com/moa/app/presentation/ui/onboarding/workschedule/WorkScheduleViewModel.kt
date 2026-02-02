@@ -10,7 +10,6 @@ import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -72,7 +71,7 @@ data class WorkScheduleUiState(
 
 @HiltViewModel(assistedFactory = WorkScheduleViewModel.Factory::class)
 class WorkScheduleViewModel @AssistedInject constructor(
-    @Assisted private val args: OnboardingNavigationArgs,
+    @Assisted private val args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
@@ -200,6 +199,6 @@ class WorkScheduleViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigationArgs): WorkScheduleViewModel
+        fun create(args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs): WorkScheduleViewModel
     }
 }

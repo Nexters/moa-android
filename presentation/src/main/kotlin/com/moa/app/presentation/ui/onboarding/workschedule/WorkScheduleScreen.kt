@@ -37,13 +37,13 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.model.Term
 import com.moa.app.presentation.model.Time
 import com.moa.app.presentation.model.WorkScheduleDay
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WorkScheduleScreen(
-    args: OnboardingNavigationArgs,
+    args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs,
     viewModel: WorkScheduleViewModel = hiltViewModel(
         creationCallback = { factory: WorkScheduleViewModel.Factory ->
             factory.create(args)

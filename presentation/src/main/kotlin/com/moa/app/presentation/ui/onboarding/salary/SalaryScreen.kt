@@ -45,11 +45,11 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
 import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.navigation.OnboardingNavigation
 
 @Composable
 fun SalaryScreen(
-    args: OnboardingNavigationArgs,
+    args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     viewModel: SalaryViewModel = hiltViewModel(
         creationCallback = { factory: SalaryViewModel.Factory ->
             factory.create(args)

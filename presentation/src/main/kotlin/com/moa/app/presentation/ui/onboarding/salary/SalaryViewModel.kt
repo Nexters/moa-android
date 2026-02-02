@@ -9,7 +9,6 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.SalaryType
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,7 +25,7 @@ data class SalaryUiState(
 
 @HiltViewModel(assistedFactory = SalaryViewModel.Factory::class)
 class SalaryViewModel @AssistedInject constructor(
-    @Assisted private val args: OnboardingNavigationArgs,
+    @Assisted private val args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
@@ -62,12 +61,7 @@ class SalaryViewModel @AssistedInject constructor(
             moaSideEffectBus.emit(
                 sideEffect = MoaSideEffect.Navigate(
                     destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WorkSchedule(
-                            args = args.copy(
-                                salaryType = _uiState.value.selectedSalaryType,
-                                salary = _uiState.value.salaryTextField.text.toString()
-                            )
-                        )
+                        OnboardingNavigation.WorkSchedule()
                     } else {
                         RootNavigation.Back
                     }
@@ -78,6 +72,6 @@ class SalaryViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigationArgs): SalaryViewModel
+        fun create(args: OnboardingNavigation.Salary.SalaryNavigationArgs): SalaryViewModel
     }
 }

@@ -11,7 +11,6 @@ import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.navigation.SettingNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -80,7 +79,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.Salary(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.Salary.SalaryNavigationArgs(
                                 salary = _uiState.value.salary,
                                 salaryType = _uiState.value.salaryType,
                                 isOnboarding = false,
@@ -104,7 +103,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.WorkPlace(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
                                 workPlace = _uiState.value.workPlace,
                                 isOnboarding = false,
                             )
@@ -121,7 +120,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.WorkSchedule(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
                                 workScheduleDays = _uiState.value.workScheduleDays,
                                 times = _uiState.value.times,
                                 isOnboarding = false,

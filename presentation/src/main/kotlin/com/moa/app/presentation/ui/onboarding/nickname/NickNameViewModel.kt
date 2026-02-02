@@ -8,7 +8,6 @@ import com.moa.app.presentation.designsystem.component.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -64,7 +63,7 @@ class NickNameViewModel @AssistedInject constructor(
                 sideEffect = MoaSideEffect.Navigate(
                     destination = if (args.isOnboarding) {
                         OnboardingNavigation.WorkPlace(
-                            args = OnboardingNavigationArgs().copy(nickName = nickNameTextFieldState.text.toString())
+                            OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs()
                         )
                     } else {
                         RootNavigation.Back

@@ -7,7 +7,6 @@ import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = WorkPlaceViewModel.Factory::class)
 class WorkPlaceViewModel @AssistedInject constructor(
-    @Assisted private val args: OnboardingNavigationArgs,
+    @Assisted private val args: OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
     val workPlaceTextFieldState = TextFieldState(args.workPlace)
@@ -39,9 +38,7 @@ class WorkPlaceViewModel @AssistedInject constructor(
             moaSideEffectBus.emit(
                 sideEffect = MoaSideEffect.Navigate(
                     destination = if (args.isOnboarding) {
-                        OnboardingNavigation.Salary(
-                            args = args.copy(workPlace = workPlaceTextFieldState.text.toString())
-                        )
+                        OnboardingNavigation.Salary()
                     } else {
                         RootNavigation.Back
                     }
@@ -52,6 +49,6 @@ class WorkPlaceViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigationArgs): WorkPlaceViewModel
+        fun create(args: OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs): WorkPlaceViewModel
     }
 }
