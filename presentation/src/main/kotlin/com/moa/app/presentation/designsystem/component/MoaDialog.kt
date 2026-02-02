@@ -11,19 +11,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun MoaDialog(
     properties: MoaDialogProperties,
     onDismissRequest: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
@@ -48,6 +53,7 @@ fun MoaDialog(
                     text = it,
                     style = MoaTheme.typography.t3_700,
                     color = MoaTheme.colors.textHighEmphasis,
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -58,6 +64,7 @@ fun MoaDialog(
                     text = it,
                     style = MoaTheme.typography.b2_400,
                     color = MoaTheme.colors.textMediumEmphasis,
+                    textAlign = TextAlign.Center,
                 )
             }
 
@@ -69,7 +76,9 @@ fun MoaDialog(
                         alertText = properties.alertText,
                         onAlert = {
                             onDismissRequest()
-                            properties.onAlert?.invoke()
+                            scope.launch {
+                                properties.onAlert?.invoke()
+                            }
                         }
                     )
                 }
@@ -80,11 +89,15 @@ fun MoaDialog(
                         negativeText = properties.negativeText,
                         onPositive = {
                             onDismissRequest()
-                            properties.onPositive()
+                            scope.launch {
+                                properties.onPositive()
+                            }
                         },
                         onNegative = {
                             onDismissRequest()
-                            properties.onNegative?.invoke()
+                            scope.launch {
+                                properties.onNegative?.invoke()
+                            }
                         }
                     )
                 }
@@ -156,8 +169,8 @@ sealed interface MoaDialogProperties {
         override val cancelable: Boolean = true,
         val positiveText: String = "확인",
         val negativeText: String = "취소",
-        val onPositive: () -> Unit,
-        val onNegative: (() -> Unit)? = null,
+        val onPositive: suspend () -> Unit,
+        val onNegative: (suspend () -> Unit)? = null,
     ) : MoaDialogProperties
 
     data class Alert(
@@ -165,7 +178,7 @@ sealed interface MoaDialogProperties {
         override val message: String? = null,
         override val cancelable: Boolean = true,
         val alertText: String = "확인",
-        val onAlert: (() -> Unit)? = null,
+        val onAlert: (suspend () -> Unit)? = null,
     ) : MoaDialogProperties
 }
 

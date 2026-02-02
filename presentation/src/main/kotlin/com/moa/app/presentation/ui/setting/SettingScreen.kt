@@ -43,6 +43,8 @@ fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
                         else -> Unit
                     }
                 }
+
+                else -> Unit
             }
         }
     }
