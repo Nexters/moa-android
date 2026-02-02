@@ -1,6 +1,6 @@
 package com.moa.app.presentation.model
 
-import com.moa.app.core.makeTimeString
+import com.moa.app.core.extensions.makeTimeString
 import kotlinx.serialization.Serializable
 
 @Serializable

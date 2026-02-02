@@ -1,4 +1,4 @@
-package com.moa.app.core
+package com.moa.app.core.extensions
 
 import java.util.Locale
 
