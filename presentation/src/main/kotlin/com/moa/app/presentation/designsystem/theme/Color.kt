@@ -42,7 +42,7 @@ val Green20 = Color(0xFFAFFAD8)
 val Green10 = Color(0xFFDFFEF0)
 
 val Blue = Color(0xFF348CFF)
-val BlueLight = Color(0xFFA5E3FF)
+val BlueLight = Color(0xFF86BBFF)
 val Pink = Color(0xFFFF3CB3)
 val PinkLight = Color(0xFFFFCDEC)
 val Yellow = Color(0xFFFFC11F)
