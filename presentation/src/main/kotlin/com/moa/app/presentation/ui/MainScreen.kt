@@ -28,7 +28,10 @@ import com.moa.app.presentation.ui.splash.SplashScreen
 import com.moa.app.presentation.ui.webview.WebViewScreen
 
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    viewModel: MainViewModel = hiltViewModel(),
+    onFinish: () -> Unit,
+) {
     val backstack = rememberNavBackStack(RootNavigation.Splash)
     val dialog by viewModel.dialog.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -40,12 +43,26 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     focusManager.clearFocus()
 
                     when (it.destination) {
-                        is RootNavigation.Back -> backstack.removeAt(backstack.lastIndex)
+                        is RootNavigation.Back -> {
+                            if (backstack.size > 1) {
+                                backstack.removeAt(backstack.lastIndex)
+                            } else {
+                                onFinish()
+                            }
+                        }
 
                         is RootNavigation.Onboarding -> {
-                            if (it.destination.startDestination is OnboardingNavigation.Login) {
-                                backstack.clear()
+                            val startDestination = it.destination.startDestination
+                            val shouldClear = when (startDestination) {
+                                is OnboardingNavigation.Login -> true
+                                is OnboardingNavigation.Nickname -> startDestination.args.isOnboarding
+                                is OnboardingNavigation.WorkPlace -> startDestination.args.isOnboarding
+                                is OnboardingNavigation.Salary -> startDestination.args.isOnboarding
+                                is OnboardingNavigation.WorkSchedule -> startDestination.args.isOnboarding
+                                else -> false
                             }
+                            if (shouldClear) backstack.clear()
+
                             backstack.add(it.destination)
                         }
 

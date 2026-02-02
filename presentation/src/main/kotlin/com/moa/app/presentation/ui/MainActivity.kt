@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MoaTheme {
-                MainScreen()
+                MainScreen(onFinish = { finish() })
             }
         }
     }

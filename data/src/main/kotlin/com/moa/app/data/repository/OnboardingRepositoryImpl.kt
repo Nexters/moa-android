@@ -8,9 +8,9 @@ class OnboardingRepositoryImpl @Inject constructor(
 ) : OnboardingRepository {
     override suspend fun fetchOnboardingState(): OnboardingState {
         return OnboardingState(
-            loginCompleted = false,
-            nickNameCompleted = false,
-            workPlaceCompleted = false,
+            loginCompleted = true,
+            nickNameCompleted = true,
+            workPlaceCompleted = true,
             salaryCompleted = false,
             workScheduleCompleted = false,
         )
