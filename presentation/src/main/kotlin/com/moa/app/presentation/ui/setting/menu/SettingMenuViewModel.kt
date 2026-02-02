@@ -18,7 +18,6 @@ data class SettingUiState(
     val oauthType: String = "카카오",
     val nickName: String = "집계사장",
     val latestAppVersion: String = "1.0.0",
-    val dialog: MoaDialogProperties? = null,
 )
 
 @HiltViewModel
@@ -36,7 +35,6 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickWorkInfo -> workInfo()
             SettingMenuIntent.ClickNotificationSetting -> notificationSetting()
             SettingMenuIntent.ClickTerms -> terms()
-            is SettingMenuIntent.SetDialog -> setDialog(intent.dialog)
             SettingMenuIntent.ClickLogout -> logout()
             SettingMenuIntent.ClickWithdraw -> withdraw()
         }
@@ -83,15 +81,25 @@ class SettingMenuViewModel @Inject constructor(
         }
     }
 
-    private fun setDialog(dialog: MoaDialogProperties?) {
-        _uiState.value = uiState.value.copy(
-            dialog = dialog
-        )
-    }
-
     private fun logout() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Onboarding()))
+            moaSideEffectBus.emit(
+                MoaSideEffect.Dialog(
+                    MoaDialogProperties.Confirm(
+                        title = "로그아웃 하시겠어요?",
+                        message = "로그아웃하면 로그인 화면으로 이동해요.",
+                        onPositive = {
+                            moaSideEffectBus.emit(
+                                MoaSideEffect.Navigate(
+                                    destination = RootNavigation.Onboarding(
+                                        startDestination = OnboardingNavigation.Login
+                                    )
+                                )
+                            )
+                        },
+                    )
+                )
+            )
         }
     }
 
