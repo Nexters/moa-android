@@ -15,4 +15,8 @@ class OnboardingRepositoryImpl @Inject constructor(
             workScheduleCompleted = false,
         )
     }
+
+    override suspend fun putNickName(nickName: String) {}
+
+    override suspend fun putWorkPlace(workPlace: String) {}
 }
