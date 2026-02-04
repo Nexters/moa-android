@@ -1,6 +1,5 @@
 package com.moa.app.presentation.model
 
-import com.moa.app.presentation.designsystem.component.MoaDialogProperties
 import com.moa.app.presentation.navigation.RootNavigation
 
 sealed interface MoaSideEffect {

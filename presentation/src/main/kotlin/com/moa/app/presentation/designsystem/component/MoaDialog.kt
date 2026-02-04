@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.model.MoaDialogProperties
 import kotlinx.coroutines.launch
 
 @Composable
@@ -155,31 +155,6 @@ private fun AlertButtonRow(
     ) {
         Text(text = alertText)
     }
-}
-
-@Stable
-sealed interface MoaDialogProperties {
-    val title: String?
-    val message: String?
-    val cancelable: Boolean
-
-    data class Confirm(
-        override val title: String?,
-        override val message: String? = null,
-        override val cancelable: Boolean = true,
-        val positiveText: String = "확인",
-        val negativeText: String = "취소",
-        val onPositive: suspend () -> Unit,
-        val onNegative: (suspend () -> Unit)? = null,
-    ) : MoaDialogProperties
-
-    data class Alert(
-        override val title: String? = null,
-        override val message: String? = null,
-        override val cancelable: Boolean = true,
-        val alertText: String = "확인",
-        val onAlert: (suspend () -> Unit)? = null,
-    ) : MoaDialogProperties
 }
 
 @Preview
