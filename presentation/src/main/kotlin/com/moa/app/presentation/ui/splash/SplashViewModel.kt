@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
@@ -17,62 +18,40 @@ class SplashViewModel @Inject constructor(
     private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     fun checkLoginStatus() {
-        viewModelScope.launch {
-            val onboardingState = onboardingRepository.fetchOnboardingState()
-
+        suspend {
+            onboardingRepository.fetchOnboardingState()
+        }.execute(scope = viewModelScope) { onboardingState ->
             when {
                 !onboardingState.loginCompleted -> {
-                    moaSideEffectBus.emit(
-                        MoaSideEffect.Navigate(
-                            RootNavigation.Onboarding()
-                        )
-                    )
+                    navigate(RootNavigation.Onboarding())
                 }
 
                 !onboardingState.nickNameCompleted -> {
-                    moaSideEffectBus.emit(
-                        MoaSideEffect.Navigate(
-                            RootNavigation.Onboarding(
-                                OnboardingNavigation.Nickname()
-                            )
-                        )
-                    )
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
                 }
 
                 !onboardingState.workPlaceCompleted -> {
-                    moaSideEffectBus.emit(
-                        MoaSideEffect.Navigate(
-                            RootNavigation.Onboarding(
-                                OnboardingNavigation.WorkPlace()
-                            )
-                        )
-                    )
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkPlace()))
                 }
 
                 !onboardingState.salaryCompleted -> {
-                    moaSideEffectBus.emit(
-                        MoaSideEffect.Navigate(
-                            RootNavigation.Onboarding(
-                                OnboardingNavigation.Salary()
-                            )
-                        )
-                    )
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Salary()))
                 }
 
                 !onboardingState.workScheduleCompleted -> {
-                    moaSideEffectBus.emit(
-                        MoaSideEffect.Navigate(
-                            RootNavigation.Onboarding(
-                                OnboardingNavigation.WorkSchedule()
-                            )
-                        )
-                    )
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkSchedule()))
                 }
 
                 else -> {
-                    moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Home))
+                    navigate(RootNavigation.Home)
                 }
             }
+        }
+    }
+
+    private fun navigate(destination: RootNavigation) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
         }
     }
 }

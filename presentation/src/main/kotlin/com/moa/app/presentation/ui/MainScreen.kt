@@ -82,6 +82,14 @@ fun MainScreen(
                 is MoaSideEffect.Dialog -> {
                     viewModel.setDialog(it.dialog)
                 }
+
+                is MoaSideEffect.Loading -> {
+                    // TODO Loading
+                }
+
+                is MoaSideEffect.Failure -> {
+                    // TODO Failure
+                }
             }
         }
     }

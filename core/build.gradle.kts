@@ -24,5 +24,5 @@ android {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.compose.stable.marker)
+    compileOnly(libs.compose.stable.marker)
 }
