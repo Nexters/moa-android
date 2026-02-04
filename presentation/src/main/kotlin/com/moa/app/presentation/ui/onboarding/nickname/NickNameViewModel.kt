@@ -3,6 +3,7 @@ package com.moa.app.presentation.ui.onboarding.nickname
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class NickNameViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     val nickNameTextFieldState = TextFieldState(args.nickName)
 
@@ -31,25 +33,21 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            if (nickNameTextFieldState.text.isNotBlank()) {
-                moaSideEffectBus.emit(
-                    MoaSideEffect.Dialog(
-                        MoaDialogProperties.Confirm(
-                            title = "정말 그만 작성하실 건가요?",
-                            message = "뒤로 돌아가기를 누르면\n" +
-                                    "지금까지 작성한 정보가 사라져요",
-                            positiveText = "아니오",
-                            negativeText = "네",
-                            onPositive = {},
-                            onNegative = {
-                                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
-                            },
-                        )
+            moaSideEffectBus.emit(
+                MoaSideEffect.Dialog(
+                    MoaDialogProperties.Confirm(
+                        title = "정말 그만 작성하실 건가요?",
+                        message = "뒤로 돌아가기를 누르면\n" +
+                                "지금까지 작성한 정보가 사라져요",
+                        positiveText = "아니오",
+                        negativeText = "네",
+                        onPositive = {},
+                        onNegative = {
+                            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+                        },
                     )
                 )
-            } else {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
-            }
+            )
         }
     }
 
