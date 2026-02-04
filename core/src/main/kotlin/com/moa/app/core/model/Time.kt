@@ -1,9 +1,11 @@
 package com.moa.app.core.model
 
+import androidx.compose.runtime.Stable
 import com.moa.app.core.extensions.makeTimeString
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Stable
 sealed interface Time {
     val title: String
     val description: String
