@@ -1,4 +1,4 @@
-package com.moa.app.presentation.model
+package com.moa.app.core.model
 
 import kotlinx.serialization.Serializable
 

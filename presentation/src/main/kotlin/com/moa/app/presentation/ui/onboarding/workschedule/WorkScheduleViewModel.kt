@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.Term
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
+import com.moa.app.core.model.Term
+import com.moa.app.core.model.Time
+import com.moa.app.core.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted

@@ -21,7 +21,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Terms
+import com.moa.app.core.model.Terms
 
 @Composable
 fun TermsScreen(viewModel: TermsViewModel = hiltViewModel()) {

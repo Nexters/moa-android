@@ -1,4 +1,4 @@
-package com.moa.app.presentation.model
+package com.moa.app.core.model
 
 enum class SalaryType(val title: String) {
     Monthly("월급"),

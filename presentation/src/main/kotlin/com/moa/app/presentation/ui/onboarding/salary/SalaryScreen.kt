@@ -44,7 +44,7 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
-import com.moa.app.presentation.model.SalaryType
+import com.moa.app.core.model.SalaryType
 import com.moa.app.presentation.navigation.OnboardingNavigation
 
 @Composable

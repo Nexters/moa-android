@@ -1,4 +1,4 @@
-package com.moa.app.presentation.model
+package com.moa.app.core.model
 
 sealed class Term(
     open val title: String,

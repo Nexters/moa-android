@@ -34,9 +34,9 @@ import com.moa.app.presentation.designsystem.component.MoaTermBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Term
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
+import com.moa.app.core.model.Term
+import com.moa.app.core.model.Time
+import com.moa.app.core.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

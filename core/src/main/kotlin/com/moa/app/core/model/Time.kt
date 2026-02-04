@@ -1,4 +1,4 @@
-package com.moa.app.presentation.model
+package com.moa.app.core.model
 
 import com.moa.app.core.extensions.makeTimeString
 import kotlinx.serialization.Serializable

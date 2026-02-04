@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.SalaryType
+import com.moa.app.core.model.SalaryType
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted

@@ -1,9 +1,9 @@
 package com.moa.app.presentation.navigation
 
 import com.moa.app.core.model.ImmutableListSerializer
-import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
+import com.moa.app.core.model.SalaryType
+import com.moa.app.core.model.Time
+import com.moa.app.core.model.WorkScheduleDay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
