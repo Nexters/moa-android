@@ -1,10 +1,12 @@
 package com.moa.app.presentation.ui.onboarding.nickname
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
@@ -22,6 +24,12 @@ class NickNameViewModel @AssistedInject constructor(
     private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     val nickNameTextFieldState = TextFieldState(args.nickName)
+
+    init {
+        if (args.isOnboarding) {
+            random()
+        }
+    }
 
     fun onIntent(intent: NickNameIntent) {
         when (intent) {
@@ -52,22 +60,30 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun random() {
-
+        suspend {
+            onboardingRepository.fetchRandomNickName()
+        }.execute(scope = viewModelScope) { nickName ->
+            nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
+        }
     }
 
     private fun next() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(
-                sideEffect = MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WorkPlace(
-                            OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs()
-                        )
-                    } else {
-                        RootNavigation.Back
-                    }
+        suspend {
+            onboardingRepository.putNickName(nickNameTextFieldState.text.toString())
+        }.execute(scope = viewModelScope) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(
+                    sideEffect = MoaSideEffect.Navigate(
+                        destination = if (args.isOnboarding) {
+                            OnboardingNavigation.WorkPlace(
+                                OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs()
+                            )
+                        } else {
+                            RootNavigation.Back
+                        }
+                    )
                 )
-            )
+            }
         }
     }
 

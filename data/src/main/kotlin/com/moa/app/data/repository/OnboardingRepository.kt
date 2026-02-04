@@ -4,6 +4,7 @@ import com.moa.app.core.model.OnboardingState
 
 interface OnboardingRepository {
     suspend fun fetchOnboardingState(): OnboardingState
-    suspend fun putNickName(nickName : String)
-    suspend fun putWorkPlace(workPlace : String)
+    suspend fun fetchRandomNickName(): String
+    suspend fun putNickName(nickName: String)
+    suspend fun putWorkPlace(workPlace: String)
 }
