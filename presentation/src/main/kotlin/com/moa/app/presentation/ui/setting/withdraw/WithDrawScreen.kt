@@ -26,7 +26,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.WithdrawalReason
+import com.moa.app.core.model.setting.WithdrawalReason
 import kotlinx.collections.immutable.ImmutableSet
 
 @Composable

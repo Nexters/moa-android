@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.Time
+import com.moa.app.core.model.onboarding.Time
 import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -28,15 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.core.extensions.makeTimeString
+import com.moa.app.core.model.onboarding.Term
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTermBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.Term
-import com.moa.app.core.model.Time
-import com.moa.app.core.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -171,16 +171,16 @@ private fun WorkScheduleScreen(
 
 @Composable
 private fun WorkScheduleDays(
-    selectedDays: ImmutableList<WorkScheduleDay>,
+    selectedDays: ImmutableList<WorkPolicy.WorkScheduleDay>,
     onIntent: (WorkScheduleIntent) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing8)
     ) {
-        WorkScheduleDay.entries.forEach { workScheduleDay ->
+        WorkPolicy.WorkScheduleDay.entries.forEach { workScheduleDay ->
             WorkScheduleDay(
-                day = workScheduleDay.title,
+                day = workScheduleDay.day,
                 selected = selectedDays.contains(workScheduleDay),
                 onClick = {
                     onIntent(WorkScheduleIntent.ClickWorkScheduleDay(workScheduleDay))
@@ -299,7 +299,7 @@ sealed interface WorkScheduleIntent {
     data object ClickBack : WorkScheduleIntent
 
     @JvmInline
-    value class ClickWorkScheduleDay(val day: WorkScheduleDay) : WorkScheduleIntent
+    value class ClickWorkScheduleDay(val day: WorkPolicy.WorkScheduleDay) : WorkScheduleIntent
 
     @JvmInline
     value class ShowTimeBottomSheet(val time: Time?) : WorkScheduleIntent
@@ -326,9 +326,9 @@ private fun WorkScheduleScreenPreview() {
         WorkScheduleScreen(
             uiState = WorkScheduleUiState(
                 selectedWorkScheduleDays = persistentListOf(
-                    WorkScheduleDay.Monday,
-                    WorkScheduleDay.Wednesday,
-                    WorkScheduleDay.Friday,
+                    WorkPolicy.WorkScheduleDay.MON,
+                    WorkPolicy.WorkScheduleDay.WED,
+                    WorkPolicy.WorkScheduleDay.FRI,
                 ),
             ),
             onIntent = {},

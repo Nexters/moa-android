@@ -1,4 +1,4 @@
-package com.moa.app.core.model
+package com.moa.app.core.model.setting
 
 enum class Terms(
     val title: String,

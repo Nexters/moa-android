@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.Term
+import com.moa.app.core.model.onboarding.Term
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

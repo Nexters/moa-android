@@ -3,11 +3,11 @@ package com.moa.app.presentation.ui.onboarding.workschedule
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.onboarding.Term
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.core.model.Term
-import com.moa.app.core.model.Time
-import com.moa.app.core.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @Stable
 data class WorkScheduleUiState(
-    val selectedWorkScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(),
+    val selectedWorkScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(),
     val times: ImmutableList<Time> = persistentListOf(
         Time.Work(
             startHour = 9,
@@ -101,7 +101,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }
     }
 
-    private fun clickWorkScheduleDay(day: WorkScheduleDay) {
+    private fun clickWorkScheduleDay(day: WorkPolicy.WorkScheduleDay) {
         val currentSet = _uiState.value.selectedWorkScheduleDays.toMutableList()
         if (currentSet.contains(day)) {
             currentSet.remove(day)

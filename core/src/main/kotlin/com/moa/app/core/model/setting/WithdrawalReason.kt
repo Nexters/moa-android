@@ -1,4 +1,4 @@
-package com.moa.app.core.model
+package com.moa.app.core.model.setting
 
 enum class WithdrawalReason(val title: String) {
     Error("앱 오류로 사용하기 불편해요"),

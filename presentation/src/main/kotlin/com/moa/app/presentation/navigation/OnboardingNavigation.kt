@@ -1,9 +1,9 @@
 package com.moa.app.presentation.navigation
 
 import com.moa.app.core.model.ImmutableListSerializer
-import com.moa.app.core.model.SalaryType
-import com.moa.app.core.model.Time
-import com.moa.app.core.model.WorkScheduleDay
+import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
@@ -33,6 +33,7 @@ sealed interface OnboardingNavigation : RootNavigation {
         @Serializable
         data class WorkPlaceNavigationArgs(
             val isOnboarding: Boolean = true,
+            val nickName: String = "",
             val workPlace: String = "",
         )
     }
@@ -45,7 +46,7 @@ sealed interface OnboardingNavigation : RootNavigation {
         @Serializable
         data class SalaryNavigationArgs(
             val isOnboarding: Boolean = true,
-            val salaryType: SalaryType = SalaryType.Monthly,
+            val salaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
             val salary: String = "",
         )
     }
@@ -59,7 +60,7 @@ sealed interface OnboardingNavigation : RootNavigation {
         data class WorkScheduleNavigationArgs(
             val isOnboarding: Boolean = true,
             @Serializable(with = ImmutableListSerializer::class)
-            val workScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(),
+            val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(),
             @Serializable(with = ImmutableListSerializer::class)
             val times: ImmutableList<Time> = persistentListOf(
                 Time.Work(

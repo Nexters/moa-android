@@ -4,9 +4,9 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.core.model.SalaryType
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 @Stable
 data class SalaryUiState(
-    val selectedSalaryType: SalaryType = SalaryType.Monthly,
+    val selectedSalaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
     val salaryTextField: TextFieldState = TextFieldState(),
 )
 
@@ -50,7 +50,7 @@ class SalaryViewModel @AssistedInject constructor(
         }
     }
 
-    private fun selectSalaryType(salaryType: SalaryType) {
+    private fun selectSalaryType(salaryType: Payroll.SalaryType) {
         _uiState.value = _uiState.value.copy(
             selectedSalaryType = salaryType
         )

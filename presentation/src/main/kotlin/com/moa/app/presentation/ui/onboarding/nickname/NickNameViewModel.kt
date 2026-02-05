@@ -61,29 +61,30 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun random() {
         suspend {
-            onboardingRepository.fetchRandomNickName()
-        }.execute(scope = viewModelScope) { nickName ->
+            onboardingRepository.getRandomNickName()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) { nickName ->
             nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
         }
     }
 
     private fun next() {
-        suspend {
-            onboardingRepository.putNickName(nickNameTextFieldState.text.toString())
-        }.execute(scope = viewModelScope) {
-            viewModelScope.launch {
-                moaSideEffectBus.emit(
-                    sideEffect = MoaSideEffect.Navigate(
-                        destination = if (args.isOnboarding) {
-                            OnboardingNavigation.WorkPlace(
-                                OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs()
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                sideEffect = MoaSideEffect.Navigate(
+                    destination = if (args.isOnboarding) {
+                        OnboardingNavigation.WorkPlace(
+                            OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
+                                nickName = nickNameTextFieldState.text.toString()
                             )
-                        } else {
-                            RootNavigation.Back
-                        }
-                    )
+                        )
+                    } else {
+                        RootNavigation.Back
+                    }
                 )
-            }
+            )
         }
     }
 

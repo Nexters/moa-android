@@ -56,9 +56,6 @@ fun MainScreen(
                             val shouldClear = when (startDestination) {
                                 is OnboardingNavigation.Login -> true
                                 is OnboardingNavigation.Nickname -> startDestination.args.isOnboarding
-                                is OnboardingNavigation.WorkPlace -> startDestination.args.isOnboarding
-                                is OnboardingNavigation.Salary -> startDestination.args.isOnboarding
-                                is OnboardingNavigation.WorkSchedule -> startDestination.args.isOnboarding
                                 else -> false
                             }
                             if (shouldClear) backstack.clear()

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
-import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
@@ -17,33 +16,72 @@ class SplashViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
-    fun checkLoginStatus() {
-        suspend {
-            onboardingRepository.fetchOnboardingState()
-        }.execute(scope = viewModelScope) { onboardingState ->
-            when {
-                !onboardingState.loginCompleted -> {
-                    navigate(RootNavigation.Onboarding())
-                }
+    fun getOnboardingStatus() {
+        viewModelScope.launch {
+            val onboardingStatus = onboardingRepository.getOnboardingStatus()
+            val profile = onboardingStatus.profile
+            val payroll = onboardingStatus.payroll
+            val workPolicy = onboardingStatus.workPolicy
 
-                !onboardingState.nickNameCompleted -> {
+            if(onboardingStatus.hasRequiredTermsAgreed) {
+                navigate(RootNavigation.Home)
+            }else {
+                if (profile == null) {
                     navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Nickname(
+                                args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                    nickName = profile.nickName
+                                )
+                            )
+                        )
+                    )
+
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.WorkPlace(
+                                OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
+                                    nickName = profile.nickName,
+                                    workPlace = profile.workPlace,
+                                )
+                            )
+                        )
+                    )
                 }
 
-                !onboardingState.workPlaceCompleted -> {
-                    navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkPlace()))
-                }
-
-                !onboardingState.salaryCompleted -> {
+                if (payroll == null) {
                     navigate(RootNavigation.Onboarding(OnboardingNavigation.Salary()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Salary(
+                                OnboardingNavigation.Salary.SalaryNavigationArgs(
+                                    salary = payroll.salary,
+                                    salaryType = payroll.salaryType,
+                                )
+                            )
+                        )
+                    )
                 }
 
-                !onboardingState.workScheduleCompleted -> {
+                if (workPolicy == null) {
                     navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkSchedule()))
-                }
-
-                else -> {
-                    navigate(RootNavigation.Home)
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.WorkSchedule(
+                                OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
+                                    workScheduleDays = workPolicy.workScheduleDays,
+                                    times = workPolicy.times,
+                                )
+                            )
+                        )
+                    )
                 }
             }
         }

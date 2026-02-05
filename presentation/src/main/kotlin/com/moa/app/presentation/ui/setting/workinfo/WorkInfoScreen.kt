@@ -85,7 +85,7 @@ private fun WorkInfoScreen(
 
             WorkInfoContent(
                 workPlace = uiState.workPlace,
-                workScheduleDays = uiState.workScheduleDays.joinToString { it.title },
+                workScheduleDays = uiState.workScheduleDays.joinToString { it.day },
                 workTime = uiState.times[0].getFormattedTimeRange(),
                 lunchTime = uiState.times[1].getFormattedTimeRange(),
                 onIntent = onIntent,
