@@ -1,6 +1,7 @@
 package com.moa.app.data.repository
 
 import com.moa.app.core.model.onboarding.OnboardingStatus
+import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Profile
 import javax.inject.Inject
 import kotlin.random.Random
@@ -23,5 +24,9 @@ class OnboardingRepositoryImpl @Inject constructor(
 
     override suspend fun patchProfile(profile: Profile) {
         // TODO patch profile
+    }
+
+    override suspend fun patchPayroll(payroll: Payroll) {
+        // TODO patch payroll
     }
 }

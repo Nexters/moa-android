@@ -5,10 +5,11 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,6 +28,7 @@ data class SalaryUiState(
 class SalaryViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         SalaryUiState(
@@ -57,16 +59,35 @@ class SalaryViewModel @AssistedInject constructor(
     }
 
     private fun next() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(
-                sideEffect = MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WorkSchedule()
-                    } else {
-                        RootNavigation.Back
-                    }
+        if (args.isOnboarding) {
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
+        suspend {
+            onboardingRepository.patchPayroll(
+                Payroll(
+                    salaryType = uiState.value.selectedSalaryType,
+                    salary = uiState.value.salaryTextField.text.toString(),
                 )
             )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WorkSchedule()))
+            }
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 급여 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
