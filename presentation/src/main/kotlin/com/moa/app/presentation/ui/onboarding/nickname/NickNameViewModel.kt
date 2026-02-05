@@ -10,7 +10,6 @@ import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -41,21 +40,25 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Dialog(
-                    MoaDialogProperties.Confirm(
-                        title = "정말 그만 작성하실 건가요?",
-                        message = "뒤로 돌아가기를 누르면\n" +
-                                "지금까지 작성한 정보가 사라져요",
-                        positiveText = "아니오",
-                        negativeText = "네",
-                        onPositive = {},
-                        onNegative = {
-                            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
-                        },
+            if (args.isOnboarding) {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Dialog(
+                        MoaDialogProperties.Confirm(
+                            title = "정말 그만 작성하실 건가요?",
+                            message = "뒤로 돌아가기를 누르면\n" +
+                                    "지금까지 작성한 정보가 사라져요",
+                            positiveText = "아니오",
+                            negativeText = "네",
+                            onPositive = {},
+                            onNegative = {
+                                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+                            },
+                        )
                     )
                 )
-            )
+            } else {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            }
         }
     }
 
@@ -71,20 +74,23 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun next() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(
-                sideEffect = MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
+        if (args.isOnboarding) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
                         OnboardingNavigation.WorkPlace(
                             OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
                                 nickName = nickNameTextFieldState.text.toString()
                             )
                         )
-                    } else {
-                        RootNavigation.Back
-                    }
+                    )
                 )
-            )
+            }
+        } else {
+            // TODO setting 닉네임 api
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            }
         }
     }
 
