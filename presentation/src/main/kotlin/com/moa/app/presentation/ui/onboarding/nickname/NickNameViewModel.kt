@@ -75,22 +75,30 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun next() {
         if (args.isOnboarding) {
-            viewModelScope.launch {
-                moaSideEffectBus.emit(
-                    MoaSideEffect.Navigate(
-                        OnboardingNavigation.WorkPlace(
-                            OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
-                                nickName = nickNameTextFieldState.text.toString()
-                            )
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    OnboardingNavigation.WorkPlace(
+                        OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
+                            nickName = nickNameTextFieldState.text.toString()
                         )
                     )
                 )
-            }
-        } else {
-            // TODO setting 닉네임 api
-            viewModelScope.launch {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
-            }
+            )
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 닉네임 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 

@@ -9,7 +9,6 @@ import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -38,27 +37,35 @@ class WorkPlaceViewModel @AssistedInject constructor(
     }
 
     private fun next() {
-        if(args.isOnboarding){
-            suspend {
-                onboardingRepository.patchProfile(
-                    Profile(
-                        nickName = args.nickName,
-                        workPlace = workPlaceTextFieldState.text.toString()
-                    )
+        if (args.isOnboarding) {
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
+        suspend {
+            onboardingRepository.patchProfile(
+                Profile(
+                    nickName = args.nickName,
+                    workPlace = workPlaceTextFieldState.text.toString()
                 )
-            }.execute(
-                bus = moaSideEffectBus,
-                scope = viewModelScope,
-            ) {
-                viewModelScope.launch {
-                    moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Salary()))
-                }
-            }
-        }else {
-            // TODO setting 근무지 api
+            )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
             viewModelScope.launch {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Salary()))
             }
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 근무지 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
