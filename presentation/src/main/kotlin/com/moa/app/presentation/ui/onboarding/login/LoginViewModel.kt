@@ -1,9 +1,7 @@
 package com.moa.app.presentation.ui.onboarding.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.moa.app.presentation.bus.MoaSideEffectBus
-import com.moa.app.presentation.manager.KakaoLoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
