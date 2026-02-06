@@ -3,8 +3,8 @@ package com.moa.app.data.security
 import android.content.Context
 import android.util.Base64
 import com.google.crypto.tink.Aead
+import com.google.crypto.tink.KeyTemplates
 import com.google.crypto.tink.aead.AeadConfig
-import com.google.crypto.tink.aead.AesGcmKeyManager
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +19,7 @@ class TinkManager @Inject constructor(
 
             val keysetHandle = AndroidKeysetManager.Builder()
                 .withSharedPref(context, KEYSET_NAME, PREF_FILE_NAME)
-                .withKeyTemplate(AesGcmKeyManager.aes256GcmTemplate())
+                .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
                 .withMasterKeyUri(MASTER_KEY_URI)
                 .build()
                 .keysetHandle
