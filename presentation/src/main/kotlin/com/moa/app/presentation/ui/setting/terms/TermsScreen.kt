@@ -21,7 +21,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Terms
+import com.moa.app.core.model.setting.Terms
 
 @Composable
 fun TermsScreen(viewModel: TermsViewModel = hiltViewModel()) {
@@ -47,7 +47,7 @@ private fun TermsScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(TermsIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -77,7 +77,7 @@ private fun TermsScreen(
                     },
                     trailingContent = {
                         Image(
-                            painter = painterResource(R.drawable.icon_chevron_right),
+                            painter = painterResource(R.drawable.ic_24_chevron_right),
                             contentDescription = "Chevron Right",
                         )
                     }

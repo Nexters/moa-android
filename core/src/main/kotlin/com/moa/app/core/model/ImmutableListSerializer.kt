@@ -1,4 +1,4 @@
-package com.moa.app.core
+package com.moa.app.core.model
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

@@ -76,7 +76,7 @@ private fun NickNameScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(NickNameIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -122,7 +122,7 @@ private fun NickNameScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.icon_refresh),
+                    painter = painterResource(R.drawable.ic_16_restart),
                     contentDescription = "Refresh",
                     tint = MoaTheme.colors.textHighEmphasis,
                 )

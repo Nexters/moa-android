@@ -33,12 +33,12 @@ import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
 fun WorkPlaceScreen(
-    args: OnboardingNavigationArgs,
+    args: OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs,
     viewModel: WorkPlaceViewModel = hiltViewModel(
         creationCallback = { factory: WorkPlaceViewModel.Factory ->
             factory.create(args)
@@ -70,7 +70,7 @@ private fun WorkPlaceScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkPlaceIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )

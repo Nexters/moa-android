@@ -19,7 +19,7 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 @Composable
 fun SplashScreen(viewModel: SplashViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
-        viewModel.checkLoginStatus()
+        viewModel.getOnboardingStatus()
     }
 
     SplashScreen()

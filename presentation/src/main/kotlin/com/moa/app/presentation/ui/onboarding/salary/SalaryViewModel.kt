@@ -4,12 +4,12 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.SalaryType
 import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -20,14 +20,15 @@ import kotlinx.coroutines.launch
 
 @Stable
 data class SalaryUiState(
-    val selectedSalaryType: SalaryType = SalaryType.Monthly,
+    val selectedSalaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
     val salaryTextField: TextFieldState = TextFieldState(),
 )
 
 @HiltViewModel(assistedFactory = SalaryViewModel.Factory::class)
 class SalaryViewModel @AssistedInject constructor(
-    @Assisted private val args: OnboardingNavigationArgs,
+    @Assisted private val args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         SalaryUiState(
@@ -51,33 +52,47 @@ class SalaryViewModel @AssistedInject constructor(
         }
     }
 
-    private fun selectSalaryType(salaryType: SalaryType) {
+    private fun selectSalaryType(salaryType: Payroll.SalaryType) {
         _uiState.value = _uiState.value.copy(
             selectedSalaryType = salaryType
         )
     }
 
     private fun next() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(
-                sideEffect = MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WorkSchedule(
-                            args = args.copy(
-                                salaryType = _uiState.value.selectedSalaryType,
-                                salary = _uiState.value.salaryTextField.text.toString()
-                            )
-                        )
-                    } else {
-                        RootNavigation.Back
-                    }
+        if (args.isOnboarding) {
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
+        suspend {
+            onboardingRepository.patchPayroll(
+                Payroll(
+                    salaryType = uiState.value.selectedSalaryType,
+                    salary = uiState.value.salaryTextField.text.toString(),
                 )
             )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WorkSchedule()))
+            }
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 급여 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigationArgs): SalaryViewModel
+        fun create(args: OnboardingNavigation.Salary.SalaryNavigationArgs): SalaryViewModel
     }
 }

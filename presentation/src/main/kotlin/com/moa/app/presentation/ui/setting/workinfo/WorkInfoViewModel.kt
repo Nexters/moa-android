@@ -3,15 +3,14 @@ package com.moa.app.presentation.ui.setting.workinfo
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
 import com.moa.app.presentation.navigation.SettingNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -23,16 +22,16 @@ import javax.inject.Inject
 @Stable
 data class WorkInfoUiState(
     val oauthType: String = "카카오",
-    val salaryType: SalaryType = SalaryType.Monthly,
+    val salaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
     val salary: String = "4000000",
     val salaryDate: String = "25일",
     val workPlace: String = "집계리아",
-    val workScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(
-        WorkScheduleDay.Monday,
-        WorkScheduleDay.Tuesday,
-        WorkScheduleDay.Wednesday,
-        WorkScheduleDay.Thursday,
-        WorkScheduleDay.Friday,
+    val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(
+        WorkPolicy.WorkScheduleDay.MON,
+        WorkPolicy.WorkScheduleDay.TUE,
+        WorkPolicy.WorkScheduleDay.WED,
+        WorkPolicy.WorkScheduleDay.THU,
+        WorkPolicy.WorkScheduleDay.FRI,
     ),
     val times: ImmutableList<Time> = persistentListOf(
         Time.Work(
@@ -80,7 +79,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.Salary(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.Salary.SalaryNavigationArgs(
                                 salary = _uiState.value.salary,
                                 salaryType = _uiState.value.salaryType,
                                 isOnboarding = false,
@@ -104,7 +103,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.WorkPlace(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
                                 workPlace = _uiState.value.workPlace,
                                 isOnboarding = false,
                             )
@@ -121,7 +120,7 @@ class WorkInfoViewModel @Inject constructor(
                 MoaSideEffect.Navigate(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.WorkSchedule(
-                            args = OnboardingNavigationArgs(
+                            args = OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
                                 workScheduleDays = _uiState.value.workScheduleDays,
                                 times = _uiState.value.times,
                                 isOnboarding = false,

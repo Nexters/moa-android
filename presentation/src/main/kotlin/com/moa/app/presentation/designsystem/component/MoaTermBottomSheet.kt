@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Term
+import com.moa.app.core.model.onboarding.Term
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -136,7 +136,7 @@ private fun TermRow(
 
                 Image(
                     modifier = Modifier.clickable { onClickArrow(term.url) },
-                    painter = painterResource(R.drawable.icon_chevron_right),
+                    painter = painterResource(R.drawable.ic_24_chevron_right),
                     contentDescription = "Chevron Right"
                 )
             }

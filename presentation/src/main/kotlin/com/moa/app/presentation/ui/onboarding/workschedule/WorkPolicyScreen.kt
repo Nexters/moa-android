@@ -27,23 +27,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moa.app.core.makeTimeString
+import com.moa.app.core.extensions.makeTimeString
+import com.moa.app.core.model.onboarding.Term
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTermBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Term
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.navigation.OnboardingNavigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WorkScheduleScreen(
-    args: OnboardingNavigationArgs,
+    args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs,
     viewModel: WorkScheduleViewModel = hiltViewModel(
         creationCallback = { factory: WorkScheduleViewModel.Factory ->
             factory.create(args)
@@ -89,7 +89,7 @@ fun WorkScheduleScreen(
             onClickArrow = { viewModel.onIntent(WorkScheduleIntent.ClickArrow(it)) },
             onClickButton = {
                 viewModel.onIntent(WorkScheduleIntent.ShowTermBottomSheet(false))
-                viewModel.onIntent(WorkScheduleIntent.ClickNext)
+                viewModel.onIntent(WorkScheduleIntent.ClickTermsNext)
             },
         )
     }
@@ -106,7 +106,7 @@ private fun WorkScheduleScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkScheduleIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -158,7 +158,7 @@ private fun WorkScheduleScreen(
                     .padding(bottom = MoaTheme.spacing.spacing24)
                     .height(64.dp),
                 enabled = uiState.selectedWorkScheduleDays.isNotEmpty(),
-                onClick = { onIntent(WorkScheduleIntent.ShowTermBottomSheet(true)) },
+                onClick = { onIntent(WorkScheduleIntent.ClickNext) },
             ) {
                 Text(
                     text = "다음",
@@ -171,16 +171,16 @@ private fun WorkScheduleScreen(
 
 @Composable
 private fun WorkScheduleDays(
-    selectedDays: ImmutableList<WorkScheduleDay>,
+    selectedDays: ImmutableList<WorkPolicy.WorkScheduleDay>,
     onIntent: (WorkScheduleIntent) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing8)
     ) {
-        WorkScheduleDay.entries.forEach { workScheduleDay ->
+        WorkPolicy.WorkScheduleDay.entries.forEach { workScheduleDay ->
             WorkScheduleDay(
-                day = workScheduleDay.title,
+                day = workScheduleDay.day,
                 selected = selectedDays.contains(workScheduleDay),
                 onClick = {
                     onIntent(WorkScheduleIntent.ClickWorkScheduleDay(workScheduleDay))
@@ -280,7 +280,7 @@ private fun WorkScheduleTime(
 
         Icon(
             modifier = Modifier.padding(horizontal = 10.dp),
-            painter = painterResource(R.drawable.icon_arrow_right),
+            painter = painterResource(R.drawable.ic_24_arrow_right),
             contentDescription = "ArrowRight",
             tint = MoaTheme.colors.textLowEmphasis,
         )
@@ -299,7 +299,7 @@ sealed interface WorkScheduleIntent {
     data object ClickBack : WorkScheduleIntent
 
     @JvmInline
-    value class ClickWorkScheduleDay(val day: WorkScheduleDay) : WorkScheduleIntent
+    value class ClickWorkScheduleDay(val day: WorkPolicy.WorkScheduleDay) : WorkScheduleIntent
 
     @JvmInline
     value class ShowTimeBottomSheet(val time: Time?) : WorkScheduleIntent
@@ -317,6 +317,7 @@ sealed interface WorkScheduleIntent {
     value class ClickArrow(val url: String) : WorkScheduleIntent
 
     data object ClickNext : WorkScheduleIntent
+    data object ClickTermsNext : WorkScheduleIntent
 }
 
 @Preview
@@ -326,9 +327,23 @@ private fun WorkScheduleScreenPreview() {
         WorkScheduleScreen(
             uiState = WorkScheduleUiState(
                 selectedWorkScheduleDays = persistentListOf(
-                    WorkScheduleDay.Monday,
-                    WorkScheduleDay.Wednesday,
-                    WorkScheduleDay.Friday,
+                    WorkPolicy.WorkScheduleDay.MON,
+                    WorkPolicy.WorkScheduleDay.WED,
+                    WorkPolicy.WorkScheduleDay.FRI,
+                ),
+                times = persistentListOf(
+                    Time.Work(
+                        startHour = 9,
+                        startMinute = 0,
+                        endHour = 18,
+                        endMinute = 0,
+                    ),
+                    Time.Lunch(
+                        startHour = 12,
+                        startMinute = 0,
+                        endHour = 13,
+                        endMinute = 0,
+                    )
                 ),
             ),
             onIntent = {},

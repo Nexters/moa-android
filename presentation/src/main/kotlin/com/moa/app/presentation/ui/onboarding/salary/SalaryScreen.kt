@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaFilledTextField
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
@@ -44,12 +45,11 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
-import com.moa.app.presentation.model.SalaryType
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
+import com.moa.app.presentation.navigation.OnboardingNavigation
 
 @Composable
 fun SalaryScreen(
-    args: OnboardingNavigationArgs,
+    args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     viewModel: SalaryViewModel = hiltViewModel(
         creationCallback = { factory: SalaryViewModel.Factory ->
             factory.create(args)
@@ -84,7 +84,7 @@ private fun SalaryScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(SalaryIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -181,14 +181,14 @@ private fun SalaryScreen(
 
 @Composable
 private fun SalaryTypeSelector(
-    selectedType: SalaryType,
+    selectedType: Payroll.SalaryType,
     onIntent: (SalaryIntent) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing12)
     ) {
-        SalaryType.entries.forEach {
+        Payroll.SalaryType.entries.forEach {
             SalaryTypeItem(
                 text = it.title,
                 selected = selectedType == it,
@@ -225,7 +225,7 @@ sealed interface SalaryIntent {
     data object ClickBack : SalaryIntent
 
     @JvmInline
-    value class SelectSalaryType(val type: SalaryType) : SalaryIntent
+    value class SelectSalaryType(val type: Payroll.SalaryType) : SalaryIntent
     data object ClickNext : SalaryIntent
 }
 

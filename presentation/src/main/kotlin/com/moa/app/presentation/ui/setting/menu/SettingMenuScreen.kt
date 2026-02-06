@@ -59,7 +59,7 @@ private fun SettingMenuScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(SettingMenuIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -128,7 +128,7 @@ private fun SettingMenuUserInfoContent(
         Spacer(Modifier.width(MoaTheme.spacing.spacing4))
 
         Image(
-            painter = painterResource(R.drawable.icon_edit),
+            painter = painterResource(R.drawable.ic_20_edit),
             contentDescription = "Edit",
         )
     }
@@ -154,7 +154,7 @@ private fun SettingMenuUserInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -182,7 +182,7 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -242,7 +242,7 @@ private fun SettingMenuAppInfoContent(
                 )
             } else {
                 Image(
-                    painter = painterResource(R.drawable.icon_chevron_right),
+                    painter = painterResource(R.drawable.ic_24_chevron_right),
                     contentDescription = "Chevron Right",
                 )
             }
@@ -262,7 +262,7 @@ private fun SettingMenuAppInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -283,7 +283,7 @@ private fun SettingMenuAppInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }

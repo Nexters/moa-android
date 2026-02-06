@@ -1,5 +1,8 @@
-package com.moa.app.presentation.model
+package com.moa.app.core.model.onboarding
 
+import androidx.compose.runtime.Stable
+
+@Stable
 sealed class Term(
     open val title: String,
     open val url: String,

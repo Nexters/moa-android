@@ -3,14 +3,15 @@ package com.moa.app.presentation.ui.onboarding.workschedule
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.onboarding.Term
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.model.Term
-import com.moa.app.presentation.model.Time
-import com.moa.app.presentation.model.WorkScheduleDay
 import com.moa.app.presentation.navigation.OnboardingNavigation
 import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -24,56 +25,18 @@ import kotlinx.coroutines.launch
 
 @Stable
 data class WorkScheduleUiState(
-    val selectedWorkScheduleDays: ImmutableList<WorkScheduleDay> = persistentListOf(),
-    val times: ImmutableList<Time> = persistentListOf(
-        Time.Work(
-            startHour = 9,
-            startMinute = 0,
-            endHour = 18,
-            endMinute = 0,
-        ),
-        Time.Lunch(
-            startHour = 12,
-            startMinute = 0,
-            endHour = 13,
-            endMinute = 0,
-        )
-    ),
-    val terms: ImmutableList<Term> = persistentListOf(
-        Term.All(
-            title = "전체 동의하기",
-            url = "",
-            checked = false,
-        ),
-        Term.Required(
-            title = "(필수) 서비스 이용 약관 동의",
-            url = "https://www.naver.com",
-            checked = false,
-        ),
-        Term.Required(
-            title = "(필수) 테스트 이용 약관 동의",
-            url = "https://www.naver.com",
-            checked = false,
-        ),
-        Term.Optional(
-            title = "(선택) 서비스 이용 약관 동의",
-            url = "https://www.naver.com",
-            checked = false,
-        ),
-        Term.Optional(
-            title = "(선택) 테스트 이용 약관 동의",
-            url = "https://www.naver.com",
-            checked = false,
-        ),
-    ),
+    val selectedWorkScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay>,
+    val times: ImmutableList<Time>,
+    val terms: ImmutableList<Term> = persistentListOf(),
     val showTimeBottomSheet: Time? = null,
     val showTermBottomSheet: Boolean = false,
 )
 
 @HiltViewModel(assistedFactory = WorkScheduleViewModel.Factory::class)
 class WorkScheduleViewModel @AssistedInject constructor(
-    @Assisted private val args: OnboardingNavigationArgs,
+    @Assisted private val args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         WorkScheduleUiState(
@@ -82,6 +45,10 @@ class WorkScheduleViewModel @AssistedInject constructor(
         )
     )
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getTerms()
+    }
 
     fun onIntent(intent: WorkScheduleIntent) {
         when (intent) {
@@ -93,6 +60,18 @@ class WorkScheduleViewModel @AssistedInject constructor(
             is WorkScheduleIntent.ClickTerm -> clickTerm(intent.term)
             is WorkScheduleIntent.ClickArrow -> clickArrow(intent.url)
             WorkScheduleIntent.ClickNext -> next()
+            WorkScheduleIntent.ClickTermsNext -> putTerms()
+        }
+    }
+
+    private fun getTerms() {
+        suspend {
+            onboardingRepository.getTerms()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ){
+            _uiState.value = _uiState.value.copy(terms = it)
         }
     }
 
@@ -102,7 +81,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }
     }
 
-    private fun clickWorkScheduleDay(day: WorkScheduleDay) {
+    private fun clickWorkScheduleDay(day: WorkPolicy.WorkScheduleDay) {
         val currentSet = _uiState.value.selectedWorkScheduleDays.toMutableList()
         if (currentSet.contains(day)) {
             currentSet.remove(day)
@@ -184,22 +163,51 @@ class WorkScheduleViewModel @AssistedInject constructor(
     }
 
     private fun next() {
-        viewModelScope.launch {
-            // TODO args 서버로 넘기고 이동시키기
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WidgetGuide
-                    } else {
-                        RootNavigation.Back
-                    }
+        if (args.isOnboarding) {
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
+        suspend {
+            onboardingRepository.patchWorkPolicy(
+                WorkPolicy(
+                    workScheduleDays = _uiState.value.selectedWorkScheduleDays,
+                    times = _uiState.value.times,
                 )
             )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            _uiState.value = _uiState.value.copy(showTermBottomSheet = true)
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 근무정책 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+        }
+    }
+
+    private fun putTerms() {
+        suspend {
+            onboardingRepository.putTerms(_uiState.value.terms)
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ){
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WidgetGuide))
+            }
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigationArgs): WorkScheduleViewModel
+        fun create(args: OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs): WorkScheduleViewModel
     }
 }

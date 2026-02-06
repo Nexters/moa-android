@@ -1,14 +1,15 @@
 package com.moa.app.presentation.ui.onboarding.nickname
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
-import com.moa.app.presentation.designsystem.component.MoaDialogProperties
+import com.moa.app.presentation.extensions.execute
+import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.ui.onboarding.OnboardingNavigationArgs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,8 +20,15 @@ import kotlinx.coroutines.launch
 class NickNameViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
     val nickNameTextFieldState = TextFieldState(args.nickName)
+
+    init {
+        if (args.isOnboarding) {
+            random()
+        }
+    }
 
     fun onIntent(intent: NickNameIntent) {
         when (intent) {
@@ -32,7 +40,7 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            if (nickNameTextFieldState.text.isNotBlank()) {
+            if (args.isOnboarding) {
                 moaSideEffectBus.emit(
                     MoaSideEffect.Dialog(
                         MoaDialogProperties.Confirm(
@@ -55,22 +63,42 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun random() {
-
+        suspend {
+            onboardingRepository.getRandomNickName()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) { nickName ->
+            nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
+        }
     }
 
     private fun next() {
+        if (args.isOnboarding) {
+            nextIfIsOnboarding()
+        } else {
+            nextIfIsNotOnboarding()
+        }
+    }
+
+    private fun nextIfIsOnboarding() {
         viewModelScope.launch {
             moaSideEffectBus.emit(
-                sideEffect = MoaSideEffect.Navigate(
-                    destination = if (args.isOnboarding) {
-                        OnboardingNavigation.WorkPlace(
-                            args = OnboardingNavigationArgs().copy(nickName = nickNameTextFieldState.text.toString())
+                MoaSideEffect.Navigate(
+                    OnboardingNavigation.WorkPlace(
+                        OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
+                            nickName = nickNameTextFieldState.text.toString()
                         )
-                    } else {
-                        RootNavigation.Back
-                    }
+                    )
                 )
             )
+        }
+    }
+
+    private fun nextIfIsNotOnboarding() {
+        // TODO setting 닉네임 api
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 

@@ -60,7 +60,7 @@ private fun SalaryDateScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(SalaryDateIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -112,7 +112,7 @@ private fun SalaryDateScreen(
                 trailingContent = {
                     Image(
                         modifier = Modifier.rotate(90f),
-                        painter = painterResource(R.drawable.icon_chevron_right),
+                        painter = painterResource(R.drawable.ic_24_chevron_right),
                         contentDescription = "Chevron Right",
                     )
                 }

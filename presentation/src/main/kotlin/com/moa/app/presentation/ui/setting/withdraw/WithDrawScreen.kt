@@ -26,7 +26,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.WithdrawalReason
+import com.moa.app.core.model.setting.WithdrawalReason
 import kotlinx.collections.immutable.ImmutableSet
 
 @Composable
@@ -55,7 +55,7 @@ private fun WithDrawScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WithDrawIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )

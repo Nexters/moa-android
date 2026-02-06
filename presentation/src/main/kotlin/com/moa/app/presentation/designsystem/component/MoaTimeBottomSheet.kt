@@ -28,10 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.moa.app.core.makeTimeString
+import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.Time
+import com.moa.app.core.model.onboarding.Time
 import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,7 +199,7 @@ private fun MoaTimeBottomSheetTimeContent(
 
         Icon(
             modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing24),
-            painter = painterResource(R.drawable.icon_arrow_right),
+            painter = painterResource(R.drawable.ic_24_arrow_right),
             contentDescription = "ArrowRight",
             tint = MoaTheme.colors.textLowEmphasis,
         )
