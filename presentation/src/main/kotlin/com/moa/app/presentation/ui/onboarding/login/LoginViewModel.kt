@@ -15,18 +15,11 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     fun onIntent(intent: LoginIntent) {
         when (intent) {
-            LoginIntent.ClickApple -> loginWithApple()
             LoginIntent.ClickKakao -> loginWithKakao()
         }
     }
 
     private fun loginWithKakao() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
-        }
-    }
-
-    private fun loginWithApple() {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
         }
