@@ -89,7 +89,7 @@ fun WorkScheduleScreen(
             onClickArrow = { viewModel.onIntent(WorkScheduleIntent.ClickArrow(it)) },
             onClickButton = {
                 viewModel.onIntent(WorkScheduleIntent.ShowTermBottomSheet(false))
-                viewModel.onIntent(WorkScheduleIntent.ClickNext)
+                viewModel.onIntent(WorkScheduleIntent.ClickTermsNext)
             },
         )
     }
@@ -158,7 +158,7 @@ private fun WorkScheduleScreen(
                     .padding(bottom = MoaTheme.spacing.spacing24)
                     .height(64.dp),
                 enabled = uiState.selectedWorkScheduleDays.isNotEmpty(),
-                onClick = { onIntent(WorkScheduleIntent.ShowTermBottomSheet(true)) },
+                onClick = { onIntent(WorkScheduleIntent.ClickNext) },
             ) {
                 Text(
                     text = "다음",
@@ -317,6 +317,7 @@ sealed interface WorkScheduleIntent {
     value class ClickArrow(val url: String) : WorkScheduleIntent
 
     data object ClickNext : WorkScheduleIntent
+    data object ClickTermsNext : WorkScheduleIntent
 }
 
 @Preview
@@ -329,6 +330,20 @@ private fun WorkScheduleScreenPreview() {
                     WorkPolicy.WorkScheduleDay.MON,
                     WorkPolicy.WorkScheduleDay.WED,
                     WorkPolicy.WorkScheduleDay.FRI,
+                ),
+                times = persistentListOf(
+                    Time.Work(
+                        startHour = 9,
+                        startMinute = 0,
+                        endHour = 18,
+                        endMinute = 0,
+                    ),
+                    Time.Lunch(
+                        startHour = 12,
+                        startMinute = 0,
+                        endHour = 13,
+                        endMinute = 0,
+                    )
                 ),
             ),
             onIntent = {},
