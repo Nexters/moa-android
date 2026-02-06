@@ -106,7 +106,7 @@ private fun WorkScheduleScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkScheduleIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -280,7 +280,7 @@ private fun WorkScheduleTime(
 
         Icon(
             modifier = Modifier.padding(horizontal = 10.dp),
-            painter = painterResource(R.drawable.icon_arrow_right),
+            painter = painterResource(R.drawable.ic_24_arrow_right),
             contentDescription = "ArrowRight",
             tint = MoaTheme.colors.textLowEmphasis,
         )

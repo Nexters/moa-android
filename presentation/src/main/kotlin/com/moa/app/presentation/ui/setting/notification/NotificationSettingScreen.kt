@@ -62,7 +62,7 @@ private fun NotificationSettingScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(NotificationSettingIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -123,7 +123,7 @@ private fun NotificationSettingHeaderContent() {
         )
 
         Image(
-            painter = painterResource(R.drawable.icon_chevron_right),
+            painter = painterResource(R.drawable.ic_24_chevron_right),
             contentDescription = "Chevron Right",
         )
     }

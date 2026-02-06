@@ -70,7 +70,7 @@ private fun WorkPlaceScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkPlaceIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )

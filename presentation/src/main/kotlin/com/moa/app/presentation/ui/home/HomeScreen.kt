@@ -44,7 +44,7 @@ private fun HomeScreen(
                 actions = {
                     IconButton(onClick = {onIntent(HomeIntent.ClickCalendar)}) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_calendar),
+                            painter = painterResource(R.drawable.ic_24_calendar),
                             contentDescription = "Notification Icon",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -52,7 +52,7 @@ private fun HomeScreen(
 
                     IconButton(onClick = {onIntent(HomeIntent.ClickSetting)}) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_setting),
+                            painter = painterResource(R.drawable.ic_24_setting),
                             contentDescription = "Notification Icon",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )

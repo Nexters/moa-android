@@ -53,7 +53,7 @@ private fun WorkInfoScreen(
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkInfoIntent.ClickBack) }) {
                         Icon(
-                            painter = painterResource(R.drawable.icon_back),
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
@@ -114,7 +114,7 @@ private fun WorkInfoAccountContent(oauthType: String) {
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -153,7 +153,7 @@ private fun WorkInfoSalaryContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -179,7 +179,7 @@ private fun WorkInfoSalaryContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -220,7 +220,7 @@ private fun WorkInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -246,7 +246,7 @@ private fun WorkInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -272,7 +272,7 @@ private fun WorkInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }
@@ -298,7 +298,7 @@ private fun WorkInfoContent(
         },
         trailingContent = {
             Image(
-                painter = painterResource(R.drawable.icon_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
             )
         }

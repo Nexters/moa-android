@@ -199,7 +199,7 @@ private fun MoaTimeBottomSheetTimeContent(
 
         Icon(
             modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing24),
-            painter = painterResource(R.drawable.icon_arrow_right),
+            painter = painterResource(R.drawable.ic_24_arrow_right),
             contentDescription = "ArrowRight",
             tint = MoaTheme.colors.textLowEmphasis,
         )

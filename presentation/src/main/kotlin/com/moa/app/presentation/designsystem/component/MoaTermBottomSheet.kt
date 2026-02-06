@@ -136,7 +136,7 @@ private fun TermRow(
 
                 Image(
                     modifier = Modifier.clickable { onClickArrow(term.url) },
-                    painter = painterResource(R.drawable.icon_chevron_right),
+                    painter = painterResource(R.drawable.ic_24_chevron_right),
                     contentDescription = "Chevron Right"
                 )
             }
