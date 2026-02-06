@@ -21,6 +21,8 @@ retrofit = "3.0.0"
 okhttp_bom = "5.3.2"
 ksp = "2.3.3"
 appcompat = "1.7.1"
+tink = "1.15.0"
+datastore = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +79,12 @@ retrofit_serialization = { module = "com.squareup.retrofit2:converter-kotlinx-se
 okhttp_bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp_bom" }
 okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp_logging = { module = "com.squareup.okhttp3:logging-interceptor" }
+
+# Tink
+tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
+
+# DataStore
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
