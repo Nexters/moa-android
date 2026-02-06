@@ -33,7 +33,7 @@ import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable

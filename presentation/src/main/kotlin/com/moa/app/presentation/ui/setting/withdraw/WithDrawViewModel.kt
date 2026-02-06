@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.core.model.setting.WithdrawalReason
-import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.model.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf

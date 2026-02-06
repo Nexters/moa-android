@@ -1,4 +1,4 @@
-package com.moa.app.presentation.navigation
+package com.moa.app.presentation.model
 
 import kotlinx.serialization.Serializable
 

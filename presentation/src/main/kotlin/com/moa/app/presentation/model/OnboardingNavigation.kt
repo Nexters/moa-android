@@ -1,4 +1,4 @@
-package com.moa.app.presentation.navigation
+package com.moa.app.presentation.model
 
 import com.moa.app.core.model.ImmutableListSerializer
 import com.moa.app.core.model.onboarding.Payroll

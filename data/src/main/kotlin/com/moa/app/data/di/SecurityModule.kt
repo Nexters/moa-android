@@ -10,11 +10,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * 보안 관련 의존성 주입 모듈
- *
- * TinkManager와 TokenDataStore를 싱글톤으로 제공
- */
 @Module
 @InstallIn(SingletonComponent::class)
 object SecurityModule {

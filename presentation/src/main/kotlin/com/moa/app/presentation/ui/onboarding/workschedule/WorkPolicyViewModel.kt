@@ -10,8 +10,8 @@ import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
+import com.moa.app.presentation.model.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

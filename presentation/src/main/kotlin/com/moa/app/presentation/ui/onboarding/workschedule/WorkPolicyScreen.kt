@@ -37,7 +37,7 @@ import com.moa.app.presentation.designsystem.component.MoaTermBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
