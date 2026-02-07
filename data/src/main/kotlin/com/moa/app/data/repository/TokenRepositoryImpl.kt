@@ -7,6 +7,11 @@ class TokenRepositoryImpl @Inject constructor(
     private val tokenDataStore: TokenDataStore,
 ) : TokenRepository {
 
+    override suspend fun postToken(token: String): String {
+        // TODO post token
+        return "token"
+    }
+
     override suspend fun saveAccessToken(token: String) {
         tokenDataStore.saveAccessToken(token)
     }

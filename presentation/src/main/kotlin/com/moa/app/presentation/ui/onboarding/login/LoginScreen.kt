@@ -40,7 +40,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                 context = context,
                 listener = object : KakaoLoginManager.OnKakaoLoginResultListener {
                     override fun onSuccess(accessToken: String) {
-                        viewModel.onIntent(LoginIntent.SaveAccessToken(accessToken))
+                        viewModel.onIntent(LoginIntent.PostToken(accessToken))
                     }
 
                     override fun onFailure(errorMsg: String) {
@@ -103,7 +103,7 @@ private fun LoginScreen(onClickKakao: () -> Unit) {
 
 sealed interface LoginIntent {
     @JvmInline
-    value class SaveAccessToken(val token: String) : LoginIntent
+    value class PostToken(val token: String) : LoginIntent
 }
 
 @Preview
