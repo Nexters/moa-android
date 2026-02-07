@@ -1,7 +1,10 @@
 package com.moa.app.data.repository
 
 interface TokenRepository {
-    suspend fun postToken(token: String): String
+    suspend fun postToken(
+        accessToken: String,
+        fcmToken: String,
+    ): String
 
     suspend fun saveAccessToken(token: String)
 
