@@ -8,9 +8,9 @@ import com.moa.app.core.model.onboarding.Time
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
+import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.model.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

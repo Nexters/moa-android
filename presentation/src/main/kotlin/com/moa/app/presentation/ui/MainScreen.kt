@@ -17,9 +17,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.designsystem.component.MoaDialog
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.OnboardingNavigation
-import com.moa.app.presentation.navigation.RootNavigation
-import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
+import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.model.SettingNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen

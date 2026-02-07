@@ -19,7 +19,7 @@ fun <T> (suspend () -> T).execute(
         } catch (e: Throwable) {
             bus?.emit(MoaSideEffect.Failure(e))
         } finally {
-            bus?.emit(MoaSideEffect.Loading(true))
+            bus?.emit(MoaSideEffect.Loading(false))
         }
     }
 }

@@ -45,7 +45,7 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
-import com.moa.app.presentation.navigation.OnboardingNavigation
+import com.moa.app.presentation.model.OnboardingNavigation
 
 @Composable
 fun SalaryScreen(

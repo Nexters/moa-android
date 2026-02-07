@@ -13,7 +13,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.SettingNavigation
+import com.moa.app.presentation.model.SettingNavigation
 import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
 import com.moa.app.presentation.ui.setting.notification.NotificationSettingScreen
 import com.moa.app.presentation.ui.setting.salarydate.SalaryDateScreen

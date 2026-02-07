@@ -1,4 +1,4 @@
-package com.moa.app.presentation.navigation
+package com.moa.app.presentation.model
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable

@@ -1,36 +1,60 @@
 package com.moa.app.presentation.ui.onboarding.login
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.manager.KakaoLoginManager
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+
     LoginScreen(
-        onIntent = viewModel::onIntent,
+        onClickKakao = {
+            KakaoLoginManager.loginWithKakao(
+                context = context,
+                listener = object : KakaoLoginManager.OnKakaoLoginResultListener {
+                    override fun onSuccess(accessToken: String) {
+                        viewModel.onIntent(LoginIntent.PostToken(accessToken))
+                    }
+
+                    override fun onFailure(errorMsg: String) {
+                        Log.e("KakaoLogin", errorMsg)
+                    }
+
+                }
+            )
+        }
     )
 }
 
 @Composable
-private fun LoginScreen(onIntent: (LoginIntent) -> Unit) {
+private fun LoginScreen(onClickKakao: () -> Unit) {
     Scaffold(containerColor = MoaTheme.colors.bgPrimary) { innerPadding ->
         Column(
             modifier = Modifier
@@ -52,30 +76,24 @@ private fun LoginScreen(onIntent: (LoginIntent) -> Unit) {
                     .height(64.dp)
                     .padding(horizontal = MoaTheme.spacing.spacing16),
                 shape = RoundedCornerShape(32.dp),
-                onClick = { onIntent(LoginIntent.ClickKakao) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500)),
+                onClick = onClickKakao,
             ) {
-                Text(
-                    text = "카카오로 계속하기",
-                    style = MoaTheme.typography.t3_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-            }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_24_kakao),
+                        contentDescription = "Kakao Login",
+                        tint = MoaTheme.colors.textHighEmphasisReverse,
+                    )
 
-            Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.width(12.dp))
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .padding(horizontal = MoaTheme.spacing.spacing16),
-                shape = RoundedCornerShape(32.dp),
-                onClick = { onIntent(LoginIntent.ClickApple) },
-            ) {
-                Text(
-                    text = "Apple로 계속하기",
-                    style = MoaTheme.typography.t3_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
+                    Text(
+                        text = "카카오 로그인",
+                        style = MoaTheme.typography.t3_700,
+                        color = MoaTheme.colors.textHighEmphasisReverse,
+                    )
+                }
             }
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
@@ -84,8 +102,8 @@ private fun LoginScreen(onIntent: (LoginIntent) -> Unit) {
 }
 
 sealed interface LoginIntent {
-    data object ClickKakao : LoginIntent
-    data object ClickApple : LoginIntent
+    @JvmInline
+    value class PostToken(val token: String) : LoginIntent
 }
 
 @Preview
@@ -93,7 +111,7 @@ sealed interface LoginIntent {
 private fun LoginScreenPreview() {
     MoaTheme {
         LoginScreen(
-            onIntent = {},
+            onClickKakao = {},
         )
     }
 }
