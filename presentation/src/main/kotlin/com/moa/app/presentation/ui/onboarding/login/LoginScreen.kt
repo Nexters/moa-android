@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui.onboarding.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,40 +20,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.manager.KakaoLoginManager
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
-    val context = LocalContext.current
-
     LoginScreen(
-        onClickKakao = {
-            KakaoLoginManager.loginWithKakao(
-                context = context,
-                listener = object : KakaoLoginManager.OnKakaoLoginResultListener {
-                    override fun onSuccess(accessToken: String) {
-                        viewModel.onIntent(LoginIntent.PostToken(accessToken))
-                    }
-
-                    override fun onFailure(errorMsg: String) {
-                        Log.e("KakaoLogin", errorMsg)
-                    }
-
-                }
-            )
-        }
+        onIntent = viewModel::onIntent
     )
 }
 
 @Composable
-private fun LoginScreen(onClickKakao: () -> Unit) {
+private fun LoginScreen(
+    onIntent: (LoginIntent) -> Unit
+) {
     Scaffold(containerColor = MoaTheme.colors.bgPrimary) { innerPadding ->
         Column(
             modifier = Modifier
@@ -77,7 +60,7 @@ private fun LoginScreen(onClickKakao: () -> Unit) {
                     .padding(horizontal = MoaTheme.spacing.spacing16),
                 shape = RoundedCornerShape(32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500)),
-                onClick = onClickKakao,
+                onClick = { onIntent(LoginIntent.ClickKakao) },
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -102,8 +85,7 @@ private fun LoginScreen(onClickKakao: () -> Unit) {
 }
 
 sealed interface LoginIntent {
-    @JvmInline
-    value class PostToken(val token: String) : LoginIntent
+    data object ClickKakao : LoginIntent
 }
 
 @Preview
@@ -111,7 +93,7 @@ sealed interface LoginIntent {
 private fun LoginScreenPreview() {
     MoaTheme {
         LoginScreen(
-            onClickKakao = {},
+            onIntent = {},
         )
     }
 }

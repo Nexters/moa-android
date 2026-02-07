@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -34,25 +35,35 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
 
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.bundles.navigation)
     implementation(libs.bundles.lifecycle)
 
+    // Kotlinx
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
 
+    // Coroutine
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
 
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
+    // Glance
     implementation(libs.androidx.glance)
     implementation(libs.androidx.glance.appwidget)
 
+    // Kakao
     implementation(libs.kakao.user)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
