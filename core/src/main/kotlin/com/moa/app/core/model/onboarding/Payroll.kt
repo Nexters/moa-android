@@ -6,7 +6,7 @@ data class Payroll(
     val paydayDay: Int = 25,
 ) {
     enum class SalaryType(val title: String) {
-        MONTHLY("월급"),
-        ANNUAL("연봉")
+        ANNUAL("연봉"),
+        MONTHLY("월급")
     }
 }

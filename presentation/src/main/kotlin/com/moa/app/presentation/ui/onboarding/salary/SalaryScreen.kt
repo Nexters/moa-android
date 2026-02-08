@@ -73,9 +73,7 @@ private fun SalaryScreen(
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        if (uiState.salaryTextField.text.isNotBlank()) {
-            focusRequester.requestFocus()
-        }
+        focusRequester.requestFocus()
     }
 
     Scaffold(
@@ -149,7 +147,7 @@ private fun SalaryScreen(
                     .fillMaxWidth(),
                 state = uiState.salaryTextField,
                 placeholder = "0",
-                trailingText = "원",
+                trailingText = "만원",
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 inputTransformation = SalaryInputTransformation(),
                 outputTransformation = CurrencyOutputTransformation(),

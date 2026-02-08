@@ -26,11 +26,11 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchNickName(nickName: String) {
-        // TODO patch profile
+        // TODO patch nickname
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {
-        // TODO patch payroll
+        // TODO patch payroll 금액 * 10000 해야함
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {

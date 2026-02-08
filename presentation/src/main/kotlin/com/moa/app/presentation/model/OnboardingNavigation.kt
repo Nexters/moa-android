@@ -33,7 +33,7 @@ sealed interface OnboardingNavigation : RootNavigation {
         @Serializable
         data class SalaryNavigationArgs(
             val isOnboarding: Boolean = true,
-            val salaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
+            val salaryType: Payroll.SalaryType = Payroll.SalaryType.ANNUAL,
             val salary: String = "",
         )
     }
