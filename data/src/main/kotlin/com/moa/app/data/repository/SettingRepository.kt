@@ -6,4 +6,5 @@ import com.moa.app.core.model.setting.WorkInfo
 interface SettingRepository {
     suspend fun getSettingMenu(): SettingMenu
     suspend fun getWorkInfo(): WorkInfo
+    suspend fun putSalaryDay(day: Int)
 }

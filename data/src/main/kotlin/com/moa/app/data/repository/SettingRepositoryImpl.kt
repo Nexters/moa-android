@@ -45,4 +45,8 @@ class SettingRepositoryImpl @Inject constructor(
             )
         )
     }
+
+    override suspend fun putSalaryDay(day: Int) {
+        // TODO put salaryday
+    }
 }
