@@ -26,9 +26,9 @@ import kotlinx.coroutines.launch
 @Stable
 data class WorkScheduleUiState(
     val selectedWorkScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay>,
-    val times: ImmutableList<Time>,
+    val time: Time,
     val terms: ImmutableList<Term> = persistentListOf(),
-    val showTimeBottomSheet: Time? = null,
+    val showTimeBottomSheet: Boolean = false,
     val showTermBottomSheet: Boolean = false,
 )
 
@@ -41,7 +41,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(
         WorkScheduleUiState(
             selectedWorkScheduleDays = args.workScheduleDays,
-            times = args.times,
+            time = args.time,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -54,7 +54,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         when (intent) {
             WorkScheduleIntent.ClickBack -> back()
             is WorkScheduleIntent.ClickWorkScheduleDay -> clickWorkScheduleDay(intent.day)
-            is WorkScheduleIntent.ShowTimeBottomSheet -> showTimeBottomSheet(intent.time)
+            is WorkScheduleIntent.ShowTimeBottomSheet -> showTimeBottomSheet(intent.visible)
             is WorkScheduleIntent.SetTime -> setTime(intent.time)
             is WorkScheduleIntent.ShowTermBottomSheet -> showTermBottomSheet(intent.visible)
             is WorkScheduleIntent.ClickTerm -> clickTerm(intent.term)
@@ -70,7 +70,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
-        ){
+        ) {
             _uiState.value = _uiState.value.copy(terms = it)
         }
     }
@@ -93,21 +93,14 @@ class WorkScheduleViewModel @AssistedInject constructor(
         )
     }
 
-    private fun showTimeBottomSheet(time: Time?) {
+    private fun showTimeBottomSheet(visible : Boolean) {
         _uiState.value = _uiState.value.copy(
-            showTimeBottomSheet = time,
+            showTimeBottomSheet = visible,
         )
     }
 
     private fun setTime(time: Time) {
-        val currentTimes = _uiState.value.times.toMutableList()
-        val index = currentTimes.indexOfFirst { it::class == time::class }
-        if (index != -1) {
-            currentTimes[index] = time
-            _uiState.value = _uiState.value.copy(
-                times = currentTimes.toImmutableList(),
-            )
-        }
+        _uiState.value = _uiState.value.copy(time = time)
     }
 
     private fun showTermBottomSheet(visible: Boolean) {
@@ -175,7 +168,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
             onboardingRepository.patchWorkPolicy(
                 WorkPolicy(
                     workScheduleDays = _uiState.value.selectedWorkScheduleDays,
-                    times = _uiState.value.times,
+                    time = _uiState.value.time,
                 )
             )
         }.execute(
@@ -199,7 +192,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
-        ){
+        ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WidgetGuide))
             }

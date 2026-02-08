@@ -4,7 +4,7 @@ import kotlinx.collections.immutable.ImmutableList
 
 data class WorkPolicy(
     val workScheduleDays: ImmutableList<WorkScheduleDay>,
-    val times: ImmutableList<Time>
+    val time: Time
 ) {
     enum class WorkScheduleDay(val day: String) {
         MON("월"),

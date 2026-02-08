@@ -77,7 +77,7 @@ class SplashViewModel @Inject constructor(
                         OnboardingNavigation.WorkSchedule(
                             OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
                                 workScheduleDays = workPolicy.workScheduleDays,
-                                times = workPolicy.times,
+                                time = workPolicy.time,
                             )
                         )
                     )

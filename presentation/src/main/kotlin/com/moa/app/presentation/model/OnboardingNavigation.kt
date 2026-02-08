@@ -54,21 +54,13 @@ sealed interface OnboardingNavigation : RootNavigation {
                 WorkPolicy.WorkScheduleDay.THU,
                 WorkPolicy.WorkScheduleDay.FRI,
             ),
-            @Serializable(with = ImmutableListSerializer::class)
-            val times: ImmutableList<Time> = persistentListOf(
-                Time.Work(
-                    startHour = 9,
-                    startMinute = 0,
-                    endHour = 18,
-                    endMinute = 0,
-                ),
-                Time.Lunch(
-                    startHour = 12,
-                    startMinute = 0,
-                    endHour = 13,
-                    endMinute = 0,
-                )
-            ),
+            @Serializable
+            val time: Time = Time(
+                startHour = 9,
+                startMinute = 0,
+                endHour = 18,
+                endMinute = 0,
+            )
         )
     }
 

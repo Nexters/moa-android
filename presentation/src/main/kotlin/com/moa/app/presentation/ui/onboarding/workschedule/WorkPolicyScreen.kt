@@ -57,28 +57,12 @@ fun WorkScheduleScreen(
         onIntent = viewModel::onIntent,
     )
 
-    uiState.showTimeBottomSheet?.let {
+    if (uiState.showTimeBottomSheet) {
         MoaTimeBottomSheet(
-            time = it,
-            onClickButton = { startHour, startMinute, endHour, endMinute ->
-                val updateTime = when (it) {
-                    is Time.Work -> Time.Work(
-                        startHour = startHour,
-                        startMinute = startMinute,
-                        endHour = endHour,
-                        endMinute = endMinute,
-                    )
-
-                    is Time.Lunch -> Time.Lunch(
-                        startHour = startHour,
-                        startMinute = startMinute,
-                        endHour = endHour,
-                        endMinute = endMinute,
-                    )
-                }
-                viewModel.onIntent(WorkScheduleIntent.SetTime(updateTime))
-            },
-            onDismissRequest = { viewModel.onIntent(WorkScheduleIntent.ShowTimeBottomSheet(null)) }
+            time = uiState.time,
+            title = "근무 시간을 알려주세요",
+            onPositive = { viewModel.onIntent(WorkScheduleIntent.SetTime(it)) },
+            onDismissRequest = { viewModel.onIntent(WorkScheduleIntent.ShowTimeBottomSheet(false)) }
         )
     }
 
@@ -145,8 +129,8 @@ private fun WorkScheduleScreen(
                 onIntent = onIntent,
             )
 
-            WorkScheduleTimes(
-                times = uiState.times,
+            WorkScheduleTime(
+                time = uiState.time,
                 onIntent = onIntent,
             )
 
@@ -226,27 +210,25 @@ private fun RowScope.WorkScheduleDay(
 }
 
 @Composable
-private fun WorkScheduleTimes(
-    times: ImmutableList<Time>,
+private fun WorkScheduleTime(
+    time: Time,
     onIntent: (WorkScheduleIntent) -> Unit,
 ) {
-    times.forEach { time ->
-        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+    Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-        Text(
-            text = time.title,
-            color = MoaTheme.colors.textMediumEmphasis,
-            style = MoaTheme.typography.b2_500,
-        )
+    Text(
+        text = "근무 시간",
+        color = MoaTheme.colors.textMediumEmphasis,
+        style = MoaTheme.typography.b2_500,
+    )
 
-        Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
-        WorkScheduleTime(
-            startTime = makeTimeString(time.startHour, time.startMinute),
-            endTime = makeTimeString(time.endHour, time.endMinute),
-            onClick = { onIntent(WorkScheduleIntent.ShowTimeBottomSheet(time)) }
-        )
-    }
+    WorkScheduleTime(
+        startTime = makeTimeString(time.startHour, time.startMinute),
+        endTime = makeTimeString(time.endHour, time.endMinute),
+        onClick = { onIntent(WorkScheduleIntent.ShowTimeBottomSheet(true)) }
+    )
 }
 
 @Composable
@@ -302,7 +284,7 @@ sealed interface WorkScheduleIntent {
     value class ClickWorkScheduleDay(val day: WorkPolicy.WorkScheduleDay) : WorkScheduleIntent
 
     @JvmInline
-    value class ShowTimeBottomSheet(val time: Time?) : WorkScheduleIntent
+    value class ShowTimeBottomSheet(val visible: Boolean) : WorkScheduleIntent
 
     @JvmInline
     value class SetTime(val time: Time) : WorkScheduleIntent
@@ -331,20 +313,13 @@ private fun WorkScheduleScreenPreview() {
                     WorkPolicy.WorkScheduleDay.WED,
                     WorkPolicy.WorkScheduleDay.FRI,
                 ),
-                times = persistentListOf(
-                    Time.Work(
+                time =
+                    Time(
                         startHour = 9,
                         startMinute = 0,
                         endHour = 18,
                         endMinute = 0,
                     ),
-                    Time.Lunch(
-                        startHour = 12,
-                        startMinute = 0,
-                        endHour = 13,
-                        endMinute = 0,
-                    )
-                ),
             ),
             onIntent = {},
         )

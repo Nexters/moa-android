@@ -33,20 +33,12 @@ data class WorkInfoUiState(
         WorkPolicy.WorkScheduleDay.THU,
         WorkPolicy.WorkScheduleDay.FRI,
     ),
-    val times: ImmutableList<Time> = persistentListOf(
-        Time.Work(
-            startHour = 9,
-            startMinute = 0,
-            endHour = 18,
-            endMinute = 0,
-        ),
-        Time.Lunch(
-            startHour = 12,
-            startMinute = 0,
-            endHour = 13,
-            endMinute = 0,
-        )
-    )
+    val time: Time = Time(
+        startHour = 9,
+        startMinute = 0,
+        endHour = 18,
+        endMinute = 0,
+    ),
 )
 
 @HiltViewModel
@@ -115,7 +107,7 @@ class WorkInfoViewModel @Inject constructor(
                         startDestination = OnboardingNavigation.WorkSchedule(
                             args = OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
                                 workScheduleDays = _uiState.value.workScheduleDays,
-                                times = _uiState.value.times,
+                                time = _uiState.value.time,
                                 isOnboarding = false,
                             )
                         )

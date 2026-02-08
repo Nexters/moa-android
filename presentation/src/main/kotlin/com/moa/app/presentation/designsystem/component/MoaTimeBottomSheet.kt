@@ -29,16 +29,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.app.core.extensions.makeTimeString
+import com.moa.app.core.model.onboarding.Time
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.onboarding.Time
 import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoaTimeBottomSheet(
     time: Time,
-    onClickButton: (startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) -> Unit,
+    title: String,
+    negativeText: String? = null,
+    positiveText: String = "확인",
+    onNegative: () -> Unit = {},
+    onPositive: (Time) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     MoaBottomSheet(
@@ -46,7 +50,11 @@ fun MoaTimeBottomSheet(
     ) {
         MoaTimeBottomSheetContent(
             time = time,
-            onClickButton = onClickButton,
+            title = title,
+            negativeText = negativeText,
+            positiveText = positiveText,
+            onNegative = onNegative,
+            onPositive = onPositive,
             onDismissRequest = onDismissRequest,
         )
     }
@@ -55,7 +63,11 @@ fun MoaTimeBottomSheet(
 @Composable
 private fun MoaTimeBottomSheetContent(
     time: Time,
-    onClickButton: (startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) -> Unit,
+    title: String,
+    negativeText: String?,
+    positiveText: String,
+    onNegative: () -> Unit,
+    onPositive: (Time) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     var selectedStartTime by remember { mutableStateOf(true) }
@@ -69,12 +81,15 @@ private fun MoaTimeBottomSheetContent(
             .fillMaxWidth()
             .padding(horizontal = MoaTheme.spacing.spacing20)
     ) {
-        MoaTimeBottomSheetTitleContent(time = time)
+        Text(
+            text = title,
+            style = MoaTheme.typography.t1_700,
+            color = MoaTheme.colors.textHighEmphasis,
+        )
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
         MoaTimeBottomSheetTimeContent(
-            time = time,
             selectedStartTime = selectedStartTime,
             startHour = startHour,
             startMinute = startMinute,
@@ -98,67 +113,32 @@ private fun MoaTimeBottomSheetContent(
             onClickEndTime = { selectedStartTime = false },
         )
 
-        MoaPrimaryButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top= MoaTheme.spacing.spacing20,
-                    bottom = MoaTheme.spacing.spacing24,
-                )
-                .height(64.dp),
+        MoaTimeBottomSheetButtonContent(
             enabled = if (selectedStartTime) {
                 true
             } else {
                 (endHour > startHour) || (endHour == startHour && endMinute > startMinute)
             },
-            onClick = {
+            negativeText = negativeText,
+            positiveText = positiveText,
+            onNegative = {
+                onNegative()
+                onDismissRequest()
+            },
+            onPositive = {
                 if (selectedStartTime) {
                     selectedStartTime = false
                 } else {
-                    onClickButton(startHour, startMinute, endHour, endMinute)
+                    onPositive(Time(startHour, startMinute, endHour, endMinute))
                     onDismissRequest()
                 }
             },
-        ) {
-            Text(
-                text = if (selectedStartTime) {
-                    time.startButtonText
-                } else {
-                    time.endButtonText
-                },
-                style = MoaTheme.typography.t3_700,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MoaTimeBottomSheetTitleContent(
-    time: Time,
-) {
-    Text(
-        text = when (time) {
-            is Time.Work -> "${time.title}을 알려주세요"
-            is Time.Lunch -> "${time.title}을 알려주세요"
-        },
-        style = MoaTheme.typography.t1_700,
-        color = MoaTheme.colors.textHighEmphasis,
-    )
-
-    if (time.description.isNotEmpty()) {
-        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
-
-        Text(
-            text = time.description,
-            style = MoaTheme.typography.b1_400,
-            color = MoaTheme.colors.textMediumEmphasis,
         )
     }
 }
 
 @Composable
 private fun MoaTimeBottomSheetTimeContent(
-    time: Time,
     selectedStartTime: Boolean,
     startHour: Int,
     startMinute: Int,
@@ -182,10 +162,7 @@ private fun MoaTimeBottomSheetTimeContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = when (time) {
-                    is Time.Work -> "출근"
-                    is Time.Lunch -> "시작"
-                },
+                text = "출근",
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textLowEmphasis,
             )
@@ -211,10 +188,7 @@ private fun MoaTimeBottomSheetTimeContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = when (time) {
-                    is Time.Work -> "퇴근"
-                    is Time.Lunch -> "종료"
-                },
+                text = "퇴근",
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textLowEmphasis,
             )
@@ -279,19 +253,69 @@ private fun MoaTimeBottomSheetTimeContent(
     }
 }
 
+@Composable
+private fun MoaTimeBottomSheetButtonContent(
+    enabled: Boolean,
+    negativeText: String?,
+    positiveText: String,
+    onNegative: () -> Unit,
+    onPositive: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = MoaTheme.spacing.spacing20,
+                bottom = MoaTheme.spacing.spacing24,
+            )
+    ) {
+        if (negativeText != null) {
+            MoaTertiaryButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(64.dp),
+                onClick = onNegative,
+            ) {
+                Text(
+                    text = negativeText,
+                    style = MoaTheme.typography.t3_700,
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(MoaTheme.spacing.spacing12))
+        }
+
+        MoaPrimaryButton(
+            modifier = Modifier
+                .weight(1f)
+                .height(64.dp),
+            enabled = enabled,
+            onClick = onPositive,
+        ) {
+            Text(
+                text = positiveText,
+                style = MoaTheme.typography.t3_700,
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun MoaTimeBottomSheetPreview() {
     MoaTheme {
         Column(Modifier.fillMaxSize()) {
             MoaTimeBottomSheet(
-                time = Time.Work(
+                title = "실제 근무 시간을 알려주세요",
+                time = Time(
                     startHour = 9,
                     startMinute = 0,
                     endHour = 18,
                     endMinute = 0,
                 ),
-                onClickButton = { _, _, _, _ -> },
+                negativeText = "오늘 휴가",
+                onNegative = {},
+                onPositive = { },
                 onDismissRequest = {}
             )
         }
