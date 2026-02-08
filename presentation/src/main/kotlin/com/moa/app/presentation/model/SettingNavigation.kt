@@ -10,6 +10,10 @@ sealed interface SettingNavigation : RootNavigation {
     data object WorkInfo : SettingNavigation
 
     @Serializable
+    @JvmInline
+    value class WorkPlace(val workPlace: String) : SettingNavigation
+
+    @Serializable
     data object NotificationSetting : SettingNavigation
 
     @Serializable

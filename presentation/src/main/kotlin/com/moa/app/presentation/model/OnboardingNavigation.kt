@@ -27,19 +27,6 @@ sealed interface OnboardingNavigation : RootNavigation {
 
     @Serializable
     @JvmInline
-    value class WorkPlace(
-        val args: WorkPlaceNavigationArgs = WorkPlaceNavigationArgs()
-    ) : OnboardingNavigation {
-        @Serializable
-        data class WorkPlaceNavigationArgs(
-            val isOnboarding: Boolean = true,
-            val nickName: String = "",
-            val workPlace: String = "",
-        )
-    }
-
-    @Serializable
-    @JvmInline
     value class Salary(
         val args: SalaryNavigationArgs = SalaryNavigationArgs()
     ) : OnboardingNavigation {
@@ -60,7 +47,13 @@ sealed interface OnboardingNavigation : RootNavigation {
         data class WorkScheduleNavigationArgs(
             val isOnboarding: Boolean = true,
             @Serializable(with = ImmutableListSerializer::class)
-            val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(),
+            val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(
+                WorkPolicy.WorkScheduleDay.MON,
+                WorkPolicy.WorkScheduleDay.TUE,
+                WorkPolicy.WorkScheduleDay.WED,
+                WorkPolicy.WorkScheduleDay.THU,
+                WorkPolicy.WorkScheduleDay.FRI,
+            ),
             @Serializable(with = ImmutableListSerializer::class)
             val times: ImmutableList<Time> = persistentListOf(
                 Time.Work(

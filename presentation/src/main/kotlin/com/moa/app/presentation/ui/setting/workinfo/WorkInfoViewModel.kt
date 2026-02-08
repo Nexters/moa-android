@@ -101,14 +101,7 @@ class WorkInfoViewModel @Inject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 MoaSideEffect.Navigate(
-                    destination = RootNavigation.Onboarding(
-                        startDestination = OnboardingNavigation.WorkPlace(
-                            args = OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
-                                workPlace = _uiState.value.workPlace,
-                                isOnboarding = false,
-                            )
-                        )
-                    )
+                    SettingNavigation.WorkPlace(_uiState.value.workPlace)
                 )
             )
         }

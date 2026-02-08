@@ -20,6 +20,7 @@ import com.moa.app.presentation.ui.setting.salarydate.SalaryDateScreen
 import com.moa.app.presentation.ui.setting.terms.TermsScreen
 import com.moa.app.presentation.ui.setting.withdraw.WithDrawScreen
 import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
+import com.moa.app.presentation.ui.setting.workplace.WorkPlaceScreen
 
 @Composable
 fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
@@ -74,6 +75,10 @@ private fun SettingNavHost(
 
             entry<SettingNavigation.WorkInfo> {
                 WorkInfoScreen()
+            }
+
+            entry<SettingNavigation.WorkPlace> { key ->
+                WorkPlaceScreen(workPlace = key.workPlace)
             }
 
             entry<SettingNavigation.SalaryDate> {

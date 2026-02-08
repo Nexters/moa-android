@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.onboarding.workplace
+package com.moa.app.presentation.ui.setting.workplace
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,15 +33,14 @@ import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
 fun WorkPlaceScreen(
-    args: OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs,
+    workPlace: String,
     viewModel: WorkPlaceViewModel = hiltViewModel(
         creationCallback = { factory: WorkPlaceViewModel.Factory ->
-            factory.create(args)
+            factory.create(workPlace)
         }
     ),
 ) {

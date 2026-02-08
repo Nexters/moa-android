@@ -82,16 +82,15 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun nextIfIsOnboarding() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    OnboardingNavigation.WorkPlace(
-                        OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
-                            nickName = nickNameTextFieldState.text.toString()
-                        )
-                    )
-                )
-            )
+        suspend {
+            onboardingRepository.patchNickName(nickNameTextFieldState.text.toString())
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Salary()))
+            }
         }
     }
 
