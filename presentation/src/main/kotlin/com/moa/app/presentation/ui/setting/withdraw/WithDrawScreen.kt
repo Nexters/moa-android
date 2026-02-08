@@ -148,9 +148,9 @@ private fun WithDrawItem(
         Image(
             painter = painterResource(
                 if (selected) {
-                    R.drawable.icon_rectangle_checked
+                    R.drawable.ic_rectangle_checked
                 } else {
-                    R.drawable.icon_rectangle_unchecked
+                    R.drawable.ic_rectangle_unchecked
                 }
             ),
             contentDescription = null,

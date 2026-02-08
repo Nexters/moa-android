@@ -109,9 +109,9 @@ private fun TermRow(
             Image(
                 painter = painterResource(
                     if (term.checked) {
-                        R.drawable.icon_circle_checked
+                        R.drawable.ic_circle_checked
                     } else {
-                        R.drawable.icon_circle_unchcked
+                        R.drawable.ic_circle_unchcked
                     }
                 ),
                 contentDescription = "Term Icon"
