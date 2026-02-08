@@ -11,7 +11,7 @@ sealed interface SettingNavigation : RootNavigation {
 
     @Serializable
     @JvmInline
-    value class WorkPlace(val workPlace: String) : SettingNavigation
+    value class CompanyName(val companyName: String) : SettingNavigation
 
     @Serializable
     data object NotificationSetting : SettingNavigation

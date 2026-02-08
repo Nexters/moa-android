@@ -89,7 +89,7 @@ presentation/ui/
 ├── MainViewModel.kt             # 중앙 네비게이션/다이얼로그 오케스트레이션
 ├── splash/                      # 스플래시 화면
 ├── onboarding/                  # 다단계 온보딩 플로우
-│   ├── login/, nickname/, workplace/, salary/, workschedule/, widgetguide/
+│   ├── login/, nickname/, CompanyName/, salary/, workschedule/, widgetguide/
 ├── home/                        # 홈 화면
 ├── history/                     # 히스토리 화면
 ├── setting/                     # 설정 플로우

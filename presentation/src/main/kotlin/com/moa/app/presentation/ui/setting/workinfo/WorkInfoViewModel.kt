@@ -40,7 +40,7 @@ class WorkInfoViewModel @Inject constructor(
             WorkInfoIntent.ClickBack -> back()
             WorkInfoIntent.ClickSalary -> salary()
             WorkInfoIntent.ClickSalaryDate -> salaryDate()
-            WorkInfoIntent.ClickWorkplace -> workPlace()
+            WorkInfoIntent.ClickCompanyName -> companyName()
             WorkInfoIntent.ClickWorkSchedule -> workSchedule()
         }
     }
@@ -92,11 +92,17 @@ class WorkInfoViewModel @Inject constructor(
         }
     }
 
-    private fun workPlace() {
+    private fun companyName() {
         viewModelScope.launch {
-            val workPlace = _uiState.value.workInfo?.workPlace
-            if (workPlace != null) {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WorkPlace(workPlace)))
+            val companyName = _uiState.value.workInfo?.companyName
+            if (companyName != null) {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
+                        SettingNavigation.CompanyName(
+                            companyName
+                        )
+                    )
+                )
             }
         }
     }

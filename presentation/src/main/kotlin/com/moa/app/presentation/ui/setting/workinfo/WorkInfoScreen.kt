@@ -90,7 +90,7 @@ private fun WorkInfoScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             WorkInfoContent(
-                workPlace = uiState.workInfo?.workPlace ?: "",
+                companyName = uiState.workInfo?.companyName ?: "",
                 workScheduleDays = uiState.workInfo
                     ?.workPolicy
                     ?.workScheduleDays
@@ -203,7 +203,7 @@ private fun WorkInfoSalaryContent(
 
 @Composable
 private fun WorkInfoContent(
-    workPlace: String,
+    companyName: String,
     workScheduleDays: String,
     workTime: String,
     onIntent: (WorkInfoIntent) -> Unit,
@@ -217,20 +217,28 @@ private fun WorkInfoContent(
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable { onIntent(WorkInfoIntent.ClickWorkplace) },
+        modifier = Modifier.clickable { onIntent(WorkInfoIntent.ClickCompanyName) },
         leadingContent = {
             Text(
-                text = "근무지",
+                text = "회사명",
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
         },
         subTrailingContent = {
-            Text(
-                text = workPlace,
-                style = MoaTheme.typography.b1_500,
-                color = MoaTheme.colors.textGreen,
-            )
+            if(companyName.isBlank()){
+                Text(
+                    text = "미등록",
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textLowEmphasis,
+                )
+            }else{
+                Text(
+                    text = companyName,
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textGreen,
+                )
+            }
         },
         trailingContent = {
             Image(
@@ -297,7 +305,7 @@ sealed interface WorkInfoIntent {
     data object ClickBack : WorkInfoIntent
     data object ClickSalary : WorkInfoIntent
     data object ClickSalaryDate : WorkInfoIntent
-    data object ClickWorkplace : WorkInfoIntent
+    data object ClickCompanyName : WorkInfoIntent
     data object ClickWorkSchedule : WorkInfoIntent
 }
 
@@ -313,7 +321,7 @@ private fun WorkInfoScreenPreview() {
                         salary = "40000000",
                         salaryType = Payroll.SalaryType.ANNUAL,
                     ),
-                    workPlace = "집계리아",
+                    companyName = "",
                     workPolicy = WorkPolicy(
                         workScheduleDays = persistentListOf(
                             WorkPolicy.WorkScheduleDay.MON,

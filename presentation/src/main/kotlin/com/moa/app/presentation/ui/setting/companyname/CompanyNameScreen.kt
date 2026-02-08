@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.setting.workplace
+package com.moa.app.presentation.ui.setting.companyname
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,24 +36,24 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
-fun WorkPlaceScreen(
-    workPlace: String,
-    viewModel: WorkPlaceViewModel = hiltViewModel(
-        creationCallback = { factory: WorkPlaceViewModel.Factory ->
-            factory.create(workPlace)
+fun CompanyNameScreen(
+    companyName: String,
+    viewModel: CompanyNameViewModel = hiltViewModel(
+        creationCallback = { factory: CompanyNameViewModel.Factory ->
+            factory.create(companyName)
         }
     ),
 ) {
-    WorkPlaceScreen(
-        workPlaceTextFieldState = viewModel.workPlaceTextFieldState,
+    CompanyNameScreen(
+        companyNameTextFieldState = viewModel.companyNameTextFieldState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
-private fun WorkPlaceScreen(
-    workPlaceTextFieldState: TextFieldState,
-    onIntent: (WorkPlaceIntent) -> Unit,
+private fun CompanyNameScreen(
+    companyNameTextFieldState: TextFieldState,
+    onIntent: (CompanyNameIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -67,7 +67,7 @@ private fun WorkPlaceScreen(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(WorkPlaceIntent.ClickBack) }) {
+                    IconButton(onClick = { onIntent(CompanyNameIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
@@ -92,10 +92,10 @@ private fun WorkPlaceScreen(
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .padding(horizontal = MoaTheme.spacing.spacing20),
-                description1 = "근무지",
-                state = workPlaceTextFieldState,
+                description1 = "저는",
+                state = companyNameTextFieldState,
                 description2 = "에서 일해요",
-                placeholder = "근무지를 입력해주세요",
+                placeholder = "회사명을 입력해주세요",
                 inputTransformation = InputTransformation.maxLength(20)
             )
 
@@ -120,10 +120,10 @@ private fun WorkPlaceScreen(
                         bottom = MoaTheme.spacing.spacing24,
                     )
                     .height(64.dp),
-                enabled = workPlaceTextFieldState.text.isNotBlank(),
+                enabled = companyNameTextFieldState.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
-                    onIntent(WorkPlaceIntent.ClickNext)
+                    onIntent(CompanyNameIntent.ClickNext)
                 },
             ) {
                 Text(
@@ -135,17 +135,17 @@ private fun WorkPlaceScreen(
     }
 }
 
-sealed interface WorkPlaceIntent {
-    data object ClickBack : WorkPlaceIntent
-    data object ClickNext : WorkPlaceIntent
+sealed interface CompanyNameIntent {
+    data object ClickBack : CompanyNameIntent
+    data object ClickNext : CompanyNameIntent
 }
 
 @Preview
 @Composable
-private fun WorkPlaceScreenPreview() {
+private fun CompanyNameScreenPreview() {
     MoaTheme {
-        WorkPlaceScreen(
-            workPlaceTextFieldState = TextFieldState(),
+        CompanyNameScreen(
+            companyNameTextFieldState = TextFieldState(),
             onIntent = {},
         )
     }

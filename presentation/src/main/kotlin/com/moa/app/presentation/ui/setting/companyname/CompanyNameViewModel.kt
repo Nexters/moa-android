@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.setting.workplace
+package com.moa.app.presentation.ui.setting.companyname
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
@@ -12,17 +12,17 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = WorkPlaceViewModel.Factory::class)
-class WorkPlaceViewModel @AssistedInject constructor(
-    @Assisted private val workPlace : String,
+@HiltViewModel(assistedFactory = CompanyNameViewModel.Factory::class)
+class CompanyNameViewModel @AssistedInject constructor(
+    @Assisted private val companyName: String,
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
-    val workPlaceTextFieldState = TextFieldState(workPlace)
+    val companyNameTextFieldState = TextFieldState(companyName)
 
-    fun onIntent(intent: WorkPlaceIntent) {
+    fun onIntent(intent: CompanyNameIntent) {
         when (intent) {
-            is WorkPlaceIntent.ClickBack -> back()
-            is WorkPlaceIntent.ClickNext -> next()
+            is CompanyNameIntent.ClickBack -> back()
+            is CompanyNameIntent.ClickNext -> next()
         }
     }
 
@@ -41,6 +41,6 @@ class WorkPlaceViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(workPlace : String): WorkPlaceViewModel
+        fun create(companyName: String): CompanyNameViewModel
     }
 }

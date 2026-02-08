@@ -31,7 +31,7 @@ class SettingRepositoryImpl @Inject constructor(
                 salary = "40000000",
                 salaryType = Payroll.SalaryType.ANNUAL,
             ),
-            workPlace = "집계리아",
+            companyName = "",
             workPolicy = WorkPolicy(
                 workScheduleDays = persistentListOf(
                     WorkPolicy.WorkScheduleDay.MON,
