@@ -34,8 +34,8 @@ class SplashViewModel @Inject constructor(
                 return@launch
             }
 
-            val profile = onboardingStatus.profile
-            if (profile == null) {
+            val nickName = onboardingStatus.nickName
+            if (nickName == null) {
                 navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
                 return@launch
             } else {
@@ -43,17 +43,7 @@ class SplashViewModel @Inject constructor(
                     RootNavigation.Onboarding(
                         OnboardingNavigation.Nickname(
                             args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                nickName = profile.nickName
-                            )
-                        )
-                    )
-                )
-                navigate(
-                    RootNavigation.Onboarding(
-                        OnboardingNavigation.WorkPlace(
-                            OnboardingNavigation.WorkPlace.WorkPlaceNavigationArgs(
-                                nickName = profile.nickName,
-                                workPlace = profile.workPlace,
+                                nickName = nickName
                             )
                         )
                     )
@@ -87,7 +77,7 @@ class SplashViewModel @Inject constructor(
                         OnboardingNavigation.WorkSchedule(
                             OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
                                 workScheduleDays = workPolicy.workScheduleDays,
-                                times = workPolicy.times,
+                                time = workPolicy.time,
                             )
                         )
                     )

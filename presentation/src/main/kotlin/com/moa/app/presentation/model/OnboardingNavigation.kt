@@ -27,26 +27,13 @@ sealed interface OnboardingNavigation : RootNavigation {
 
     @Serializable
     @JvmInline
-    value class WorkPlace(
-        val args: WorkPlaceNavigationArgs = WorkPlaceNavigationArgs()
-    ) : OnboardingNavigation {
-        @Serializable
-        data class WorkPlaceNavigationArgs(
-            val isOnboarding: Boolean = true,
-            val nickName: String = "",
-            val workPlace: String = "",
-        )
-    }
-
-    @Serializable
-    @JvmInline
     value class Salary(
         val args: SalaryNavigationArgs = SalaryNavigationArgs()
     ) : OnboardingNavigation {
         @Serializable
         data class SalaryNavigationArgs(
             val isOnboarding: Boolean = true,
-            val salaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
+            val salaryType: Payroll.SalaryType = Payroll.SalaryType.ANNUAL,
             val salary: String = "",
         )
     }
@@ -60,22 +47,20 @@ sealed interface OnboardingNavigation : RootNavigation {
         data class WorkScheduleNavigationArgs(
             val isOnboarding: Boolean = true,
             @Serializable(with = ImmutableListSerializer::class)
-            val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(),
-            @Serializable(with = ImmutableListSerializer::class)
-            val times: ImmutableList<Time> = persistentListOf(
-                Time.Work(
-                    startHour = 9,
-                    startMinute = 0,
-                    endHour = 18,
-                    endMinute = 0,
-                ),
-                Time.Lunch(
-                    startHour = 12,
-                    startMinute = 0,
-                    endHour = 13,
-                    endMinute = 0,
-                )
+            val workScheduleDays: ImmutableList<WorkPolicy.WorkScheduleDay> = persistentListOf(
+                WorkPolicy.WorkScheduleDay.MON,
+                WorkPolicy.WorkScheduleDay.TUE,
+                WorkPolicy.WorkScheduleDay.WED,
+                WorkPolicy.WorkScheduleDay.THU,
+                WorkPolicy.WorkScheduleDay.FRI,
             ),
+            @Serializable
+            val time: Time = Time(
+                startHour = 9,
+                startMinute = 0,
+                endHour = 18,
+                endMinute = 0,
+            )
         )
     }
 

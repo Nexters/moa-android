@@ -18,7 +18,6 @@ import com.moa.app.presentation.ui.onboarding.login.LoginScreen
 import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
 import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
 import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
-import com.moa.app.presentation.ui.onboarding.workplace.WorkPlaceScreen
 import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
 
 @Composable
@@ -77,10 +76,6 @@ private fun OnboardingNavHost(
 
             entry<OnboardingNavigation.Nickname> { key ->
                 NickNameScreen(args = key.args)
-            }
-
-            entry<OnboardingNavigation.WorkPlace> { key ->
-                WorkPlaceScreen(args = key.args)
             }
 
             entry<OnboardingNavigation.Salary> { key ->

@@ -2,7 +2,6 @@ package com.moa.app.data.repository
 
 import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
-import com.moa.app.core.model.onboarding.Profile
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.WorkPolicy
 import kotlinx.collections.immutable.ImmutableList
@@ -15,7 +14,7 @@ class OnboardingRepositoryImpl @Inject constructor(
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
         return OnboardingStatus(
-            profile = null,
+            nickName = null,
             payroll = null,
             workPolicy = null,
             hasRequiredTermsAgreed = false,
@@ -26,12 +25,12 @@ class OnboardingRepositoryImpl @Inject constructor(
         return "집계사장${Random.nextInt(10)}"
     }
 
-    override suspend fun patchProfile(profile: Profile) {
-        // TODO patch profile
+    override suspend fun patchNickName(nickName: String) {
+        // TODO patch nickname
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {
-        // TODO patch payroll
+        // TODO patch payroll 금액 * 10000 해야함
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {

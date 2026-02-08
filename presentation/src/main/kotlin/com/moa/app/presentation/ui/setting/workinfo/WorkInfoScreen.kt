@@ -86,8 +86,7 @@ private fun WorkInfoScreen(
             WorkInfoContent(
                 workPlace = uiState.workPlace,
                 workScheduleDays = uiState.workScheduleDays.joinToString { it.day },
-                workTime = uiState.times[0].getFormattedTimeRange(),
-                lunchTime = uiState.times[1].getFormattedTimeRange(),
+                workTime = uiState.time.getFormattedTimeRange(),
                 onIntent = onIntent,
             )
         }
@@ -191,7 +190,6 @@ private fun WorkInfoContent(
     workPlace: String,
     workScheduleDays: String,
     workTime: String,
-    lunchTime: String,
     onIntent: (WorkInfoIntent) -> Unit,
 ) {
     Text(
@@ -266,32 +264,6 @@ private fun WorkInfoContent(
         subTrailingContent = {
             Text(
                 text = workTime,
-                style = MoaTheme.typography.b1_500,
-                color = MoaTheme.colors.textGreen,
-            )
-        },
-        trailingContent = {
-            Image(
-                painter = painterResource(R.drawable.ic_24_chevron_right),
-                contentDescription = "Chevron Right",
-            )
-        }
-    )
-
-    Spacer(Modifier.height(10.dp))
-
-    MoaRow(
-        modifier = Modifier.clickable { onIntent(WorkInfoIntent.ClickWorkSchedule) },
-        leadingContent = {
-            Text(
-                text = "점심 시간",
-                style = MoaTheme.typography.b1_500,
-                color = MoaTheme.colors.textHighEmphasis,
-            )
-        },
-        subTrailingContent = {
-            Text(
-                text = lunchTime,
                 style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textGreen,
             )
