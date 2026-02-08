@@ -2,7 +2,10 @@ package com.moa.app.presentation.ui.setting.menu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
@@ -15,18 +18,25 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingUiState(
-    val oauthType: String = "카카오",
-    val nickName: String = "집계사장",
-    val latestAppVersion: String = "1.0.0",
+    val settingMenu: SettingMenu = SettingMenu(
+        oAuthType = null,
+        nickName = "",
+        latestAppVersion = "1.0.0",
+    )
 )
 
 @HiltViewModel
 class SettingMenuViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getSettingMenu()
+    }
 
     fun onIntent(intent: SettingMenuIntent) {
         when (intent) {
@@ -37,6 +47,17 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickTerms -> terms()
             SettingMenuIntent.ClickLogout -> logout()
             SettingMenuIntent.ClickWithdraw -> withdraw()
+        }
+    }
+
+    private fun getSettingMenu() {
+        suspend {
+            settingRepository.getSettingMenu()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            _uiState.value = _uiState.value.copy(settingMenu = it)
         }
     }
 
@@ -53,7 +74,7 @@ class SettingMenuViewModel @Inject constructor(
                     destination = RootNavigation.Onboarding(
                         startDestination = OnboardingNavigation.Nickname(
                             args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                nickName = uiState.value.nickName,
+                                nickName = uiState.value.settingMenu.nickName,
                                 isOnboarding = false,
                             )
                         )

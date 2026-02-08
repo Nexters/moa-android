@@ -25,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.model.setting.OAuthType
+import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.presentation.BuildConfig
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
@@ -78,8 +80,8 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             SettingMenuUserInfoContent(
-                oauthType = uiState.oauthType,
-                nickName = uiState.nickName,
+                oauthType = uiState.settingMenu.oAuthType,
+                nickName = uiState.settingMenu.nickName,
                 onIntent = onIntent,
             )
 
@@ -90,7 +92,7 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             SettingMenuAppInfoContent(
-                latestAppVersion = uiState.latestAppVersion,
+                latestAppVersion = uiState.settingMenu.latestAppVersion,
                 onIntent = onIntent,
             )
 
@@ -103,17 +105,19 @@ private fun SettingMenuScreen(
 
 @Composable
 private fun SettingMenuUserInfoContent(
-    oauthType: String,
+    oauthType: OAuthType?,
     nickName: String,
     onIntent: (SettingMenuIntent) -> Unit
 ) {
-    Text(
-        text = "$oauthType 계정 회원",
-        style = MoaTheme.typography.b2_400,
-        color = MoaTheme.colors.textMediumEmphasis,
-    )
+    if(oauthType != null){
+        Text(
+            text = "${oauthType.title} 계정 회원",
+            style = MoaTheme.typography.b2_400,
+            color = MoaTheme.colors.textMediumEmphasis,
+        )
 
-    Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+    }
 
     Row(
         modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickNickName) },
@@ -335,7 +339,13 @@ sealed interface SettingMenuIntent {
 private fun SettingMenuScreenPreview() {
     MoaTheme {
         SettingMenuScreen(
-            uiState = SettingUiState(),
+            uiState = SettingUiState(
+                settingMenu = SettingMenu(
+                    oAuthType = OAuthType.KAKAO,
+                    nickName = "집계사장",
+                    latestAppVersion = "1.0.0",
+                )
+            ),
             onIntent = {},
         )
     }
