@@ -7,6 +7,7 @@ import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -75,5 +76,9 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun putNotificationSetting(id: NotificationId, enabled: Boolean) {
         // TODO put notificationsetting
+    }
+
+    override suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>) {
+        // TODO withdraw
     }
 }

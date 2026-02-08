@@ -22,12 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.setting.WithdrawalReason
-import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun WithDrawScreen(viewModel: WithDrawViewModel = hiltViewModel()) {
@@ -39,7 +39,7 @@ fun WithDrawScreen(viewModel: WithDrawViewModel = hiltViewModel()) {
 
 @Composable
 private fun WithDrawScreen(
-    selectedReasons: ImmutableSet<WithdrawalReason>,
+    selectedReasons: ImmutableList<WithdrawalReason>,
     onIntent: (WithDrawIntent) -> Unit,
 ) {
     Scaffold(
@@ -117,7 +117,7 @@ private fun WithDrawScreen(
 
 @Composable
 private fun WithDrawItems(
-    selectedReasons: ImmutableSet<WithdrawalReason>,
+    selectedReasons: ImmutableList<WithdrawalReason>,
     onIntent: (WithDrawIntent) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing24)) {
