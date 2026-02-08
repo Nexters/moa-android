@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.setting.salarydate
+package com.moa.app.presentation.ui.setting.salaryday
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,26 +25,33 @@ import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
-fun SalaryDateScreen(viewModel: SalaryDateViewModel = hiltViewModel()) {
+fun SalaryDayScreen(
+    day : Int,
+    viewModel: SalaryDayViewModel = hiltViewModel(
+        creationCallback = { factory: SalaryDayViewModel.Factory ->
+            factory.create(day)
+        }
+    )
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SalaryDateScreen(
-        salaryDate = uiState.salaryDate,
+    SalaryDayScreen(
+        salaryDay = uiState.salaryDay,
         onIntent = viewModel::onIntent,
     )
 
-    if (uiState.showSalaryDateBottomSheet) {
-        SalaryDateBottomSheet(
-            salaryDate = uiState.salaryDate,
-            onConfirm = { viewModel.onIntent(SalaryDateIntent.SetSalaryDate(it)) },
-            onDismissRequest = { viewModel.onIntent(SalaryDateIntent.ShowSalaryDateBottomSheet(false)) }
+    if (uiState.showSalaryDayBottomSheet) {
+        SalaryDayBottomSheet(
+            salaryDay = uiState.salaryDay,
+            onConfirm = { viewModel.onIntent(SalaryDateIntent.SetSalaryDay(it)) },
+            onDismissRequest = { viewModel.onIntent(SalaryDateIntent.ShowSalaryDayBottomSheet(false)) }
         )
     }
 }
 
 @Composable
-private fun SalaryDateScreen(
-    salaryDate: Int,
+private fun SalaryDayScreen(
+    salaryDay: Int,
     onIntent: (SalaryDateIntent) -> Unit,
 ) {
     Scaffold(
@@ -95,16 +102,10 @@ private fun SalaryDateScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
             MoaRow(
-                modifier = Modifier.clickable {
-                    onIntent(
-                        SalaryDateIntent.ShowSalaryDateBottomSheet(
-                            true
-                        )
-                    )
-                },
+                modifier = Modifier.clickable { onIntent(SalaryDateIntent.ShowSalaryDayBottomSheet(true)) },
                 leadingContent = {
                     Text(
-                        text = "${salaryDate}일",
+                        text = "${salaryDay}일",
                         style = MoaTheme.typography.t2_700,
                         color = MoaTheme.colors.textHighEmphasis,
                     )
@@ -125,18 +126,18 @@ sealed interface SalaryDateIntent {
     data object ClickBack : SalaryDateIntent
 
     @JvmInline
-    value class ShowSalaryDateBottomSheet(val visible: Boolean) : SalaryDateIntent
+    value class ShowSalaryDayBottomSheet(val visible: Boolean) : SalaryDateIntent
 
     @JvmInline
-    value class SetSalaryDate(val date: Int) : SalaryDateIntent
+    value class SetSalaryDay(val day: Int) : SalaryDateIntent
 }
 
 @Preview
 @Composable
 private fun SalaryDateScreenPreview() {
     MoaTheme {
-        SalaryDateScreen(
-            salaryDate = 25,
+        SalaryDayScreen(
+            salaryDay = 25,
             onIntent = {},
         )
     }

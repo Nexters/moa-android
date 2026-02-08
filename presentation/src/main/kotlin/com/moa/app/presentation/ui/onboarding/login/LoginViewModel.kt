@@ -1,6 +1,6 @@
 package com.moa.app.presentation.ui.onboarding.login
 
-import android.content.Context
+import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,28 +12,21 @@ import com.moa.app.presentation.manager.KakaoLoginManager
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    @param:ApplicationContext private val context : Context,
     private val moaSideEffectBus: MoaSideEffectBus,
     private val tokenRepository: TokenRepository,
 ) : ViewModel() {
-    fun onIntent(intent: LoginIntent) {
-        when (intent) {
-            is LoginIntent.ClickKakao -> clickKakao()
-        }
-    }
 
-    private fun clickKakao() {
+    fun clickKakao(activity: Activity) {
         viewModelScope.launch {
             try {
                 val kakaoTokenDeferred = async {
-                    KakaoLoginManager.loginWithKakao(context)
+                    KakaoLoginManager.loginWithKakao(activity)
                 }
                 val fcmTokenDeferred = async {
                     FcmTokenManager.getFcmToken()
@@ -43,12 +36,12 @@ class LoginViewModel @Inject constructor(
                 val fcmToken = fcmTokenDeferred.await()
 
                 postToken(
-                        accessToken = kakaoToken,
-                        fcmToken = fcmToken
-                    )
+                    accessToken = kakaoToken,
+                    fcmToken = fcmToken
+                )
             } catch (e: Exception) {
                 Toast.makeText(
-                    context,
+                    activity,
                     "로그인 실패: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()

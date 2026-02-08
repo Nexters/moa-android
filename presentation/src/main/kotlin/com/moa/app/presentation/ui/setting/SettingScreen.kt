@@ -14,13 +14,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.SettingNavigation
+import com.moa.app.presentation.ui.setting.companyname.CompanyNameScreen
 import com.moa.app.presentation.ui.setting.menu.SettingMenuScreen
 import com.moa.app.presentation.ui.setting.notification.NotificationSettingScreen
-import com.moa.app.presentation.ui.setting.salarydate.SalaryDateScreen
+import com.moa.app.presentation.ui.setting.salaryday.SalaryDayScreen
 import com.moa.app.presentation.ui.setting.terms.TermsScreen
 import com.moa.app.presentation.ui.setting.withdraw.WithDrawScreen
 import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
-import com.moa.app.presentation.ui.setting.workplace.WorkPlaceScreen
 
 @Composable
 fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
@@ -77,12 +77,12 @@ private fun SettingNavHost(
                 WorkInfoScreen()
             }
 
-            entry<SettingNavigation.WorkPlace> { key ->
-                WorkPlaceScreen(workPlace = key.workPlace)
+            entry<SettingNavigation.CompanyName> { key ->
+                CompanyNameScreen(companyName = key.companyName)
             }
 
-            entry<SettingNavigation.SalaryDate> {
-                SalaryDateScreen()
+            entry<SettingNavigation.SalaryDay> { key ->
+                SalaryDayScreen(day = key.day)
             }
 
             entry<SettingNavigation.NotificationSetting> {

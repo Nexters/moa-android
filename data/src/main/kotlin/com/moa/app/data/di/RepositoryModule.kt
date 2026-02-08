@@ -2,6 +2,8 @@ package com.moa.app.data.di
 
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.OnboardingRepositoryImpl
+import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.SettingRepositoryImpl
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.data.repository.TokenRepositoryImpl
 import dagger.Binds
@@ -24,4 +26,10 @@ interface RepositoryModule {
     fun bindsTokenRepository(
         impl: TokenRepositoryImpl
     ): TokenRepository
+
+    @Binds
+    @Singleton
+    fun bindsSettingRepository(
+        impl: SettingRepositoryImpl
+    ): SettingRepository
 }

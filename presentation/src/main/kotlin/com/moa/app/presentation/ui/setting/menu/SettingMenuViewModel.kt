@@ -1,8 +1,13 @@
 package com.moa.app.presentation.ui.setting.menu
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
@@ -14,19 +19,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class SettingUiState(
-    val oauthType: String = "카카오",
-    val nickName: String = "집계사장",
-    val latestAppVersion: String = "1.0.0",
+    val settingMenu: SettingMenu? = null
 )
 
 @HiltViewModel
 class SettingMenuViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val settingRepository: SettingRepository,
+    private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getSettingMenu()
+    }
 
     fun onIntent(intent: SettingMenuIntent) {
         when (intent) {
@@ -40,6 +50,17 @@ class SettingMenuViewModel @Inject constructor(
         }
     }
 
+    private fun getSettingMenu() {
+        suspend {
+            settingRepository.getSettingMenu()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            _uiState.value = _uiState.value.copy(settingMenu = it)
+        }
+    }
+
     private fun back() {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Back))
@@ -48,18 +69,21 @@ class SettingMenuViewModel @Inject constructor(
 
     private fun nickName() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    destination = RootNavigation.Onboarding(
-                        startDestination = OnboardingNavigation.Nickname(
-                            args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                nickName = uiState.value.nickName,
-                                isOnboarding = false,
+            val nickName = _uiState.value.settingMenu?.nickName
+            if (nickName != null) {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
+                        destination = RootNavigation.Onboarding(
+                            startDestination = OnboardingNavigation.Nickname(
+                                args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                    nickName = nickName,
+                                    isOnboarding = false,
+                                )
                             )
                         )
                     )
                 )
-            )
+            }
         }
     }
 
@@ -88,18 +112,29 @@ class SettingMenuViewModel @Inject constructor(
                     MoaDialogProperties.Confirm(
                         title = "로그아웃 하시겠어요?",
                         message = "로그아웃하면 로그인 화면으로 이동해요.",
-                        onPositive = {
-                            moaSideEffectBus.emit(
-                                MoaSideEffect.Navigate(
-                                    destination = RootNavigation.Onboarding(
-                                        startDestination = OnboardingNavigation.Login
-                                    )
-                                )
-                            )
-                        },
+                        onPositive = { clearToken() },
                     )
                 )
             )
+        }
+    }
+
+    private fun clearToken() {
+        suspend {
+            tokenRepository.clearToken()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
+                        destination = RootNavigation.Onboarding(
+                            startDestination = OnboardingNavigation.Login
+                        )
+                    )
+                )
+            }
         }
     }
 

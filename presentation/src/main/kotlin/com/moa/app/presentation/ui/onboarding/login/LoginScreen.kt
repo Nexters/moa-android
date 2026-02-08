@@ -1,5 +1,6 @@
 package com.moa.app.presentation.ui.onboarding.login
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,14 +30,20 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
+    val activity = LocalActivity.current
+
     LoginScreen(
-        onIntent = viewModel::onIntent
+        onClickKakao = {
+            if (activity != null) {
+                viewModel.clickKakao(activity)
+            }
+        }
     )
 }
 
 @Composable
 private fun LoginScreen(
-    onIntent: (LoginIntent) -> Unit
+    onClickKakao: () -> Unit
 ) {
     Scaffold(containerColor = MoaTheme.colors.bgPrimary) { innerPadding ->
         Column(
@@ -60,7 +67,7 @@ private fun LoginScreen(
                     .padding(horizontal = MoaTheme.spacing.spacing16),
                 shape = RoundedCornerShape(32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500)),
-                onClick = { onIntent(LoginIntent.ClickKakao) },
+                onClick = onClickKakao,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -84,16 +91,12 @@ private fun LoginScreen(
     }
 }
 
-sealed interface LoginIntent {
-    data object ClickKakao : LoginIntent
-}
-
 @Preview
 @Composable
 private fun LoginScreenPreview() {
     MoaTheme {
         LoginScreen(
-            onIntent = {},
+            onClickKakao = {},
         )
     }
 }
