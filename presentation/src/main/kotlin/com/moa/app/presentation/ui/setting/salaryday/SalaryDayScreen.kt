@@ -23,7 +23,6 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.ui.onboarding.nickname.NickNameViewModel
 
 @Composable
 fun SalaryDayScreen(
