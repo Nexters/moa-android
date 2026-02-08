@@ -80,8 +80,8 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             SettingMenuUserInfoContent(
-                oauthType = uiState.settingMenu.oAuthType,
-                nickName = uiState.settingMenu.nickName,
+                oAuthType = uiState.settingMenu?.oAuthType,
+                nickName = uiState.settingMenu?.nickName ?: "",
                 onIntent = onIntent,
             )
 
@@ -92,7 +92,7 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             SettingMenuAppInfoContent(
-                latestAppVersion = uiState.settingMenu.latestAppVersion,
+                latestAppVersion = uiState.settingMenu?.latestAppVersion ?: "",
                 onIntent = onIntent,
             )
 
@@ -105,13 +105,13 @@ private fun SettingMenuScreen(
 
 @Composable
 private fun SettingMenuUserInfoContent(
-    oauthType: OAuthType?,
+    oAuthType: OAuthType?,
     nickName: String,
     onIntent: (SettingMenuIntent) -> Unit
 ) {
-    if(oauthType != null){
+    if (oAuthType != null) {
         Text(
-            text = "${oauthType.title} 계정 회원",
+            text = "${oAuthType.title} 계정 회원",
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
         )

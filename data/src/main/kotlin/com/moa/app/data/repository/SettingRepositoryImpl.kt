@@ -1,7 +1,12 @@
 package com.moa.app.data.repository
 
+import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.core.model.setting.WorkInfo
+import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
 
 class SettingRepositoryImpl @Inject constructor(
@@ -12,6 +17,32 @@ class SettingRepositoryImpl @Inject constructor(
             oAuthType = OAuthType.KAKAO,
             nickName = "집계사장",
             latestAppVersion = "1.0.0",
+        )
+    }
+
+    override suspend fun getWorkInfo(): WorkInfo {
+        return WorkInfo(
+            oAuthType = OAuthType.KAKAO,
+            payroll = Payroll(
+                salary = "40000000",
+                salaryType = Payroll.SalaryType.ANNUAL,
+            ),
+            workPlace = "집계리아",
+            workPolicy = WorkPolicy(
+                workScheduleDays = persistentListOf(
+                    WorkPolicy.WorkScheduleDay.MON,
+                    WorkPolicy.WorkScheduleDay.TUE,
+                    WorkPolicy.WorkScheduleDay.WED,
+                    WorkPolicy.WorkScheduleDay.THU,
+                    WorkPolicy.WorkScheduleDay.FRI,
+                ),
+                time = Time(
+                    startHour = 9,
+                    startMinute = 0,
+                    endHour = 18,
+                    endMinute = 0,
+                )
+            )
         )
     }
 }

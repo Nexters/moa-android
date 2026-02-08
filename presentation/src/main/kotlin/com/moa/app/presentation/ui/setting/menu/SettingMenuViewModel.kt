@@ -20,11 +20,7 @@ import javax.inject.Inject
 
 @Stable
 data class SettingUiState(
-    val settingMenu: SettingMenu = SettingMenu(
-        oAuthType = null,
-        nickName = "",
-        latestAppVersion = "1.0.0",
-    )
+    val settingMenu: SettingMenu? = null
 )
 
 @HiltViewModel
@@ -71,18 +67,21 @@ class SettingMenuViewModel @Inject constructor(
 
     private fun nickName() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    destination = RootNavigation.Onboarding(
-                        startDestination = OnboardingNavigation.Nickname(
-                            args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                nickName = uiState.value.settingMenu.nickName,
-                                isOnboarding = false,
+            val nickName = _uiState.value.settingMenu?.nickName
+            if (nickName != null) {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
+                        destination = RootNavigation.Onboarding(
+                            startDestination = OnboardingNavigation.Nickname(
+                                args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                    nickName = nickName,
+                                    isOnboarding = false,
+                                )
                             )
                         )
                     )
                 )
-            )
+            }
         }
     }
 
