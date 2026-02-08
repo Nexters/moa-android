@@ -1,8 +1,5 @@
 package com.moa.app.presentation.ui.setting.menu
 
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.core.model.setting.OAuthType
@@ -37,6 +33,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.extensions.sendEmail
 
 @Composable
 fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
@@ -282,7 +279,7 @@ private fun SettingMenuAppInfoContent(
 
     MoaRow(
         modifier = Modifier.clickable {
-            sendEmail(context, currentAppVersion)
+            context.sendEmail(currentAppVersion)
         },
         leadingContent = {
             Text(
@@ -327,33 +324,6 @@ private fun SettingMenuButtonContent(onIntent: (SettingMenuIntent) -> Unit) {
             style = MoaTheme.typography.b2_400,
             color = MoaTheme.colors.textMediumEmphasis,
         )
-    }
-}
-
-private fun sendEmail(context: Context, appVersion: String) {
-    val email = "moa.mymoney@gmail.com"
-    val subject = "[문의] 모아 서비스에 문의드립니다."
-    val body = """
-        문의 유형: (버그 신고 / 제휴·광고 / 계정·결제 / 신고 / 기능 제안 / 기타)
-        상세 설명:
-
-        스크린샷/영상(선택):
-
-        ------------------------------
-        앱 버전/빌드: $appVersion
-    """.trimIndent()
-
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = "mailto:".toUri()
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-        putExtra(Intent.EXTRA_TEXT, body)
-    }
-
-    try {
-        context.startActivity(intent)
-    } catch (_: ActivityNotFoundException) {
-
     }
 }
 
