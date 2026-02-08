@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaDialogProperties
@@ -27,6 +28,7 @@ data class SettingUiState(
 class SettingMenuViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val settingRepository: SettingRepository,
+    private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
@@ -110,18 +112,29 @@ class SettingMenuViewModel @Inject constructor(
                     MoaDialogProperties.Confirm(
                         title = "로그아웃 하시겠어요?",
                         message = "로그아웃하면 로그인 화면으로 이동해요.",
-                        onPositive = {
-                            moaSideEffectBus.emit(
-                                MoaSideEffect.Navigate(
-                                    destination = RootNavigation.Onboarding(
-                                        startDestination = OnboardingNavigation.Login
-                                    )
-                                )
-                            )
-                        },
+                        onPositive = { clearToken() },
                     )
                 )
             )
+        }
+    }
+
+    private fun clearToken() {
+        suspend {
+            tokenRepository.clearToken()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(
+                    MoaSideEffect.Navigate(
+                        destination = RootNavigation.Onboarding(
+                            startDestination = OnboardingNavigation.Login
+                        )
+                    )
+                )
+            }
         }
     }
 
