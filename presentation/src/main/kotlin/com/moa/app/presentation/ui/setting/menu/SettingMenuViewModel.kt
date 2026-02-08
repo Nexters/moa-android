@@ -1,5 +1,6 @@
 package com.moa.app.presentation.ui.setting.menu
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.setting.SettingMenu
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class SettingUiState(
     val settingMenu: SettingMenu = SettingMenu(
         oAuthType = null,
