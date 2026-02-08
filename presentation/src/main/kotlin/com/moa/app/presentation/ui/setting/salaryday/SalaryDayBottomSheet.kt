@@ -1,4 +1,4 @@
-package com.moa.app.presentation.ui.setting.salarydate
+package com.moa.app.presentation.ui.setting.salaryday
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -28,12 +28,12 @@ import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SalaryDateBottomSheet(
-    salaryDate: Int,
+fun SalaryDayBottomSheet(
+    salaryDay: Int,
     onConfirm: (Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var date by remember { mutableIntStateOf(salaryDate) }
+    var day by remember { mutableIntStateOf(salaryDay) }
 
     MoaBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
@@ -49,9 +49,9 @@ fun SalaryDateBottomSheet(
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-            SalaryDateWheelPicker(
-                date = date,
-                onDateChange = { date = it }
+            SalaryDayWheelPicker(
+                day = day,
+                onDayChange = { day = it }
             )
 
             MoaPrimaryButton(
@@ -63,7 +63,7 @@ fun SalaryDateBottomSheet(
                     )
                     .height(64.dp),
                 onClick = {
-                    onConfirm(date)
+                    onConfirm(day)
                     onDismissRequest()
                 },
             ) {
@@ -77,9 +77,9 @@ fun SalaryDateBottomSheet(
 }
 
 @Composable
-private fun SalaryDateWheelPicker(
-    date: Int,
-    onDateChange: (Int) -> Unit,
+private fun SalaryDayWheelPicker(
+    day: Int,
+    onDayChange: (Int) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -106,8 +106,8 @@ private fun SalaryDateWheelPicker(
         MoaWheelPicker(
             modifier = Modifier.width(120.dp),
             items = (1..28).toList().toImmutableList(),
-            initialSelectedIndex = date - 1,
-            onItemSelected = onDateChange,
+            initialSelectedIndex = day - 1,
+            onItemSelected = onDayChange,
             itemToString = { "${it}일" }
         )
     }
