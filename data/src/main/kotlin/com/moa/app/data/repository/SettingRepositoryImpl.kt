@@ -54,6 +54,10 @@ class SettingRepositoryImpl @Inject constructor(
         // TODO put salaryday
     }
 
+    override suspend fun putCompanyName(companyName: String) {
+        // TODO put companyname
+    }
+
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {
         return persistentListOf(
             NotificationSetting.Service(

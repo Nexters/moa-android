@@ -3,7 +3,9 @@ package com.moa.app.presentation.ui.setting.companyname
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.SettingNavigation
 import dagger.assisted.Assisted
@@ -16,6 +18,7 @@ import kotlinx.coroutines.launch
 class CompanyNameViewModel @AssistedInject constructor(
     @Assisted private val companyName: String,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
     val companyNameTextFieldState = TextFieldState(companyName)
 
@@ -33,9 +36,15 @@ class CompanyNameViewModel @AssistedInject constructor(
     }
 
     private fun next() {
-        // TODO setting 근무지 api
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Back))
+        suspend {
+            settingRepository.putCompanyName(companyNameTextFieldState.text.toString())
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Back))
+            }
         }
     }
 
