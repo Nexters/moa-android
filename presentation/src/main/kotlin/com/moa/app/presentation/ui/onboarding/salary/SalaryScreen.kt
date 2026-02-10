@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.extensions.makePriceString
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaFilledTextField
@@ -111,7 +112,7 @@ private fun SalaryScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
             Text(
-                text = "세전, 세후 상관없이 보고 싶은 금액을 입력해주세요.",
+                text = "입력한 정보를 바탕으로 실시간 급여가 계산되며,\n급여 정보는 누구에게도 공개되지 않아요.",
                 color = MoaTheme.colors.textMediumEmphasis,
                 style = MoaTheme.typography.b2_400,
             )
@@ -147,10 +148,20 @@ private fun SalaryScreen(
                     .fillMaxWidth(),
                 state = uiState.salaryTextField,
                 placeholder = "0",
-                trailingText = "만원",
+                trailingText = "원",
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 inputTransformation = SalaryInputTransformation(),
                 outputTransformation = CurrencyOutputTransformation(),
+            )
+
+            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End,
+                text = uiState.salaryTextField.text.toString().makePriceString(),
+                color = MoaTheme.colors.textGreen,
+                style = MoaTheme.typography.b2_500,
             )
 
             Spacer(Modifier.weight(1f))
