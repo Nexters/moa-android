@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.Button
 import androidx.glance.ButtonDefaults
-import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -36,7 +35,6 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -44,6 +42,7 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.moa.app.core.model.widget.Widget
 import com.moa.app.presentation.R
+import com.moa.app.presentation.designsystem.theme.Gray20
 import com.moa.app.presentation.designsystem.theme.Gray70
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import dagger.hilt.android.EntryPointAccessors
@@ -394,15 +393,8 @@ private fun MoaWidgetTimeWithRefresh(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            modifier = GlanceModifier.size(14.dp),
-            provider = ImageProvider(R.drawable.ic_16_restart),
+            provider = ImageProvider(R.drawable.ic_14_gray_restart),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(
-                colorProvider = ColorProvider(
-                    day = MoaTheme.colors.textMediumEmphasis,
-                    night = MoaTheme.colors.textMediumEmphasis,
-                ),
-            )
         )
 
         Spacer(GlanceModifier.width(2.dp))
@@ -413,8 +405,8 @@ private fun MoaWidgetTimeWithRefresh(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Normal,
                 color = ColorProvider(
-                    day = MoaTheme.colors.textMediumEmphasis,
-                    night = MoaTheme.colors.textMediumEmphasis,
+                    day = Gray20,
+                    night = Gray20,
                 ),
             ),
         )
