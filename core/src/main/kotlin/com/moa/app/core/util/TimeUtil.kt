@@ -6,7 +6,7 @@ import java.util.Locale
 
 object TimeUtil {
     fun getCurrentTimeKorean(): String {
-        val dateFormat = SimpleDateFormat("a h:mm", Locale.KOREAN)
+        val dateFormat = SimpleDateFormat("a hh:mm", Locale.KOREAN)
         return dateFormat.format(Date())
     }
 }
