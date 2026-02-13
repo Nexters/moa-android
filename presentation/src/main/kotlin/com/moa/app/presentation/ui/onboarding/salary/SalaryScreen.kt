@@ -40,12 +40,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.app.core.extensions.makePriceString
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.presentation.R
+import com.moa.app.presentation.designsystem.component.CurrencyInputTransformation
+import com.moa.app.presentation.designsystem.component.CurrencyOutputTransformation
 import com.moa.app.presentation.designsystem.component.MoaFilledTextField
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.designsystem.transformation.CurrencyOutputTransformation
-import com.moa.app.presentation.designsystem.transformation.SalaryInputTransformation
 import com.moa.app.presentation.model.OnboardingNavigation
 
 @Composable
@@ -150,7 +150,7 @@ private fun SalaryScreen(
                 placeholder = "0",
                 trailingText = "원",
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                inputTransformation = SalaryInputTransformation(),
+                inputTransformation = CurrencyInputTransformation(),
                 outputTransformation = CurrencyOutputTransformation(),
             )
 

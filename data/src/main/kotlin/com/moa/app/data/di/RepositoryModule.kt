@@ -6,6 +6,8 @@ import com.moa.app.data.repository.SettingRepository
 import com.moa.app.data.repository.SettingRepositoryImpl
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.data.repository.TokenRepositoryImpl
+import com.moa.app.data.repository.WidgetRepository
+import com.moa.app.data.repository.WidgetRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,4 +34,10 @@ interface RepositoryModule {
     fun bindsSettingRepository(
         impl: SettingRepositoryImpl
     ): SettingRepository
+
+    @Binds
+    @Singleton
+    fun bindsWidgetRepository(
+        impl: WidgetRepositoryImpl
+    ): WidgetRepository
 }

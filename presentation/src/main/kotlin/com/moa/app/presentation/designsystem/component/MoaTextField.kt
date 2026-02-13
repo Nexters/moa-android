@@ -11,7 +11,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.insert
+import com.moa.app.core.util.PayrollConstants
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -89,5 +92,35 @@ private fun MoaTextFieldPreview() {
             placeholder = "0",
             trailingText = "원"
         )
+    }
+}
+
+class CurrencyInputTransformation(
+    private val maxAmount: Long = PayrollConstants.MAX_SALARY_AMOUNT
+) : InputTransformation {
+    override fun TextFieldBuffer.transformInput() {
+        val filtered = asCharSequence().filter { it.isDigit() }.toString()
+        val longValue = filtered.toLongOrNull() ?: 0L
+
+        if (longValue > maxAmount) {
+            revertAllChanges()
+            return
+        }
+
+        if (filtered != asCharSequence().toString()) {
+            replace(0, length, filtered)
+        }
+    }
+}
+
+class CurrencyOutputTransformation : OutputTransformation {
+    override fun TextFieldBuffer.transformOutput() {
+        val original = asCharSequence().toString()
+        if (original.isEmpty() || original.toLongOrNull() == null) return
+
+        val len = original.length
+        for (i in len - 3 downTo 1 step 3) {
+            insert(i, ",")
+        }
     }
 }
