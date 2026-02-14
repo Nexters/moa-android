@@ -8,7 +8,7 @@ import kotlinx.collections.immutable.ImmutableList
 
 interface OnboardingRepository {
     suspend fun getOnboardingStatus(): OnboardingStatus
-    suspend fun getRandomNickName(): String
+    fun getRandomNickName(): String
     suspend fun patchNickName(nickName: String)
     suspend fun patchPayroll(payroll: Payroll)
     suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
