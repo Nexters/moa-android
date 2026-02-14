@@ -21,7 +21,7 @@ class OnboardingRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getRandomNickName(): String {
+    override fun getRandomNickName(): String {
         return "집계사장${Random.nextInt(10)}"
     }
 
