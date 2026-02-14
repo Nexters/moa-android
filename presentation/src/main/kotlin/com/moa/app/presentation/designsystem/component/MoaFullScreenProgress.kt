@@ -37,7 +37,7 @@ fun MoaFullScreenProgress() {
         contentAlignment = Alignment.Center,
     ) {
         LottieAnimation(
-            modifier = Modifier.size(96.dp),
+            modifier = Modifier.size(52.dp),
             composition = composition,
             progress = { progress }
         )

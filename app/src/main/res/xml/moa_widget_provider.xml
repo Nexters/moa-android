@@ -2,8 +2,9 @@
     android:description="@string/app_name"
     android:minWidth="110dp"
     android:minHeight="110dp"
+    android:previewImage="@drawable/img_widget_thumbnail"
+    android:resizeMode="none"
     android:targetCellWidth="2"
     android:targetCellHeight="2"
-    android:widgetCategory="home_screen"
-    android:resizeMode="none"
-    android:updatePeriodMillis="0" />
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />
