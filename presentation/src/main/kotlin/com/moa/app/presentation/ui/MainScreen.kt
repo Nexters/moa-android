@@ -1,5 +1,10 @@
 package com.moa.app.presentation.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +21,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.designsystem.component.MoaDialog
+import com.moa.app.presentation.designsystem.component.MoaFullScreenProgress
+import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
@@ -33,7 +40,7 @@ fun MainScreen(
     onFinish: () -> Unit,
 ) {
     val backstack = rememberNavBackStack(RootNavigation.Splash)
-    val dialog by viewModel.dialog.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
@@ -77,11 +84,11 @@ fun MainScreen(
                 }
 
                 is MoaSideEffect.Dialog -> {
-                    viewModel.setDialog(it.dialog)
+                    viewModel.onIntent(MainIntent.SetDialog(it.dialog))
                 }
 
                 is MoaSideEffect.Loading -> {
-                    // TODO Loading
+                    viewModel.onIntent(MainIntent.SetLoading(it.isLoading))
                 }
 
                 is MoaSideEffect.Failure -> {
@@ -96,11 +103,15 @@ fun MainScreen(
         backstack = backstack,
     )
 
-    dialog?.let {
+    uiState.dialog?.let {
         MoaDialog(
             properties = it,
-            onDismissRequest = { viewModel.setDialog(null) },
+            onDismissRequest = { viewModel.onIntent(MainIntent.SetDialog(null)) },
         )
+    }
+
+    if (uiState.isLoading) {
+        MoaFullScreenProgress()
     }
 }
 
@@ -142,4 +153,12 @@ private fun MainNavHost(
             }
         }
     )
+}
+
+sealed interface MainIntent {
+    @JvmInline
+    value class SetDialog(val dialog: MoaDialogProperties?) : MainIntent
+
+    @JvmInline
+    value class SetLoading(val visible: Boolean) : MainIntent
 }
