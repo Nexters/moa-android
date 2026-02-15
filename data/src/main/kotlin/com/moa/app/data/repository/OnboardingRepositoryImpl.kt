@@ -1,6 +1,5 @@
 package com.moa.app.data.repository
 
-import android.util.Log
 import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
@@ -28,14 +27,19 @@ class OnboardingRepositoryImpl @Inject constructor(
         idToken: String,
         fcmDeviceToken: String,
     ): String {
-        val abc = tokenService.postToken(
+        val response = tokenService.postToken(
             TokenRequest(
                 idToken = idToken,
                 fcmDeviceToken = fcmDeviceToken,
             )
         )
-        Log.e("ABC", abc.toString())
-        return "token"
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("Token authentication failed: ${response.message}")
+        }
+
+        return response.content.accessToken
     }
 
     override fun getRandomNickName(): String {

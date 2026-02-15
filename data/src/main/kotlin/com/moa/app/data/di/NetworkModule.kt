@@ -1,7 +1,6 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.BuildConfig
-import com.moa.app.data.remote.adapter.ResultCallAdapterFactory
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
@@ -67,7 +66,6 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
-            .addCallAdapterFactory(ResultCallAdapterFactory())
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
