@@ -63,14 +63,8 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun random() {
-        suspend {
-            onboardingRepository.getRandomNickName()
-        }.execute(
-            bus = moaSideEffectBus,
-            scope = viewModelScope,
-        ) { nickName ->
-            nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
-        }
+        val nickName = onboardingRepository.getRandomNickName()
+        nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
     }
 
     private fun next() {

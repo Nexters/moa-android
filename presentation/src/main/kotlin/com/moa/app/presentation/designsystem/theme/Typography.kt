@@ -35,7 +35,7 @@ data class MoaTypography(
     val c1_400: TextStyle,
 )
 
-private val Pretendard = FontFamily(
+val Pretendard = FontFamily(
     Font(resId = R.font.pretendard_bold, weight = FontWeight.Bold),
     Font(resId = R.font.pretendard_medium, weight = FontWeight.Medium),
     Font(resId = R.font.pretendard_regular, weight = FontWeight.Normal),

@@ -11,7 +11,7 @@ sealed interface SettingNavigation : RootNavigation {
 
     @Serializable
     @JvmInline
-    value class WorkPlace(val workPlace: String) : SettingNavigation
+    value class CompanyName(val companyName: String) : SettingNavigation
 
     @Serializable
     data object NotificationSetting : SettingNavigation
@@ -20,7 +20,8 @@ sealed interface SettingNavigation : RootNavigation {
     data object Terms : SettingNavigation
 
     @Serializable
-    data object SalaryDate : SettingNavigation
+    @JvmInline
+    value class SalaryDay(val day: Int) : SettingNavigation
 
     @Serializable
     data object WithDraw : SettingNavigation

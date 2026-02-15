@@ -4,13 +4,15 @@ import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.WorkPolicy
+import com.moa.app.data.remote.api.TokenService
+import com.moa.app.data.remote.model.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
 import kotlin.random.Random
 
 class OnboardingRepositoryImpl @Inject constructor(
-
+    private val tokenService: TokenService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
         return OnboardingStatus(
@@ -21,7 +23,26 @@ class OnboardingRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getRandomNickName(): String {
+    override suspend fun postToken(
+        idToken: String,
+        fcmDeviceToken: String,
+    ): String {
+        val response = tokenService.postToken(
+            TokenRequest(
+                idToken = idToken,
+                fcmDeviceToken = fcmDeviceToken,
+            )
+        )
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("Token authentication failed: ${response.message}")
+        }
+
+        return response.content.accessToken
+    }
+
+    override fun getRandomNickName(): String {
         return "집계사장${Random.nextInt(10)}"
     }
 

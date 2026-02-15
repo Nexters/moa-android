@@ -65,6 +65,12 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
 
+    // Splash
+    implementation(libs.androidx.core.splashscreen)
+
+    // Lottie
+    implementation(libs.lottie.compose)
+
     // Lottie
     implementation(libs.lottie.compose)
 

@@ -36,7 +36,7 @@ object KakaoLoginManager {
                 )
             )
 
-            token != null -> continuation.resume(token.accessToken)
+            token != null -> continuation.resume(token.idToken ?: "")
             else -> continuation.resumeWithException(Exception("카카오 계정으로 로그인 실패"))
         }
     }
