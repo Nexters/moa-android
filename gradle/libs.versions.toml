@@ -29,7 +29,6 @@ kakao = "2.23.2"
 firebase-bom = "34.9.0"
 google-services = "4.4.4"
 firebaseCrashlyticsGradle = "3.0.6"
-lottie = "6.6.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -105,9 +104,6 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 
 # Lottie
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
-
-# Lottie
-lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
