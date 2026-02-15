@@ -1,5 +1,8 @@
 package com.moa.app.data.di
 
+import com.moa.app.data.BuildConfig
+import com.moa.app.data.remote.adapter.ResultCallAdapterFactory
+import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -18,7 +21,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://api.moa-temp.com/" // TODO: 실제 API URL로 변경
     private const val TIMEOUT_SECONDS = 30L
 
     @Provides
@@ -63,9 +65,15 @@ object NetworkModule {
     ): Retrofit {
         val contentType = "application/json; charset=utf-8".toMediaType()
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
+            .addCallAdapterFactory(ResultCallAdapterFactory())
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideTokenService(retrofit: Retrofit): TokenService =
+        retrofit.create(TokenService::class.java)
 }
