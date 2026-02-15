@@ -1,78 +1,100 @@
 package com.moa.app.presentation.ui.home
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.moa.app.presentation.R
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.moa.app.presentation.designsystem.component.MoaHomeTopBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.ui.home.afterwork.AfterWorkScreen
+import com.moa.app.presentation.ui.home.beforework.BeforeWorkScreen
+import com.moa.app.presentation.ui.home.working.WorkingScreen
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+    val backStack = rememberNavBackStack(HomeNavigation.BeforeWork())
 
-    HomeScreen(
-        onIntent = viewModel::onIntent,
-    )
-}
+    LaunchedEffect(Unit) {
+        viewModel.moaSideEffects.collect {
+            when (it) {
+                is MoaSideEffect.Navigate -> {
+                    when (it.destination) {
+                        HomeNavigation.Back -> {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                        }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreen(
-    onIntent: (HomeIntent) -> Unit,
-) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MoaTheme.colors.bgPrimary),
-                title = {
-                    Text(
-                        text = "Moa",
-                        style = MoaTheme.typography.t3_500,
-                        color = MoaTheme.colors.textHighEmphasis,
-                    )
-                },
-                actions = {
-                    IconButton(onClick = {onIntent(HomeIntent.ClickCalendar)}) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_24_calendar),
-                            contentDescription = "Notification Icon",
-                            tint = MoaTheme.colors.textHighEmphasis,
-                        )
+                        is HomeNavigation -> backStack.add(it.destination)
+
+                        else -> Unit
                     }
+                }
 
-                    IconButton(onClick = {onIntent(HomeIntent.ClickSetting)}) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_24_setting),
-                            contentDescription = "Notification Icon",
-                            tint = MoaTheme.colors.textHighEmphasis,
-                        )
-                    }
-                },
-            )
-        },
-        containerColor = MoaTheme.colors.bgPrimary,
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-        ) {
-
+                else -> Unit
+            }
         }
+    }
+
+    Scaffold(
+        containerColor = MoaTheme.colors.bgPrimary,
+        topBar = {
+            MoaHomeTopBar(
+                onCalendarClick = { viewModel.onIntent(HomeIntent.NavigateToHistory) },
+                onSettingClick = { viewModel.onIntent(HomeIntent.NavigateToSetting) },
+            )
+        }
+    ) { innerPadding ->
+        HomeNavHost(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            backstack = backStack,
+        )
     }
 }
 
+@Composable
+private fun HomeNavHost(
+    modifier: Modifier,
+    backstack: NavBackStack<NavKey>,
+) {
+    NavDisplay(
+        modifier = modifier,
+        backStack = backstack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
+        entryProvider = entryProvider {
+            entry<HomeNavigation.BeforeWork> { key ->
+                BeforeWorkScreen(args = key)
+            }
+
+            entry<HomeNavigation.Working> { key ->
+                WorkingScreen(args = key)
+            }
+
+            entry<HomeNavigation.AfterWork> { key ->
+                AfterWorkScreen(args = key)
+            }
+        }
+    )
+}
+
 sealed interface HomeIntent {
-    data object ClickCalendar : HomeIntent
-    data object ClickSetting : HomeIntent
+    data object NavigateToHistory : HomeIntent
+    data object NavigateToSetting : HomeIntent
 }
