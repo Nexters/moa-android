@@ -22,6 +22,7 @@ import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
 import com.moa.app.presentation.model.SettingNavigation
+import com.moa.app.presentation.navigation.HomeNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
@@ -36,6 +37,8 @@ fun MainScreen(
 ) {
     val backstack = rememberNavBackStack(RootNavigation.Splash)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val backstack = rememberNavBackStack(RootNavigation.Home)
+    val dialog by viewModel.dialog.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
@@ -73,6 +76,8 @@ fun MainScreen(
                         is OnboardingNavigation -> Unit
 
                         is SettingNavigation -> Unit
+
+                        is HomeNavigation -> Unit // HomeScreen 내부에서 처리
 
                         else -> backstack.add(it.destination)
                     }

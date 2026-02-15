@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- BeforeWorkScreen -->
+    <string name="before_work_time_bottom_sheet_title">예상 출퇴근 시간을 알려주세요</string>
+    <string name="before_work_early_clock_in">일찍 출근하기</string>
+    <string name="before_work_vacation_today">오늘 휴가예요</string>
+    <string name="before_work_date_icon_description">날짜</string>
+    <string name="before_work_location_icon_description">위치</string>
+    <string name="before_work_coin_icon_description">모아 코인</string>
+    <string name="before_work_accumulated_salary_title">%1$d월 누적 월급</string>
+    <string name="before_work_currency_won">원</string>
+    <string name="before_work_additional_salary_message">기본 월급보다 %1$s 더 일했어요</string>
+    <string name="before_work_today_salary">오늘 일급</string>
+    <string name="before_work_work_time">근무 시간</string>
+    <string name="before_work_edit_icon_description">수정</string>
+    <string name="before_work_auto_clock_in">%1$s 자동 출근 예정</string>
+    <string name="before_work_day_off_no_schedule">근무 예정 없음</string>
+    <string name="before_work_day_off_clock_in">쉬는 날 출근하기</string>
+
+    <!-- WorkingScreen -->
+    <string name="working_time_bottom_sheet_title">근무 시간을 조정해주세요</string>
+    <string name="working_month_salary_banner">이번달에 받은 월급 %1$s원</string>
+    <string name="working_today_salary_label">오늘 쌓은 월급</string>
+    <string name="working_currency_won">원</string>
+    <string name="working_coin_icon_description">모아 코인</string>
+    <string name="working_adjust_schedule">일정 조정</string>
+
+    <!-- WorkingScreen - Status Tags -->
+    <string name="working_status_working">근무 중</string>
+    <string name="working_status_lunch">점심시간</string>
+    <string name="working_status_vacation">휴가</string>
+    <string name="working_status_overtime">추가 근무</string>
+
+    <!-- WorkingScreen - Rolling Tooltip -->
+    <string name="working_tooltip_month_salary">이번달에 쌓은 월급 %1$s원</string>
+    <string name="working_tooltip_remaining_time">화이팅! %1$d시간 후 퇴근이에요</string>
+    <string name="working_tooltip_vacation">휴가 중이지만 월급은 쌓여요</string>
+
+    <!-- WorkingScreen - Purchasable Tooltip by Amount -->
+    <string name="working_tooltip_purchasable_default">열심히 일해서 월급을 모아봐요</string>
+    <string name="working_tooltip_purchasable_10000">커피와 조각 케이크를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_20000">치킨 한 마리 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_30000">영화 2인 예매를 할 수 있어요</string>
+    <string name="working_tooltip_purchasable_50000">로지텍 무선 마우스를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_100000">나이키 운동화 한 켤레를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_200000">노스페이스 백팩을 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_250000">갤럭시 워치 FE를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_300000">에어팟 3세대를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_350000">아이패드 9세대를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_400000">다이슨 무선 청소기를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_450000">닌텐도 스위치를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_500000">플레이스테이션 5를 살 수 있어요</string>
+
+    <!-- WorkingScreen - Work Completion Overlay -->
+    <string name="working_completion_accumulated_salary_label">누적 월급</string>
+    <string name="working_completion_work_time_label">근무 시간</string>
+    <string name="working_completion_continue">더 일할게요</string>
+    <string name="working_completion_complete">완료</string>
+    <string name="working_more_work_title">얼마나 더 일하나요?</string>
+    <string name="working_work_time_edit_title">실제 근무 시간을 알려주세요</string>
+    <string name="working_today_vacation">오늘 휴가</string>
+
+    <!-- WorkingScreen - Schedule Adjust BottomSheet -->
+    <string name="schedule_adjust_title">근무 일정에 변동이 생겼나요?</string>
+    <string name="schedule_adjust_option_vacation">오늘 휴가예요</string>
+    <string name="schedule_adjust_option_end_work">오늘 근무를 마칠 거예요</string>
+    <string name="schedule_adjust_option_adjust_time">근무 시간 조정이 필요해요</string>
+    <string name="schedule_adjust_cancel">취소</string>
+    <string name="schedule_adjust_confirm">확인</string>
+
+    <!-- AfterWorkScreen -->
+    <string name="after_work_accumulated_salary_title">%1$d월 누적 월급</string>
+    <string name="after_work_today_salary_label">오늘 쌓은 월급</string>
+    <string name="after_work_today_salary_info_label">오늘 일급</string>
+    <string name="after_work_currency_won">원</string>
+    <string name="after_work_accumulated_salary">누적 월급 %1$s원</string>
+    <string name="after_work_accumulated_salary_label">누적 월급</string>
+    <string name="after_work_work_time">근무 시간 %1$s - %2$s</string>
+    <string name="after_work_work_time_label">근무 시간</string>
+    <string name="after_work_vacation">휴가</string>
+    <string name="after_work_check_work_history">이번달 근무 기록 확인하기</string>
+    <string name="after_work_more_work">더 일할게요</string>
+    <string name="after_work_complete">완료</string>
+    <string name="after_work_coin_description">모아 코인</string>
+
+    <!-- AfterWorkScreen - BottomSheet -->
+    <string name="after_work_actual_time_title">실제 근무 시간을 알려주세요</string>
+    <string name="after_work_more_work_title">얼마나 더 일하나요?</string>
+    <string name="after_work_clock_in">출근</string>
+    <string name="after_work_clock_out">퇴근</string>
+    <string name="after_work_today_vacation">오늘 휴가</string>
+    <string name="after_work_cancel">취소</string>
+    <string name="after_work_confirm">확인</string>
+
+    <!-- Common Components -->
+    <string name="date_location_bar_date_icon_description">날짜</string>
+    <string name="date_location_bar_location_icon_description">위치</string>
+</resources>

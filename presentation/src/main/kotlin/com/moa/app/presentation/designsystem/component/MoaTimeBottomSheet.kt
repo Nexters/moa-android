@@ -41,6 +41,7 @@ fun MoaTimeBottomSheet(
     title: String,
     negativeText: String? = null,
     positiveText: String = "확인",
+    endTimeOnly: Boolean = false,
     onNegative: () -> Unit = {},
     onPositive: (Time) -> Unit,
     onDismissRequest: () -> Unit,
@@ -53,6 +54,7 @@ fun MoaTimeBottomSheet(
             title = title,
             negativeText = negativeText,
             positiveText = positiveText,
+            endTimeOnly = endTimeOnly,
             onNegative = onNegative,
             onPositive = onPositive,
             onDismissRequest = onDismissRequest,
@@ -66,11 +68,12 @@ private fun MoaTimeBottomSheetContent(
     title: String,
     negativeText: String?,
     positiveText: String,
+    endTimeOnly: Boolean,
     onNegative: () -> Unit,
     onPositive: (Time) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var selectedStartTime by remember { mutableStateOf(true) }
+    var selectedStartTime by remember { mutableStateOf(!endTimeOnly) }
     var startHour by remember { mutableIntStateOf(time.startHour) }
     var startMinute by remember { mutableIntStateOf(time.startMinute) }
     var endHour by remember { mutableIntStateOf(time.endHour) }
@@ -95,6 +98,7 @@ private fun MoaTimeBottomSheetContent(
             startMinute = startMinute,
             endHour = endHour,
             endMinute = endMinute,
+            endTimeOnly = endTimeOnly,
             onSelectedHour = { selectedHour ->
                 if (selectedStartTime) {
                     startHour = selectedHour
@@ -109,12 +113,12 @@ private fun MoaTimeBottomSheetContent(
                     endMinute = selectedMinute
                 }
             },
-            onClickStartTime = { selectedStartTime = true },
+            onClickStartTime = { if (!endTimeOnly) selectedStartTime = true },
             onClickEndTime = { selectedStartTime = false },
         )
 
         MoaTimeBottomSheetButtonContent(
-            enabled = if (selectedStartTime) {
+            enabled = if (selectedStartTime && !endTimeOnly) {
                 true
             } else {
                 (endHour > startHour) || (endHour == startHour && endMinute > startMinute)
@@ -126,7 +130,7 @@ private fun MoaTimeBottomSheetContent(
                 onDismissRequest()
             },
             onPositive = {
-                if (selectedStartTime) {
+                if (selectedStartTime && !endTimeOnly) {
                     selectedStartTime = false
                 } else {
                     onPositive(Time(startHour, startMinute, endHour, endMinute))
@@ -144,6 +148,7 @@ private fun MoaTimeBottomSheetTimeContent(
     startMinute: Int,
     endHour: Int,
     endMinute: Int,
+    endTimeOnly: Boolean,
     onSelectedHour: (Int) -> Unit,
     onSelectedMinute: (Int) -> Unit,
     onClickStartTime: () -> Unit,
@@ -158,7 +163,7 @@ private fun MoaTimeBottomSheetTimeContent(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickable { onClickStartTime() },
+                .then(if (!endTimeOnly) Modifier.clickable { onClickStartTime() } else Modifier),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -169,8 +174,8 @@ private fun MoaTimeBottomSheetTimeContent(
 
             Text(
                 text = makeTimeString(startHour, startMinute),
-                style = if (selectedStartTime) MoaTheme.typography.t1_700 else MoaTheme.typography.t1_500,
-                color = if (selectedStartTime) MoaTheme.colors.textGreen else MoaTheme.colors.textLowEmphasis,
+                style = if (selectedStartTime && !endTimeOnly) MoaTheme.typography.t1_700 else MoaTheme.typography.t1_500,
+                color = if (selectedStartTime && !endTimeOnly) MoaTheme.colors.textGreen else MoaTheme.colors.textLowEmphasis,
             )
         }
 
