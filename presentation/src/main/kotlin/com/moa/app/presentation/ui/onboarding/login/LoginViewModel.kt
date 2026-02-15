@@ -4,6 +4,7 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val onboardingRepository: OnboardingRepository,
     private val tokenRepository: TokenRepository,
 ) : ViewModel() {
 
@@ -33,11 +35,11 @@ class LoginViewModel @Inject constructor(
                 }
 
                 val kakaoToken = kakaoTokenDeferred.await()
-                val fcmToken = fcmTokenDeferred.await()
+                val fcmDeviceToken = fcmTokenDeferred.await()
 
                 postToken(
-                    accessToken = kakaoToken,
-                    fcmToken = fcmToken
+                    idToken = kakaoToken,
+                    fcmDeviceToken = fcmDeviceToken
                 )
             } catch (e: Exception) {
                 Toast.makeText(
@@ -50,13 +52,13 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun postToken(
-        accessToken: String,
-        fcmToken: String,
+        idToken: String,
+        fcmDeviceToken: String,
     ) {
         suspend {
-            tokenRepository.postToken(
-                accessToken = accessToken,
-                fcmToken = fcmToken,
+            onboardingRepository.postToken(
+                idToken = idToken,
+                fcmDeviceToken = fcmDeviceToken,
             )
         }.execute(
             bus = moaSideEffectBus,
@@ -66,9 +68,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun saveToken(jwt: String) {
+    private fun saveToken(accessToken: String) {
         suspend {
-            tokenRepository.saveAccessToken(jwt)
+            tokenRepository.saveAccessToken(accessToken)
         }.execute(scope = viewModelScope) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
