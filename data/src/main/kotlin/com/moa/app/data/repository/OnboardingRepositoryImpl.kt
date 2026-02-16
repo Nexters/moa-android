@@ -4,7 +4,9 @@ import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.WorkPolicy
+import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
+import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -13,14 +15,17 @@ import kotlin.random.Random
 
 class OnboardingRepositoryImpl @Inject constructor(
     private val tokenService: TokenService,
+    private val onboardingService: OnboardingService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
-        return OnboardingStatus(
-            nickName = null,
-            payroll = null,
-            workPolicy = null,
-            hasRequiredTermsAgreed = false,
-        )
+        val response = onboardingService.getStatus()
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("OnboardingStatus failed: ${response.message}")
+        }
+
+        return response.content.toDomain()
     }
 
     override suspend fun postToken(

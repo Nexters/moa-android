@@ -27,61 +27,65 @@ class SplashViewModel @Inject constructor(
                 return@launch
             }
 
-            val onboardingStatus = onboardingRepository.getOnboardingStatus()
+            runCatching {
+                onboardingRepository.getOnboardingStatus()
+            }.onSuccess { onboardingStatus ->
+                if (onboardingStatus.hasRequiredTermsAgreed) {
+                    navigate(RootNavigation.Home)
+                    return@launch
+                }
 
-            if (onboardingStatus.hasRequiredTermsAgreed) {
-                navigate(RootNavigation.Home)
-                return@launch
-            }
-
-            val nickName = onboardingStatus.nickName
-            if (nickName == null) {
-                navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
-                return@launch
-            } else {
-                navigate(
-                    RootNavigation.Onboarding(
-                        OnboardingNavigation.Nickname(
-                            args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                nickName = nickName
+                val nickName = onboardingStatus.nickName
+                if (nickName == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Nickname(
+                                args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                    nickName = nickName
+                                )
                             )
                         )
                     )
-                )
-            }
+                }
 
-            val payroll = onboardingStatus.payroll
-            if (payroll == null) {
-                navigate(RootNavigation.Onboarding(OnboardingNavigation.Salary()))
-                return@launch
-            } else {
-                navigate(
-                    RootNavigation.Onboarding(
-                        OnboardingNavigation.Salary(
-                            OnboardingNavigation.Salary.SalaryNavigationArgs(
-                                salary = payroll.salary,
-                                salaryType = payroll.salaryType,
+                val payroll = onboardingStatus.payroll
+                if (payroll == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Salary()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Salary(
+                                OnboardingNavigation.Salary.SalaryNavigationArgs(
+                                    salary = payroll.salary,
+                                    salaryType = payroll.salaryType,
+                                )
                             )
                         )
                     )
-                )
-            }
+                }
 
-            val workPolicy = onboardingStatus.workPolicy
-            if (workPolicy == null) {
-                navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkSchedule()))
-                return@launch
-            } else {
-                navigate(
-                    RootNavigation.Onboarding(
-                        OnboardingNavigation.WorkSchedule(
-                            OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
-                                workScheduleDays = workPolicy.workScheduleDays,
-                                time = workPolicy.time,
+                val workPolicy = onboardingStatus.workPolicy
+                if (workPolicy == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkSchedule()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.WorkSchedule(
+                                OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
+                                    workScheduleDays = workPolicy.workScheduleDays,
+                                    time = workPolicy.time,
+                                )
                             )
                         )
                     )
-                )
+                }
+            }.onFailure {
+                navigate(RootNavigation.Onboarding())
             }
         }
     }
