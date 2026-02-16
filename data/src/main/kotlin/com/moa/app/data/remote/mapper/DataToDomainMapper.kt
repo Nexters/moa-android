@@ -5,9 +5,9 @@ import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Time
 import com.moa.app.core.model.onboarding.WorkPolicy
-import com.moa.app.data.remote.model.PayrollResponse
-import com.moa.app.data.remote.model.StatusResponse
-import com.moa.app.data.remote.model.WorkPolicyResponse
+import com.moa.app.data.remote.model.response.PayrollResponse
+import com.moa.app.data.remote.model.response.StatusResponse
+import com.moa.app.data.remote.model.response.WorkPolicyResponse
 import kotlinx.collections.immutable.toImmutableList
 
 fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(

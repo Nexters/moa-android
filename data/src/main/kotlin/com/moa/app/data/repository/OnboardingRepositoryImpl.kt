@@ -7,7 +7,7 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toDomain
-import com.moa.app.data.remote.model.TokenRequest
+import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject

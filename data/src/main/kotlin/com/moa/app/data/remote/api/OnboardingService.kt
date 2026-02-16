@@ -1,7 +1,7 @@
 package com.moa.app.data.remote.api
 
-import com.moa.app.data.remote.model.ApiResponse
-import com.moa.app.data.remote.model.StatusResponse
+import com.moa.app.data.remote.model.response.ApiResponse
+import com.moa.app.data.remote.model.response.StatusResponse
 import retrofit2.http.GET
 
 interface OnboardingService {
