@@ -83,7 +83,7 @@ private fun LoginScreen(
                     isProgrammaticScroll = false
 
                     if (!isAutoPagingEnabled) {
-                        delay(5000)
+                        delay(2000)
                         isAutoPagingEnabled = true
                     }
                 }
