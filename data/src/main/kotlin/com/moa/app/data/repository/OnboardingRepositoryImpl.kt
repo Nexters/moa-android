@@ -7,6 +7,7 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -22,7 +23,7 @@ class OnboardingRepositoryImpl @Inject constructor(
 
         // TODO 에러 처리
         if (response.content == null) {
-            throw Exception("OnboardingStatus failed: ${response.message}")
+            throw Exception("${response.code} ${response.message}")
         }
 
         return response.content.toDomain()
@@ -41,7 +42,7 @@ class OnboardingRepositoryImpl @Inject constructor(
 
         // TODO 에러 처리
         if (response.content == null) {
-            throw Exception("Token authentication failed: ${response.message}")
+            throw Exception("${response.code} ${response.message}")
         }
 
         return response.content.accessToken
@@ -52,7 +53,12 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchNickName(nickName: String) {
-        // TODO patch nickname
+        val response = onboardingService.patchProfile(ProfileRequest(nickname = nickName))
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("${response.code} ${response.message}")
+        }
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {

@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProfileResponse(
     val nickname: String,
-    val workplace: String,
+    val workplace: String?,
 )
