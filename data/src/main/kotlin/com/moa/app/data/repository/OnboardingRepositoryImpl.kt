@@ -23,33 +23,19 @@ class OnboardingRepositoryImpl @Inject constructor(
     private val onboardingService: OnboardingService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
-        val response = onboardingService.getStatus()
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
-
-        return response.content.toDomain()
+        return onboardingService.getStatus().toDomain()
     }
 
     override suspend fun postToken(
         idToken: String,
         fcmDeviceToken: String,
     ): String {
-        val response = tokenService.postToken(
+        return tokenService.postToken(
             TokenRequest(
                 idToken = idToken,
                 fcmDeviceToken = fcmDeviceToken,
             )
-        )
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
-
-        return response.content.accessToken
+        ).accessToken
     }
 
     override fun getRandomNickName(): String {
@@ -57,42 +43,25 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchNickName(nickName: String) {
-        val response = onboardingService.patchProfile(ProfileRequest(nickname = nickName))
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
+        onboardingService.patchProfile(ProfileRequest(nickname = nickName))
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {
-        val response = onboardingService.patchPayroll(
+        onboardingService.patchPayroll(
             PayrollRequest(
                 salaryInputType = payroll.salaryType.name,
                 salaryAmount = payroll.salary.toLong(),
                 paydayDay = payroll.paydayDay,
             )
         )
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
     }
 
     override suspend fun getTerms(): ImmutableList<Term> {
-        val response = onboardingService.getTerms()
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
-
-        return response.content.terms.toDomain()
+        return onboardingService.getTerms().terms.toDomain()
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
-        val response = onboardingService.patchWorkPolicy(
+        onboardingService.patchWorkPolicy(
             WorkPolicyRequest(
                 workdays = workPolicy.workScheduleDays.map { it.name },
                 clockInTime = makeTimeString(
@@ -105,15 +74,10 @@ class OnboardingRepositoryImpl @Inject constructor(
                 ),
             )
         )
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
     }
 
     override suspend fun putTerms(terms: ImmutableList<Term>) {
-        val response = onboardingService.putAgreements(
+        onboardingService.putAgreements(
             AgreementsRequest(
                 agreements = terms
                     .filter { it !is Term.All }
@@ -125,10 +89,5 @@ class OnboardingRepositoryImpl @Inject constructor(
                     }
             )
         )
-
-        // TODO 에러 처리
-        if (response.content == null) {
-            throw Exception("${response.code} ${response.message}")
-        }
     }
 }
