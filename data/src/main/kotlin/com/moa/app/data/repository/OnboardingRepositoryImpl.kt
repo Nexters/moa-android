@@ -8,6 +8,8 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.model.request.AgreementRequest
+import com.moa.app.data.remote.model.request.AgreementsRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.TokenRequest
@@ -111,6 +113,22 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun putTerms(terms: ImmutableList<Term>) {
-        // TODO put terms
+        val response = onboardingService.putAgreements(
+            AgreementsRequest(
+                agreements = terms
+                    .filter { it !is Term.All }
+                    .map {
+                        AgreementRequest(
+                            code = it.code,
+                            agreed = it.checked,
+                        )
+                    }
+            )
+        )
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("${response.code} ${response.message}")
+        }
     }
 }

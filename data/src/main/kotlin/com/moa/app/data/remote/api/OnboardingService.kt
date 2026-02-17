@@ -1,8 +1,10 @@
 package com.moa.app.data.remote.api
 
+import com.moa.app.data.remote.model.request.AgreementsRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
+import com.moa.app.data.remote.model.response.AgreementsResponse
 import com.moa.app.data.remote.model.response.ApiResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
@@ -12,6 +14,7 @@ import com.moa.app.data.remote.model.response.WorkPolicyResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.PUT
 
 interface OnboardingService {
     @GET("/api/v1/onboarding/status")
@@ -28,4 +31,7 @@ interface OnboardingService {
 
     @PATCH("/api/v1/onboarding/work-policy")
     suspend fun patchWorkPolicy(@Body workPolicyRequest: WorkPolicyRequest): ApiResponse<WorkPolicyResponse>
+
+    @PUT("/api/v1/onboarding/terms/agreements")
+    suspend fun putAgreements(@Body agreementsRequest: AgreementsRequest): ApiResponse<AgreementsResponse>
 }
