@@ -11,7 +11,6 @@ import com.moa.app.data.remote.model.response.StatusResponse
 import com.moa.app.data.remote.model.response.TermResponse
 import com.moa.app.data.remote.model.response.WorkPolicyResponse
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
@@ -51,6 +50,7 @@ fun List<TermResponse>.toDomain(): ImmutableList<Term> {
         if (termResponse.required) {
             list.add(
                 Term.Required(
+                    code = termResponse.code,
                     title = "(필수) ${termResponse.title}",
                     url = termResponse.contentUrl,
                     checked = false,
@@ -59,6 +59,7 @@ fun List<TermResponse>.toDomain(): ImmutableList<Term> {
         } else {
             list.add(
                 Term.Optional(
+                    code = termResponse.code,
                     title = "(선택) ${termResponse.title}",
                     url = termResponse.contentUrl,
                     checked = false,
