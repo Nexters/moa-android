@@ -4,8 +4,9 @@ import com.moa.app.core.exception.ApiErrorException
 import com.moa.app.core.exception.MoaException
 import com.moa.app.core.exception.NetworkException
 import com.moa.app.core.exception.ServerException
-import com.moa.app.data.remote.model.response.ApiResponse
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -41,9 +42,9 @@ object ErrorManager {
             httpCode >= 500 -> ServerException(exception)
 
             httpCode >= 400 -> {
-                val apiResponse = errorBody?.let { parseApiResponse(it) }
-                if (apiResponse != null) {
-                    ApiErrorException(apiResponse.code, apiResponse.message)
+                val errorPair = errorBody?.let { parseErrorCodeAndMessage(it) }
+                if (errorPair != null) {
+                    ApiErrorException(errorPair.first, errorPair.second)
                 } else {
                     ServerException(exception)
                 }
@@ -53,9 +54,17 @@ object ErrorManager {
         }
     }
 
-    private fun parseApiResponse(jsonString: String): ApiResponse<Any?>? {
+    private fun parseErrorCodeAndMessage(jsonString: String): Pair<String, String>? {
         return try {
-            json.decodeFromString<ApiResponse<Any?>>(jsonString)
+            val jsonElement = json.parseToJsonElement(jsonString)
+            val code = jsonElement.jsonObject["code"]?.jsonPrimitive?.content
+            val message = jsonElement.jsonObject["message"]?.jsonPrimitive?.content
+
+            if (code != null && message != null) {
+                Pair(code, message)
+            } else {
+                null
+            }
         } catch (_: Exception) {
             null
         }

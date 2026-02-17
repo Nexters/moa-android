@@ -1,7 +1,7 @@
 package com.moa.app.presentation.extensions
 
-import com.moa.app.presentation.manager.ErrorManager
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.manager.ErrorManager
 import com.moa.app.presentation.model.MoaSideEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -19,7 +19,6 @@ fun <T> (suspend () -> T).execute(
             onSuccess(this@execute())
         } catch (e: Throwable) {
             val moaException = ErrorManager.map(e)
-            moaException.printStackTrace()
             bus?.emit(MoaSideEffect.Failure(moaException))
         } finally {
             bus?.emit(MoaSideEffect.Loading(false))
