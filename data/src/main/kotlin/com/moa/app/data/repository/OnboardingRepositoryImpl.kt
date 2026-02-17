@@ -1,5 +1,6 @@
 package com.moa.app.data.repository
 
+import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
@@ -10,6 +11,7 @@ import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.TokenRequest
+import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import kotlinx.collections.immutable.ImmutableList
 import javax.inject.Inject
 import kotlin.random.Random
@@ -88,7 +90,24 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
-        // TODO patch workpolicy
+        val response = onboardingService.patchWorkPolicy(
+            WorkPolicyRequest(
+                workdays = workPolicy.workScheduleDays.map { it.name },
+                clockInTime = makeTimeString(
+                    workPolicy.time.startHour,
+                    workPolicy.time.startMinute
+                ),
+                clockOutTime = makeTimeString(
+                    workPolicy.time.endHour,
+                    workPolicy.time.endMinute
+                ),
+            )
+        )
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("${response.code} ${response.message}")
+        }
     }
 
     override suspend fun putTerms(terms: ImmutableList<Term>) {
