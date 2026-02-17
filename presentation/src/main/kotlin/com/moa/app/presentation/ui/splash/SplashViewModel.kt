@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui.splash
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
@@ -31,7 +30,6 @@ class SplashViewModel @Inject constructor(
             runCatching {
                 onboardingRepository.getOnboardingStatus()
             }.onSuccess { onboardingStatus ->
-                Log.e("ABC", onboardingStatus.toString())
                 if (onboardingStatus.hasRequiredTermsAgreed) {
                     navigate(RootNavigation.Home)
                     return@launch
