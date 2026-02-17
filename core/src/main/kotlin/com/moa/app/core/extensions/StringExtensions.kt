@@ -10,6 +10,10 @@ fun makeTimeString(hour: Int, minute: Int): String {
 fun String.makePriceString(): String {
     val value = this.toDoubleOrNull() ?: return ""
 
+    if (value < PayrollConstants.MAN) {
+        return ""
+    }
+
     if (value < PayrollConstants.EOK) {
         val divided = value / PayrollConstants.MAN
         var formatted = String.format(Locale.getDefault(), "%.1f", divided)
