@@ -8,5 +8,5 @@ class NetworkException(cause: Throwable? = null) : MoaException("네트워크 �
 
 data class ApiErrorException(
     val code: String,
-    val serverMessage: String
-) : MoaException("[$code] $serverMessage")
+    override val message: String
+) : MoaException("[$code] $message")

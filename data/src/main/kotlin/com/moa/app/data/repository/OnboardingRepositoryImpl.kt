@@ -23,21 +23,19 @@ class OnboardingRepositoryImpl @Inject constructor(
     private val onboardingService: OnboardingService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
-        val response = onboardingService.getStatus()
-        return response.content!!.toDomain()
+        return onboardingService.getStatus().toDomain()
     }
 
     override suspend fun postToken(
         idToken: String,
         fcmDeviceToken: String,
     ): String {
-        val response = tokenService.postToken(
+        return tokenService.postToken(
             TokenRequest(
                 idToken = idToken,
                 fcmDeviceToken = fcmDeviceToken,
             )
-        )
-        return response.content!!.accessToken
+        ).accessToken
     }
 
     override fun getRandomNickName(): String {
@@ -59,8 +57,7 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTerms(): ImmutableList<Term> {
-        val response = onboardingService.getTerms()
-        return response.content!!.terms.toDomain()
+        return onboardingService.getTerms().terms.toDomain()
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {

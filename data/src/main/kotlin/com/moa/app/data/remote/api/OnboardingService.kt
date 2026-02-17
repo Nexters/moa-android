@@ -5,7 +5,6 @@ import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import com.moa.app.data.remote.model.response.AgreementsResponse
-import com.moa.app.data.remote.model.response.ApiResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
 import com.moa.app.data.remote.model.response.StatusResponse
@@ -18,20 +17,20 @@ import retrofit2.http.PUT
 
 interface OnboardingService {
     @GET("/api/v1/onboarding/status")
-    suspend fun getStatus(): ApiResponse<StatusResponse>
+    suspend fun getStatus(): StatusResponse
 
     @PATCH("/api/v1/onboarding/profile")
-    suspend fun patchProfile(@Body profileRequest: ProfileRequest): ApiResponse<ProfileResponse>
+    suspend fun patchProfile(@Body profileRequest: ProfileRequest): ProfileResponse
 
     @PATCH("/api/v1/onboarding/payroll")
-    suspend fun patchPayroll(@Body payrollRequest: PayrollRequest): ApiResponse<PayrollResponse>
+    suspend fun patchPayroll(@Body payrollRequest: PayrollRequest): PayrollResponse
 
     @GET("/api/v1/onboarding/terms")
-    suspend fun getTerms(): ApiResponse<TermsResponse>
+    suspend fun getTerms(): TermsResponse
 
     @PATCH("/api/v1/onboarding/work-policy")
-    suspend fun patchWorkPolicy(@Body workPolicyRequest: WorkPolicyRequest): ApiResponse<WorkPolicyResponse>
+    suspend fun patchWorkPolicy(@Body workPolicyRequest: WorkPolicyRequest): WorkPolicyResponse
 
     @PUT("/api/v1/onboarding/terms/agreements")
-    suspend fun putAgreements(@Body agreementsRequest: AgreementsRequest): ApiResponse<AgreementsResponse>
+    suspend fun putAgreements(@Body agreementsRequest: AgreementsRequest): AgreementsResponse
 }

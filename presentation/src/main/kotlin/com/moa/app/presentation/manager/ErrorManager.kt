@@ -21,6 +21,7 @@ object ErrorManager {
     }
 
     fun map(throwable: Throwable): Exception {
+        throwable.printStackTrace()
         return when (throwable) {
             is HttpException -> mapHttpException(throwable)
 
