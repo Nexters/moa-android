@@ -77,7 +77,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
         }
     }
 
@@ -93,7 +93,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         )
     }
 
-    private fun showTimeBottomSheet(visible : Boolean) {
+    private fun showTimeBottomSheet(visible: Boolean) {
         _uiState.value = _uiState.value.copy(
             showTimeBottomSheet = visible,
         )

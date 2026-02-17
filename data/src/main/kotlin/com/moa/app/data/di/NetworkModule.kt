@@ -1,6 +1,7 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.BuildConfig
+import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
@@ -74,4 +75,9 @@ object NetworkModule {
     @Singleton
     fun provideTokenService(retrofit: Retrofit): TokenService =
         retrofit.create(TokenService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOnboardingService(retrofit: Retrofit): OnboardingService =
+        retrofit.create(OnboardingService::class.java)
 }
