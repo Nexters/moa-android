@@ -70,6 +70,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { getTerms() }
         ) {
             _uiState.value = _uiState.value.copy(terms = it)
         }
@@ -174,6 +175,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { nextIfIsOnboarding() },
         ) {
             _uiState.value = _uiState.value.copy(showTermBottomSheet = true)
         }
@@ -192,6 +194,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { putTerms() }
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WidgetGuide))

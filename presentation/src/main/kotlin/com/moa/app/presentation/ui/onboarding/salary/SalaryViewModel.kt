@@ -77,6 +77,7 @@ class SalaryViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { nextIfIsOnboarding() },
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WorkSchedule()))

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 fun <T> (suspend () -> T).execute(
     bus: MoaSideEffectBus? = null,
     scope: CoroutineScope,
+    onRetry: () -> Unit = {},
     onSuccess: (T) -> Unit,
 ): Job {
     return scope.launch {
@@ -19,7 +20,12 @@ fun <T> (suspend () -> T).execute(
             onSuccess(this@execute())
         } catch (e: Throwable) {
             val moaException = ErrorManager.map(e)
-            bus?.emit(MoaSideEffect.Failure(moaException))
+            bus?.emit(
+                MoaSideEffect.Failure(
+                    exception = moaException,
+                    onRetry = onRetry,
+                )
+            )
         } finally {
             bus?.emit(MoaSideEffect.Loading(false))
         }

@@ -13,6 +13,7 @@ import javax.inject.Inject
 data class MainUiState(
     val isLoading: Boolean = false,
     val dialog: MoaDialogProperties? = null,
+    val errorRetry: (() -> Unit)? = null,
 )
 
 @HiltViewModel
@@ -28,6 +29,7 @@ class MainViewModel @Inject constructor(
         when (intent) {
             is MainIntent.SetDialog -> setDialog(intent.dialog)
             is MainIntent.SetLoading -> setLoading(intent.visible)
+            is MainIntent.SetErrorRetry -> setErrorRetry(intent.retry)
         }
     }
 
@@ -37,5 +39,9 @@ class MainViewModel @Inject constructor(
 
     private fun setLoading(visible: Boolean) {
         _uiState.value = _uiState.value.copy(isLoading = visible)
+    }
+
+    private fun setErrorRetry(retry: (() -> Unit)?){
+        _uiState.value = _uiState.value.copy(errorRetry = retry)
     }
 }
