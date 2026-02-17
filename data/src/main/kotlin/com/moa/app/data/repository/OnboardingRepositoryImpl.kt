@@ -7,6 +7,7 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -62,7 +63,18 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {
-        // TODO patch payroll 금액 * 10000 해야함
+        val response = onboardingService.patchPayroll(
+            PayrollRequest(
+                salaryInputType = payroll.salaryType.name,
+                salaryAmount = payroll.salary.toLong(),
+                paydayDay = payroll.paydayDay,
+            )
+        )
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("${response.code} ${response.message}")
+        }
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
