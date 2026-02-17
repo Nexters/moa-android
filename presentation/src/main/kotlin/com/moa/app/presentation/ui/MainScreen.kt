@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
