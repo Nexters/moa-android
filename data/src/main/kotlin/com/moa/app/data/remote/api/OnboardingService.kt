@@ -6,6 +6,7 @@ import com.moa.app.data.remote.model.response.ApiResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
 import com.moa.app.data.remote.model.response.StatusResponse
+import com.moa.app.data.remote.model.response.TermsResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -19,4 +20,7 @@ interface OnboardingService {
 
     @PATCH("/api/v1/onboarding/payroll")
     suspend fun patchPayroll(@Body payrollRequest: PayrollRequest): ApiResponse<PayrollResponse>
+
+    @GET("/api/v1/onboarding/terms")
+    suspend fun getTerms(): ApiResponse<TermsResponse>
 }

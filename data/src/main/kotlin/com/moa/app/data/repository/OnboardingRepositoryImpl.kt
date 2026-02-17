@@ -11,7 +11,6 @@ import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.ProfileRequest
 import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -77,38 +76,19 @@ class OnboardingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
-        // TODO patch workpolicy
+    override suspend fun getTerms(): ImmutableList<Term> {
+        val response = onboardingService.getTerms()
+
+        // TODO 에러 처리
+        if (response.content == null) {
+            throw Exception("${response.code} ${response.message}")
+        }
+
+        return response.content.terms.toDomain()
     }
 
-    override suspend fun getTerms(): ImmutableList<Term> {
-        return persistentListOf(
-            Term.All(
-                title = "전체 동의하기",
-                url = "",
-                checked = false,
-            ),
-            Term.Required(
-                title = "(필수) 서비스 이용 약관 동의",
-                url = "https://www.naver.com",
-                checked = false,
-            ),
-            Term.Required(
-                title = "(필수) 테스트 이용 약관 동의",
-                url = "https://www.naver.com",
-                checked = false,
-            ),
-            Term.Optional(
-                title = "(선택) 서비스 이용 약관 동의",
-                url = "https://www.naver.com",
-                checked = false,
-            ),
-            Term.Optional(
-                title = "(선택) 테스트 이용 약관 동의",
-                url = "https://www.naver.com",
-                checked = false,
-            ),
-        )
+    override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
+        // TODO patch workpolicy
     }
 
     override suspend fun putTerms(terms: ImmutableList<Term>) {

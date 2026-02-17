@@ -7,6 +7,7 @@ sealed class Term(
     open val title: String,
     open val url: String,
     open val checked: Boolean,
+    val order: Int,
 ) {
     data class All(
         override val title: String,
@@ -16,6 +17,7 @@ sealed class Term(
         title = title,
         url = url,
         checked = checked,
+        order = 0,
     )
 
     data class Required(
@@ -26,6 +28,7 @@ sealed class Term(
         title = title,
         url = url,
         checked = checked,
+        order = 1,
     )
 
     data class Optional(
@@ -36,5 +39,6 @@ sealed class Term(
         title = title,
         url = url,
         checked = checked,
+        order = 2,
     )
 }
