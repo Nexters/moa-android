@@ -16,6 +16,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @Stable
@@ -56,21 +57,36 @@ class NotificationSettingViewModel @Inject constructor(
     }
 
     private fun toggleNotification(notificationSetting: NotificationSetting.Content) {
+        val updateNotificationSetting =
+            notificationSetting.copy(checked = !notificationSetting.checked)
         suspend {
-            settingRepository.patchNotificationSetting(notificationSetting.copy(checked = !notificationSetting.checked))
+            settingRepository.patchNotificationSetting(updateNotificationSetting)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { toggleNotification(notificationSetting) }
         ) {
+            sendNotificationToast(updateNotificationSetting)
+
             val updatedNotificationSettings = _uiState.value.notificationSettings.map {
-                if (it is NotificationSetting.Content && it.type == notificationSetting.type) {
-                    it.copy(checked = !it.checked)
+                if (it is NotificationSetting.Content && it.type == updateNotificationSetting.type) {
+                    updateNotificationSetting
                 } else {
                     it
                 }
             }
             _uiState.value =
                 _uiState.value.copy(notificationSettings = updatedNotificationSettings.toImmutableList())
+        }
+    }
+
+    private fun sendNotificationToast(notificationSetting: NotificationSetting.Content) {
+        val date = LocalDate.now()
+        val title = notificationSetting.title
+        val message = if (notificationSetting.checked) "에 동의했어요." else "을 거부했어요."
+
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Toast("$date $title$message"))
         }
     }
 
