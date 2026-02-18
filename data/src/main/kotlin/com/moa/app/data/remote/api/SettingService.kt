@@ -2,7 +2,9 @@ package com.moa.app.data.remote.api
 
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
+import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
+import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
 import retrofit2.http.Body
 import retrofit2.http.PATCH
@@ -16,4 +18,7 @@ interface SettingService {
 
     @PATCH("/api/v1/profile/payday")
     suspend fun patchPaydayDay(@Body paydayDayRequest: PaydayDayRequest): ProfileResponse
+
+    @PATCH("/api/v1/payroll")
+    suspend fun patchPayroll(@Body payrollRequest: PayrollRequest): PayrollResponse
 }

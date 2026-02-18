@@ -1,5 +1,6 @@
 package com.moa.app.data.repository
 
+import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
@@ -11,6 +12,7 @@ import com.moa.app.data.remote.api.SettingService
 import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
+import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -69,6 +71,15 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun patchPaydayDay(paydayDay: Int) {
         settingService.patchPaydayDay(PaydayDayRequest(paydayDay))
+    }
+
+    override suspend fun patchPayroll(payroll: Payroll) {
+        settingService.patchPayroll(
+            PayrollRequest(
+                salaryInputType = payroll.salaryType.name,
+                salaryAmount = payroll.salary.toLong(),
+            )
+        )
     }
 
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {

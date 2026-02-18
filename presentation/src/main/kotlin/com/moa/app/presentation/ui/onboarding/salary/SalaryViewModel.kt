@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.data.repository.OnboardingRepository
+import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.MoaSideEffect
@@ -29,6 +30,7 @@ class SalaryViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigation.Salary.SalaryNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
     private val onboardingRepository: OnboardingRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         SalaryUiState(
@@ -86,9 +88,21 @@ class SalaryViewModel @AssistedInject constructor(
     }
 
     private fun nextIfIsNotOnboarding() {
-        // TODO setting 급여 api
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+        suspend {
+            settingRepository.patchPayroll(
+                Payroll(
+                    salaryType = uiState.value.selectedSalaryType,
+                    salary = uiState.value.salaryTextField.text.toString(),
+                )
+            )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { nextIfIsNotOnboarding() },
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            }
         }
     }
 
