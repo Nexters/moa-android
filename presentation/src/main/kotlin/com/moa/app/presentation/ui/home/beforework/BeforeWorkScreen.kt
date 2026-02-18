@@ -37,7 +37,7 @@ import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.app.presentation.designsystem.component.MoaVacationButton
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.beforework.model.BeforeWorkIntent
 import com.moa.app.presentation.ui.home.beforework.model.BeforeWorkUiState
 

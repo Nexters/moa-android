@@ -23,12 +23,12 @@ import com.moa.app.core.exception.ServerException
 import com.moa.app.presentation.designsystem.component.MoaDialog
 import com.moa.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.app.presentation.designsystem.component.MoaFullScreenProgress
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
 import com.moa.app.presentation.model.SettingNavigation
-import com.moa.app.presentation.navigation.HomeNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
@@ -43,8 +43,6 @@ fun MainScreen(
 ) {
     val backstack = rememberNavBackStack(RootNavigation.Splash)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val backstack = rememberNavBackStack(RootNavigation.Home)
-    val dialog by viewModel.dialog.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
@@ -84,7 +82,7 @@ fun MainScreen(
 
                         is SettingNavigation -> Unit
 
-                        is HomeNavigation -> Unit // HomeScreen 내부에서 처리
+                        is HomeNavigation -> Unit
 
                         else -> backstack.add(it.destination)
                     }

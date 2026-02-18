@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.working.model.WorkStatus
 import com.moa.app.presentation.ui.home.working.model.WorkingIntent
 import com.moa.app.presentation.ui.home.working.model.WorkingUiState

@@ -17,7 +17,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.designsystem.component.MoaHomeTopBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.afterwork.AfterWorkScreen
 import com.moa.app.presentation.ui.home.beforework.BeforeWorkScreen
 import com.moa.app.presentation.ui.home.working.WorkingScreen

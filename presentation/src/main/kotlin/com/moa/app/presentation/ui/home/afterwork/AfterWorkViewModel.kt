@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
-import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkIntent
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkUiState
 import dagger.assisted.Assisted

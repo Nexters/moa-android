@@ -1,9 +1,8 @@
-package com.moa.app.presentation.navigation
+package com.moa.app.presentation.model
 
-import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface HomeNavigation : NavKey {
+sealed interface HomeNavigation : RootNavigation {
     @Serializable
     data class BeforeWork(
         val todayEarnedSalary: Long? = null,

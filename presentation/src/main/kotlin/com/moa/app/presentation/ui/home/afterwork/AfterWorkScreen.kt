@@ -36,7 +36,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.presentation.navigation.HomeNavigation
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkIntent
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkUiState
 
