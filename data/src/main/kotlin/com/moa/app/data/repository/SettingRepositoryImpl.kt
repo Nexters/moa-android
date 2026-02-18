@@ -1,6 +1,5 @@
 package com.moa.app.data.repository
 
-import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationId
@@ -11,11 +10,10 @@ import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.SettingService
+import com.moa.app.data.remote.mapper.toData
 import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
-import com.moa.app.data.remote.model.request.PayrollRequest
-import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -77,28 +75,11 @@ class SettingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {
-        settingService.patchPayroll(
-            PayrollRequest(
-                salaryInputType = payroll.salaryType.name,
-                salaryAmount = payroll.salary.toLong(),
-            )
-        )
+        settingService.patchPayroll(payroll.toData())
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
-        settingService.patchWorkPolicy(
-            WorkPolicyRequest(
-                workdays = workPolicy.workScheduleDays.map { it.name },
-                clockInTime = makeTimeString(
-                    workPolicy.time.startHour,
-                    workPolicy.time.startMinute
-                ),
-                clockOutTime = makeTimeString(
-                    workPolicy.time.endHour,
-                    workPolicy.time.endMinute
-                ),
-            )
-        )
+        settingService.patchWorkPolicy(workPolicy.toData())
     }
 
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {
