@@ -35,7 +35,7 @@ class SplashViewModel @Inject constructor(
                     return@launch
                 }
 
-                val nickName = onboardingStatus.nickName
+                val nickName = onboardingStatus.profile?.nickname
                 if (nickName == null) {
                     navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
                     return@launch

@@ -1,6 +1,7 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.BuildConfig
+import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.converter.ContentOnlyConverterFactory
@@ -82,4 +83,9 @@ object NetworkModule {
     @Singleton
     fun provideOnboardingService(retrofit: Retrofit): OnboardingService =
         retrofit.create(OnboardingService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMoaService(retrofit: Retrofit): MoaService =
+        retrofit.create(MoaService::class.java)
 }
