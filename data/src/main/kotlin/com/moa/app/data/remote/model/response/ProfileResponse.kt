@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class ProfileResponse(
     val nickname: String,
     val workplace: String?,
+    val paydayDay: Int,
 )

@@ -83,14 +83,14 @@ private fun WorkInfoScreen(
 
             WorkInfoSalaryContent(
                 salary = "${uiState.workInfo?.payroll?.salaryType?.title} · ${uiState.workInfo?.payroll?.salary?.makePriceString()}",
-                salaryDate = uiState.workInfo?.payroll?.paydayDay ?: 0,
+                salaryDate = uiState.workInfo?.paydayDay ?: 0,
                 onIntent = onIntent,
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             WorkInfoContent(
-                companyName = uiState.workInfo?.companyName ?: "",
+                companyName = uiState.workInfo?.companyName,
                 workScheduleDays = uiState.workInfo
                     ?.workPolicy
                     ?.workScheduleDays
@@ -203,7 +203,7 @@ private fun WorkInfoSalaryContent(
 
 @Composable
 private fun WorkInfoContent(
-    companyName: String,
+    companyName: String?,
     workScheduleDays: String,
     workTime: String,
     onIntent: (WorkInfoIntent) -> Unit,
@@ -226,13 +226,13 @@ private fun WorkInfoContent(
             )
         },
         subTrailingContent = {
-            if(companyName.isBlank()){
+            if (companyName.isNullOrBlank()) {
                 Text(
                     text = "미등록",
                     style = MoaTheme.typography.b1_500,
                     color = MoaTheme.colors.textLowEmphasis,
                 )
-            }else{
+            } else {
                 Text(
                     text = companyName,
                     style = MoaTheme.typography.b1_500,
@@ -321,7 +321,8 @@ private fun WorkInfoScreenPreview() {
                         salary = "40000000",
                         salaryType = Payroll.SalaryType.ANNUAL,
                     ),
-                    companyName = "",
+                    companyName = null,
+                    paydayDay = 25,
                     workPolicy = WorkPolicy(
                         workScheduleDays = persistentListOf(
                             WorkPolicy.WorkScheduleDay.MON,

@@ -23,7 +23,6 @@ fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
 fun PayrollResponse.toDomain(): Payroll = Payroll(
     salaryType = Payroll.SalaryType.valueOf(salaryInputType),
     salary = salaryAmount.toString(),
-    paydayDay = paydayDay,
 )
 
 fun WorkPolicyResponse.toDomain(): WorkPolicy {
