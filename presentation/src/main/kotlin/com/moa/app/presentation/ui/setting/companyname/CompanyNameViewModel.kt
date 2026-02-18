@@ -41,6 +41,7 @@ class CompanyNameViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { next() },
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.Back))

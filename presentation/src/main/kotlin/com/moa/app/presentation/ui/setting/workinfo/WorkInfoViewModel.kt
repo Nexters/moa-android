@@ -48,6 +48,7 @@ class WorkInfoViewModel @Inject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { getWorkInfo() }
         ) {
             _uiState.value = _uiState.value.copy(workInfo = it)
         }

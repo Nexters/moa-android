@@ -53,6 +53,7 @@ class SettingMenuViewModel @Inject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { getSettingMenu() }
         ) {
             _uiState.value = _uiState.value.copy(settingMenu = it)
         }
