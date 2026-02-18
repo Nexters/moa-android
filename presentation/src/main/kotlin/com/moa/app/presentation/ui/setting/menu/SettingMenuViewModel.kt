@@ -34,12 +34,9 @@ class SettingMenuViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getSettingMenu()
-    }
-
     fun onIntent(intent: SettingMenuIntent) {
         when (intent) {
+            SettingMenuIntent.GetSettingMenu -> getSettingMenu()
             SettingMenuIntent.ClickBack -> back()
             SettingMenuIntent.ClickNickName -> nickName()
             SettingMenuIntent.ClickWorkInfo -> workInfo()
