@@ -124,7 +124,7 @@ fun MainScreen(
                         }
 
                         else -> {
-                            Toast.makeText(context, "알 수 없는 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "일시적인 오류가 발생했어요", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
