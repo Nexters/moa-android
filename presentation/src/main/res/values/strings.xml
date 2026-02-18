@@ -95,4 +95,38 @@
     <!-- Common Components -->
     <string name="date_location_bar_date_icon_description">날짜</string>
     <string name="date_location_bar_location_icon_description">위치</string>
+
+    <!-- HistoryScreen -->
+    <string name="history_back_description">뒤로</string>
+    <string name="history_previous_month_description">이전 달</string>
+    <string name="history_next_month_description">다음 달</string>
+    <string name="history_add_schedule_description">일정 추가</string>
+    <string name="history_month_format">%1$d월</string>
+    <string name="history_work_hours_label">근무 시간</string>
+    <string name="history_work_hours_format"> / %1$d시간</string>
+    <string name="history_salary_label">내 월급</string>
+    <string name="history_salary_format"> / %1$d만원</string>
+    <string name="history_schedule_work_scheduled">근무 예정</string>
+    <string name="history_schedule_work_completed">근무 완료</string>
+    <string name="history_schedule_vacation">휴가</string>
+    <string name="history_schedule_payday">월급날 · 매달 %1$d일</string>
+    <string name="history_schedule_all_day">종일</string>
+    <string name="history_schedule_detail_description">상세</string>
+    <string name="history_no_schedule">일정이 없습니다</string>
+
+    <!-- HistoryCalendar -->
+    <string name="history_calendar_payday">월급</string>
+    <string name="history_calendar_separator">·</string>
+
+    <!-- ScheduleForm -->
+    <string name="schedule_form_title_add">일정을 추가해주세요</string>
+    <string name="schedule_form_title_edit">일정을 수정해주세요</string>
+    <string name="schedule_form_work_time_title">근무 시간을 알려주세요</string>
+    <string name="schedule_form_select_date">날짜를 선택해주세요</string>
+    <string name="schedule_form_schedule_type_question">어떤 일정인가요?</string>
+    <string name="schedule_form_type_vacation">휴가</string>
+    <string name="schedule_form_type_work">근무</string>
+    <string name="schedule_form_work_time_label">근무 시간</string>
+    <string name="schedule_form_cancel">취소</string>
+    <string name="schedule_form_confirm">확인</string>
 </resources>
