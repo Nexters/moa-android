@@ -31,12 +31,9 @@ class WorkInfoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WorkInfoUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getWorkInfo()
-    }
-
     fun onIntent(intent: WorkInfoIntent) {
         when (intent) {
+            WorkInfoIntent.GetWorkInfo -> getWorkInfo()
             WorkInfoIntent.ClickBack -> back()
             WorkInfoIntent.ClickSalary -> salary()
             WorkInfoIntent.ClickSalaryDate -> salaryDate()
@@ -94,16 +91,13 @@ class WorkInfoViewModel @Inject constructor(
 
     private fun companyName() {
         viewModelScope.launch {
-            val companyName = _uiState.value.workInfo?.companyName
-            if (companyName != null) {
-                moaSideEffectBus.emit(
-                    MoaSideEffect.Navigate(
-                        SettingNavigation.CompanyName(
-                            companyName
-                        )
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    SettingNavigation.CompanyName(
+                        _uiState.value.workInfo?.companyName ?: ""
                     )
                 )
-            }
+            )
         }
     }
 

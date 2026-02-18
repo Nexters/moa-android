@@ -34,7 +34,7 @@ object ErrorManager {
         }
     }
 
-    private fun mapHttpException(exception: HttpException): MoaException {
+    private fun mapHttpException(exception: HttpException): Exception {
         val httpCode = exception.code()
         val errorBody = exception.response()?.errorBody()?.string()
 
@@ -46,11 +46,11 @@ object ErrorManager {
                 if (errorPair != null) {
                     ApiErrorException(errorPair.first, errorPair.second)
                 } else {
-                    ServerException(exception)
+                    exception
                 }
             }
 
-            else -> ServerException(exception)
+            else -> exception
         }
     }
 

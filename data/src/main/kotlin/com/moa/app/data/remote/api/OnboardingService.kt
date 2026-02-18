@@ -2,7 +2,7 @@ package com.moa.app.data.remote.api
 
 import com.moa.app.data.remote.model.request.AgreementsRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
-import com.moa.app.data.remote.model.request.ProfileRequest
+import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import com.moa.app.data.remote.model.response.AgreementsResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
@@ -20,7 +20,7 @@ interface OnboardingService {
     suspend fun getStatus(): StatusResponse
 
     @PATCH("/api/v1/onboarding/profile")
-    suspend fun patchProfile(@Body profileRequest: ProfileRequest): ProfileResponse
+    suspend fun patchProfile(@Body nicknameRequest: NicknameRequest): ProfileResponse
 
     @PATCH("/api/v1/onboarding/payroll")
     suspend fun patchPayroll(@Body payrollRequest: PayrollRequest): PayrollResponse

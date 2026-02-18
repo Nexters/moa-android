@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
+import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.manager.RandomNickManager
@@ -17,13 +18,14 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = NickNameViewModel.Factory::class)
-class NickNameViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = NicknameViewModel.Factory::class)
+class NicknameViewModel @AssistedInject constructor(
     @Assisted private val args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
     private val onboardingRepository: OnboardingRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
-    val nickNameTextFieldState = TextFieldState(args.nickName)
+    val nicknameTextFieldState = TextFieldState(args.nickname)
 
     init {
         if (args.isOnboarding) {
@@ -31,11 +33,11 @@ class NickNameViewModel @AssistedInject constructor(
         }
     }
 
-    fun onIntent(intent: NickNameIntent) {
+    fun onIntent(intent: NicknameIntent) {
         when (intent) {
-            is NickNameIntent.ClickBack -> back()
-            is NickNameIntent.ClickRandom -> random()
-            is NickNameIntent.ClickNext -> next()
+            is NicknameIntent.ClickBack -> back()
+            is NicknameIntent.ClickRandom -> random()
+            is NicknameIntent.ClickNext -> next()
         }
     }
 
@@ -65,7 +67,7 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun random() {
         val nickName = RandomNickManager.get()
-        nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
+        nicknameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
     }
 
     private fun next() {
@@ -78,7 +80,7 @@ class NickNameViewModel @AssistedInject constructor(
 
     private fun nextIfIsOnboarding() {
         suspend {
-            onboardingRepository.patchNickName(nickNameTextFieldState.text.toString())
+            onboardingRepository.patchNickname(nicknameTextFieldState.text.toString())
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
@@ -91,14 +93,21 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun nextIfIsNotOnboarding() {
-        // TODO setting 닉네임 api
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+        suspend {
+            settingRepository.patchNickname(nicknameTextFieldState.text.toString())
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { nextIfIsNotOnboarding() }
+        ) {
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
+            }
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(args: OnboardingNavigation.Nickname.NicknameNavigationArgs): NickNameViewModel
+        fun create(args: OnboardingNavigation.Nickname.NicknameNavigationArgs): NicknameViewModel
     }
 }

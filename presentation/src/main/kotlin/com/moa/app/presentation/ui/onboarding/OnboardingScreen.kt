@@ -15,7 +15,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
-import com.moa.app.presentation.ui.onboarding.nickname.NickNameScreen
+import com.moa.app.presentation.ui.onboarding.nickname.NicknameScreen
 import com.moa.app.presentation.ui.onboarding.salary.SalaryScreen
 import com.moa.app.presentation.ui.onboarding.widgetguide.WidgetGuideScreen
 import com.moa.app.presentation.ui.onboarding.workschedule.WorkScheduleScreen
@@ -75,7 +75,7 @@ private fun OnboardingNavHost(
             }
 
             entry<OnboardingNavigation.Nickname> { key ->
-                NickNameScreen(args = key.args)
+                NicknameScreen(args = key.args)
             }
 
             entry<OnboardingNavigation.Salary> { key ->

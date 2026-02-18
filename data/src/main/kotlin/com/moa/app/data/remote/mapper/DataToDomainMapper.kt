@@ -3,10 +3,12 @@ package com.moa.app.data.remote.mapper
 import com.moa.app.core.extensions.toHourMinute
 import com.moa.app.core.model.onboarding.OnboardingStatus
 import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.Profile
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.Time
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.model.response.PayrollResponse
+import com.moa.app.data.remote.model.response.ProfileResponse
 import com.moa.app.data.remote.model.response.StatusResponse
 import com.moa.app.data.remote.model.response.TermResponse
 import com.moa.app.data.remote.model.response.WorkPolicyResponse
@@ -14,10 +16,16 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
-    nickName = profile?.nickname,
+    profile = profile?.toDomain(),
     payroll = payroll?.toDomain(),
     workPolicy = workPolicy?.toDomain(),
     hasRequiredTermsAgreed = hasRequiredTermsAgreed,
+)
+
+fun ProfileResponse.toDomain(): Profile = Profile(
+    nickname = nickname,
+    companyName = workplace,
+    paydayDay = paydayDay,
 )
 
 fun PayrollResponse.toDomain(): Payroll = Payroll(

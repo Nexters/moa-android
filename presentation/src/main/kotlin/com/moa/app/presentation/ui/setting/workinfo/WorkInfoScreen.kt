@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,6 +35,10 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun WorkInfoScreen(viewModel: WorkInfoViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(WorkInfoIntent.GetWorkInfo)
+    }
 
     WorkInfoScreen(
         uiState = uiState,
@@ -302,6 +307,7 @@ private fun WorkInfoContent(
 }
 
 sealed interface WorkInfoIntent {
+    data object GetWorkInfo : WorkInfoIntent
     data object ClickBack : WorkInfoIntent
     data object ClickSalary : WorkInfoIntent
     data object ClickSalaryDate : WorkInfoIntent

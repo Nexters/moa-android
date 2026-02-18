@@ -37,7 +37,7 @@ class CompanyNameViewModel @AssistedInject constructor(
 
     private fun next() {
         suspend {
-            settingRepository.putCompanyName(companyNameTextFieldState.text.toString())
+            settingRepository.patchCompanyName(companyNameTextFieldState.text.toString())
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,

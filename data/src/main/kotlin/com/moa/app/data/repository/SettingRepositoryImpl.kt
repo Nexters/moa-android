@@ -1,7 +1,6 @@
 package com.moa.app.data.repository
 
 import com.moa.app.core.model.onboarding.Payroll
-import com.moa.app.core.model.onboarding.Time
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
@@ -9,54 +8,78 @@ import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
+import com.moa.app.data.remote.api.MoaService
+import com.moa.app.data.remote.api.SettingService
+import com.moa.app.data.remote.mapper.toData
+import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.model.request.NicknameRequest
+import com.moa.app.data.remote.model.request.PaydayDayRequest
+import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 class SettingRepositoryImpl @Inject constructor(
-
+    private val moaService: MoaService,
+    private val settingService: SettingService,
 ) : SettingRepository {
     override suspend fun getSettingMenu(): SettingMenu {
-        return SettingMenu(
-            oAuthType = OAuthType.KAKAO,
-            nickName = "집계사장",
-            latestAppVersion = "1.0.0",
-        )
+        return coroutineScope {
+            val memberDeferred = async { moaService.getMember() }
+            val profileDeferred = async { moaService.getProfile() }
+            // TODO version api
+            val versionDeferred = "1.0.0"
+
+            SettingMenu(
+                oAuthType = OAuthType.valueOf(memberDeferred.await().provider),
+                nickName = profileDeferred.await().nickname,
+                latestAppVersion = versionDeferred
+            )
+        }
     }
 
     override suspend fun getWorkInfo(): WorkInfo {
-        return WorkInfo(
-            oAuthType = OAuthType.KAKAO,
-            payroll = Payroll(
-                salary = "40000000",
-                salaryType = Payroll.SalaryType.ANNUAL,
-            ),
-            companyName = null,
-            paydayDay = 25,
-            workPolicy = WorkPolicy(
-                workScheduleDays = persistentListOf(
-                    WorkPolicy.WorkScheduleDay.MON,
-                    WorkPolicy.WorkScheduleDay.TUE,
-                    WorkPolicy.WorkScheduleDay.WED,
-                    WorkPolicy.WorkScheduleDay.THU,
-                    WorkPolicy.WorkScheduleDay.FRI,
-                ),
-                time = Time(
-                    startHour = 9,
-                    startMinute = 0,
-                    endHour = 18,
-                    endMinute = 0,
-                )
+        return coroutineScope {
+            val memberDeferred = async { moaService.getMember() }
+            val profileDeferred = async { moaService.getProfile() }
+            val payrollDeferred = async { moaService.getPayroll() }
+            val workPolicyDeferred = async { moaService.getWorkPolicy() }
+
+            val member = memberDeferred.await()
+            val profile = profileDeferred.await().toDomain()
+            val payroll = payrollDeferred.await().toDomain()
+            val workPolicy = workPolicyDeferred.await().toDomain()
+
+            WorkInfo(
+                oAuthType = OAuthType.valueOf(member.provider),
+                payroll = payroll,
+                paydayDay = profile.paydayDay,
+                companyName = profile.companyName,
+                workPolicy = workPolicy,
             )
-        )
+        }
     }
 
-    override suspend fun putSalaryDay(day: Int) {
-        // TODO put salaryday
+    override suspend fun patchNickname(nickname: String) {
+        settingService.patchNickname(NicknameRequest(nickname))
     }
 
-    override suspend fun putCompanyName(companyName: String) {
-        // TODO put companyname
+    override suspend fun patchCompanyName(companyName: String) {
+        settingService.patchWorkplace(WorkplaceRequest(companyName))
+    }
+
+    override suspend fun patchPaydayDay(paydayDay: Int) {
+        settingService.patchPaydayDay(PaydayDayRequest(paydayDay))
+    }
+
+    override suspend fun patchPayroll(payroll: Payroll) {
+        settingService.patchPayroll(payroll.toData())
+    }
+
+    override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
+        settingService.patchWorkPolicy(workPolicy.toData())
     }
 
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {
