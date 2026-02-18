@@ -42,7 +42,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onFinish: () -> Unit,
 ) {
-    val backstack = rememberNavBackStack(RootNavigation.Home)
+    val backstack = rememberNavBackStack(RootNavigation.Splash)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
