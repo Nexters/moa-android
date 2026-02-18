@@ -2,8 +2,8 @@ package com.moa.app.presentation.manager
 
 object RandomNickManager {
 
-    fun get() : String {
-        return (adj.random() + noun.random()).trim()
+    fun get(): String {
+        return (adj.random() + noun.random()).replace(" ", "")
     }
 
     private val adj = listOf(
