@@ -2,7 +2,6 @@ package com.moa.app.data.repository
 
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.WorkPolicy
-import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
@@ -11,12 +10,12 @@ import com.moa.app.core.model.setting.WorkInfo
 import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.SettingService
 import com.moa.app.data.remote.mapper.toData
-import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.mapper.toTermDomain
+import com.moa.app.data.remote.mapper.toNotificationSettingDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -48,9 +47,9 @@ class SettingRepositoryImpl @Inject constructor(
             val workPolicyDeferred = async { moaService.getWorkPolicy() }
 
             val member = memberDeferred.await()
-            val profile = profileDeferred.await().toDomain()
-            val payroll = payrollDeferred.await().toDomain()
-            val workPolicy = workPolicyDeferred.await().toDomain()
+            val profile = profileDeferred.await().toTermDomain()
+            val payroll = payrollDeferred.await().toTermDomain()
+            val workPolicy = workPolicyDeferred.await().toTermDomain()
 
             WorkInfo(
                 oAuthType = OAuthType.valueOf(member.provider),
@@ -83,27 +82,11 @@ class SettingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {
-        return persistentListOf(
-            NotificationSetting.Service(
-                id = NotificationId.COMMUTE,
-                title = "출퇴근 알림",
-                enabled = true,
-            ),
-            NotificationSetting.Service(
-                id = NotificationId.SALARY_DAY,
-                title = "월급날 알림",
-                enabled = true,
-            ),
-            NotificationSetting.Marketing(
-                id = NotificationId.BENEFITS,
-                title = "혜택 및 이벤트 알림",
-                enabled = true,
-            ),
-        )
+        return settingService.getNotificationSettings().toNotificationSettingDomain()
     }
 
-    override suspend fun putNotificationSetting(id: NotificationId, enabled: Boolean) {
-        // TODO put notificationsetting
+    override suspend fun patchNotificationSetting(notificationSetting: NotificationSetting.Content) {
+        settingService.patchNotificationSetting(notificationSetting.toData())
     }
 
     override suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>) {

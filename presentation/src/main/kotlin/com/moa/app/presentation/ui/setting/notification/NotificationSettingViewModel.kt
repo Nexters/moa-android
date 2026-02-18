@@ -3,7 +3,6 @@ package com.moa.app.presentation.ui.setting.notification
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
@@ -21,7 +20,7 @@ import javax.inject.Inject
 
 @Stable
 data class NotificationSettingUiState(
-    val notifications: ImmutableList<NotificationSetting> = persistentListOf(),
+    val notificationSettings: ImmutableList<NotificationSetting> = persistentListOf(),
 )
 
 @HiltViewModel
@@ -40,10 +39,7 @@ class NotificationSettingViewModel @Inject constructor(
     fun onIntent(intent: NotificationSettingIntent) {
         when (intent) {
             NotificationSettingIntent.ClickBack -> back()
-            is NotificationSettingIntent.ToggleNotification -> toggleNotification(
-                id = intent.id,
-                enabled = intent.enabled,
-            )
+            is NotificationSettingIntent.ToggleNotification -> toggleNotification(intent.notificationSetting)
         }
     }
 
@@ -52,31 +48,29 @@ class NotificationSettingViewModel @Inject constructor(
             settingRepository.getNotificationSettings()
         }.execute(
             bus = moaSideEffectBus,
-            scope = viewModelScope
-        ) { notifications ->
-            _uiState.value = _uiState.value.copy(notifications = notifications)
+            scope = viewModelScope,
+            onRetry = { getNotificationSettings() },
+        ) {
+            _uiState.value = _uiState.value.copy(notificationSettings = it)
         }
     }
 
-    private fun toggleNotification(id: NotificationId, enabled: Boolean) {
+    private fun toggleNotification(notificationSetting: NotificationSetting.Content) {
         suspend {
-            settingRepository.putNotificationSetting(id, enabled)
+            settingRepository.patchNotificationSetting(notificationSetting.copy(checked = !notificationSetting.checked))
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
         ) {
-            val updatedNotifications = _uiState.value.notifications.map { notification ->
-                if (notification.id == id) {
-                    when (notification) {
-                        is NotificationSetting.Service -> notification.copy(enabled = enabled)
-                        is NotificationSetting.Marketing -> notification.copy(enabled = enabled)
-                    }
+            val updatedNotificationSettings = _uiState.value.notificationSettings.map {
+                if (it is NotificationSetting.Content && it.type == notificationSetting.type) {
+                    it.copy(checked = !it.checked)
                 } else {
-                    notification
+                    it
                 }
             }
             _uiState.value =
-                _uiState.value.copy(notifications = updatedNotifications.toImmutableList())
+                _uiState.value.copy(notificationSettings = updatedNotificationSettings.toImmutableList())
         }
     }
 
