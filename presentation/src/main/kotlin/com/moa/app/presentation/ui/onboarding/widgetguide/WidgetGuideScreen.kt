@@ -1,5 +1,7 @@
 package com.moa.app.presentation.ui.onboarding.widgetguide
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,8 +16,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -26,6 +30,7 @@ import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.ui.widget.MoaWidgetReceiver
 
 @Composable
 fun WidgetGuideScreen(viewModel: WidgetGuideViewModel = hiltViewModel()) {
@@ -38,6 +43,10 @@ fun WidgetGuideScreen(viewModel: WidgetGuideViewModel = hiltViewModel()) {
 private fun WidgetGuideScreen(
     onIntent: (WidgetGuideIntent) -> Unit,
 ) {
+    val context = LocalContext.current
+    val appWidgetManager = remember { AppWidgetManager.getInstance(context) }
+    val moaWidgetReceiver = remember { ComponentName(context, MoaWidgetReceiver::class.java) }
+
     Scaffold(
         topBar = {
             MoaTopAppBar(
@@ -101,7 +110,9 @@ private fun WidgetGuideScreen(
                     .height(64.dp)
                     .padding(horizontal = MoaTheme.spacing.spacing20),
                 onClick = {
-                    // TODO 위젯 추가 로직
+                    if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                        appWidgetManager.requestPinAppWidget(moaWidgetReceiver, null, null)
+                    }
                 },
             ) {
                 Text(
