@@ -23,6 +23,7 @@ import com.moa.app.core.exception.ServerException
 import com.moa.app.presentation.designsystem.component.MoaDialog
 import com.moa.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.app.presentation.designsystem.component.MoaFullScreenProgress
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
@@ -80,6 +81,8 @@ fun MainScreen(
                         is OnboardingNavigation -> Unit
 
                         is SettingNavigation -> Unit
+
+                        is HomeNavigation -> Unit
 
                         else -> backstack.add(it.destination)
                     }

@@ -13,26 +13,24 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
 ) : ViewModel() {
+    val moaSideEffects = moaSideEffectBus.sideEffects
+
     fun onIntent(intent: HomeIntent) {
         when (intent) {
-            is HomeIntent.ClickCalendar -> calendar()
-            is HomeIntent.ClickSetting -> setting()
+            is HomeIntent.NavigateToHistory -> navigateToHistory()
+            is HomeIntent.NavigateToSetting -> navigateToSetting()
         }
     }
 
-    private fun calendar() {
+    private fun navigateToHistory() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(RootNavigation.History)
-            )
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History))
         }
     }
 
-    private fun setting() {
+    private fun navigateToSetting() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(RootNavigation.Setting)
-            )
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Setting))
         }
     }
 }

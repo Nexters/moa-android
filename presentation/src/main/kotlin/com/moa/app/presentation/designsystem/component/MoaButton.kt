@@ -60,6 +60,87 @@ fun MoaPrimaryButton(
 }
 
 @Composable
+fun MoaSecondaryButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(32.dp),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val containerColor = when {
+        !enabled -> MoaTheme.colors.containerSecondary
+        isPressed -> MoaTheme.colors.containerSecondary
+        else -> MoaTheme.colors.containerPrimary
+    }
+    val contentColor = when {
+        !enabled -> MoaTheme.colors.textDisabled
+        else -> MoaTheme.colors.textHighEmphasis
+    }
+
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        border = BorderStroke(1.dp, MoaTheme.colors.dividerSecondary),
+        contentPadding = contentPadding,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContentColor = contentColor,
+            disabledContainerColor = containerColor
+        )
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun MoaVacationButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(32.dp),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val containerColor = when {
+        !enabled -> MoaTheme.colors.btnTertiaryDisabled
+        isPressed -> MoaTheme.colors.btnTertiaryPressed
+        else -> MoaTheme.colors.btnTertiaryEnable
+    }
+    val contentColor = when {
+        !enabled -> MoaTheme.colors.textDisabled
+        else -> Gray90
+    }
+
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        border = border,
+        contentPadding = contentPadding,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContentColor = contentColor,
+            disabledContainerColor = containerColor
+        )
+    ) {
+        content()
+    }
+}
+
+@Composable
 fun MoaTertiaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
