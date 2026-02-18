@@ -1,6 +1,7 @@
 package com.moa.app.data.repository
 
 import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.SettingMenu
@@ -15,6 +16,7 @@ interface SettingRepository {
     suspend fun patchCompanyName(companyName: String)
     suspend fun patchPaydayDay(paydayDay: Int)
     suspend fun patchPayroll(payroll: Payroll)
+    suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
     suspend fun getNotificationSettings(): ImmutableList<NotificationSetting>
     suspend fun putNotificationSetting(id: NotificationId, enabled: Boolean)
     suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>)

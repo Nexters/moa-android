@@ -1,6 +1,8 @@
 package com.moa.app.data.repository
 
+import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.core.model.onboarding.Payroll
+import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
@@ -13,6 +15,7 @@ import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
+import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -78,6 +81,22 @@ class SettingRepositoryImpl @Inject constructor(
             PayrollRequest(
                 salaryInputType = payroll.salaryType.name,
                 salaryAmount = payroll.salary.toLong(),
+            )
+        )
+    }
+
+    override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {
+        settingService.patchWorkPolicy(
+            WorkPolicyRequest(
+                workdays = workPolicy.workScheduleDays.map { it.name },
+                clockInTime = makeTimeString(
+                    workPolicy.time.startHour,
+                    workPolicy.time.startMinute
+                ),
+                clockOutTime = makeTimeString(
+                    workPolicy.time.endHour,
+                    workPolicy.time.endMinute
+                ),
             )
         )
     }
