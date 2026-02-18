@@ -3,7 +3,7 @@ package com.moa.app.presentation.ui.setting.notification
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.app.core.model.setting.NotificationId
+import com.moa.app.core.extensions.toYearMonthDayString
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
@@ -17,11 +17,12 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @Stable
 data class NotificationSettingUiState(
-    val notifications: ImmutableList<NotificationSetting> = persistentListOf(),
+    val notificationSettings: ImmutableList<NotificationSetting> = persistentListOf(),
 )
 
 @HiltViewModel
@@ -40,10 +41,7 @@ class NotificationSettingViewModel @Inject constructor(
     fun onIntent(intent: NotificationSettingIntent) {
         when (intent) {
             NotificationSettingIntent.ClickBack -> back()
-            is NotificationSettingIntent.ToggleNotification -> toggleNotification(
-                id = intent.id,
-                enabled = intent.enabled,
-            )
+            is NotificationSettingIntent.ToggleNotification -> toggleNotification(intent.notificationSetting)
         }
     }
 
@@ -52,31 +50,53 @@ class NotificationSettingViewModel @Inject constructor(
             settingRepository.getNotificationSettings()
         }.execute(
             bus = moaSideEffectBus,
-            scope = viewModelScope
-        ) { notifications ->
-            _uiState.value = _uiState.value.copy(notifications = notifications)
+            scope = viewModelScope,
+            onRetry = { getNotificationSettings() },
+        ) {
+            _uiState.value = _uiState.value.copy(notificationSettings = it)
         }
     }
 
-    private fun toggleNotification(id: NotificationId, enabled: Boolean) {
+    private fun toggleNotification(notificationSetting: NotificationSetting.Content) {
+        val updateNotificationSetting =
+            notificationSetting.copy(checked = !notificationSetting.checked)
         suspend {
-            settingRepository.putNotificationSetting(id, enabled)
+            settingRepository.patchNotificationSetting(updateNotificationSetting)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { toggleNotification(notificationSetting) }
         ) {
-            val updatedNotifications = _uiState.value.notifications.map { notification ->
-                if (notification.id == id) {
-                    when (notification) {
-                        is NotificationSetting.Service -> notification.copy(enabled = enabled)
-                        is NotificationSetting.Marketing -> notification.copy(enabled = enabled)
-                    }
+            sendNotificationToast(updateNotificationSetting)
+
+            val updatedNotificationSettings = _uiState.value.notificationSettings.map {
+                if (it is NotificationSetting.Content && it.type == updateNotificationSetting.type) {
+                    updateNotificationSetting
                 } else {
-                    notification
+                    it
                 }
             }
             _uiState.value =
-                _uiState.value.copy(notifications = updatedNotifications.toImmutableList())
+                _uiState.value.copy(notificationSettings = updatedNotificationSettings.toImmutableList())
+        }
+    }
+
+    private fun sendNotificationToast(notificationSetting: NotificationSetting.Content) {
+        val toastMessage = buildString {
+            append(LocalDate.now().toYearMonthDayString())
+            append(" ")
+
+            if (notificationSetting.type == "MARKETING") {
+                val status = if (notificationSetting.checked) "수신 동의 완료" else "수신 동의 철회"
+                append("마케팅 정보 $status\n")
+            }
+
+            val status = if (notificationSetting.checked) "을 켰어요." else "을 껐어요."
+            append("${notificationSetting.title}$status")
+        }
+
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Toast(toastMessage))
         }
     }
 

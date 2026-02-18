@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moa.app.core.model.setting.NotificationId
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
@@ -47,7 +48,7 @@ fun NotificationSettingScreen(viewModel: NotificationSettingViewModel = hiltView
 
     NotificationSettingScreen(
         isNotificationEnabled = isNotificationEnabled,
-        notifications = uiState.notifications,
+        notificationSettings = uiState.notificationSettings,
         onIntent = viewModel::onIntent
     )
 }
@@ -55,7 +56,7 @@ fun NotificationSettingScreen(viewModel: NotificationSettingViewModel = hiltView
 @Composable
 private fun NotificationSettingScreen(
     isNotificationEnabled: Boolean,
-    notifications: ImmutableList<NotificationSetting>,
+    notificationSettings: ImmutableList<NotificationSetting>,
     onIntent: (NotificationSettingIntent) -> Unit,
 ) {
     Scaffold(
@@ -87,17 +88,15 @@ private fun NotificationSettingScreen(
                 .fillMaxSize()
                 .padding(horizontal = MoaTheme.spacing.spacing20),
         ) {
-            Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-
             if (!isNotificationEnabled) {
-                NotificationSettingHeaderContent()
-
                 Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+
+                NotificationSettingHeaderContent()
             }
 
             NotificationSettingContent(
                 isNotificationEnabled = isNotificationEnabled,
-                notifications = notifications,
+                notificationSettings = notificationSettings,
                 onIntent = onIntent,
             )
         }
@@ -137,90 +136,63 @@ private fun NotificationSettingHeaderContent() {
 @Composable
 private fun NotificationSettingContent(
     isNotificationEnabled: Boolean,
-    notifications: ImmutableList<NotificationSetting>,
+    notificationSettings: ImmutableList<NotificationSetting>,
     onIntent: (NotificationSettingIntent) -> Unit,
 ) {
-    val serviceNotifications = notifications.filterIsInstance<NotificationSetting.Service>()
-    val marketingNotifications = notifications.filterIsInstance<NotificationSetting.Marketing>()
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(
+            items = notificationSettings,
+            key = { it.hashCode() },
+            contentType = { it },
+        ) { notificationSetting ->
+            when (notificationSetting) {
+                is NotificationSetting.Title -> {
+                    Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-    if (serviceNotifications.isNotEmpty()) {
-        NotificationSection(
-            sectionTitle = "서비스 알림",
-            isNotificationEnabled = isNotificationEnabled,
-            notifications = serviceNotifications,
-            onIntent = onIntent,
-        )
-    }
+                    Text(
+                        text = notificationSetting.title,
+                        style = MoaTheme.typography.b2_500,
+                        color = MoaTheme.colors.textMediumEmphasis,
+                    )
+                }
 
-    if (serviceNotifications.isNotEmpty() && marketingNotifications.isNotEmpty()) {
-        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-    }
+                is NotificationSetting.Content -> {
+                    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
-    if (marketingNotifications.isNotEmpty()) {
-        NotificationSection(
-            sectionTitle = "광고성 정보 알림",
-            isNotificationEnabled = isNotificationEnabled,
-            notifications = marketingNotifications,
-            onIntent = onIntent,
-        )
-    }
-}
-
-@Composable
-private fun NotificationSection(
-    sectionTitle: String,
-    isNotificationEnabled: Boolean,
-    notifications: List<NotificationSetting>,
-    onIntent: (NotificationSettingIntent) -> Unit,
-) {
-    Text(
-        text = sectionTitle,
-        style = MoaTheme.typography.b2_500,
-        color = MoaTheme.colors.textMediumEmphasis,
-    )
-
-    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-    notifications.forEachIndexed { index, notification ->
-        if (index > 0) {
-            Spacer(Modifier.height(10.dp))
-        }
-
-        MoaRow(
-            leadingContent = {
-                Text(
-                    text = notification.title,
-                    style = MoaTheme.typography.b1_500,
-                    color = if (isNotificationEnabled) {
-                        MoaTheme.colors.textHighEmphasis
-                    } else {
-                        MoaTheme.colors.textDisabled
-                    },
-                )
-            },
-            trailingContent = {
-                MoaSwitch(
-                    checked = notification.enabled,
-                    onCheckedChange = { enabled ->
-                        onIntent(
-                            NotificationSettingIntent.ToggleNotification(
-                                id = notification.id,
-                                enabled = enabled,
+                    MoaRow(
+                        leadingContent = {
+                            Text(
+                                text = notificationSetting.title,
+                                style = MoaTheme.typography.b1_500,
+                                color = if (isNotificationEnabled) {
+                                    MoaTheme.colors.textHighEmphasis
+                                } else {
+                                    MoaTheme.colors.textDisabled
+                                },
                             )
-                        )
-                    },
-                    enabled = isNotificationEnabled,
-                )
+                        },
+                        trailingContent = {
+                            MoaSwitch(
+                                checked =if(isNotificationEnabled) notificationSetting.checked else false,
+                                onCheckedChange = {
+                                    onIntent(NotificationSettingIntent.ToggleNotification(notificationSetting ))
+                                },
+                                enabled = isNotificationEnabled,
+                            )
+                        }
+                    )
+                }
             }
-        )
+        }
     }
 }
 
 sealed interface NotificationSettingIntent {
     data object ClickBack : NotificationSettingIntent
-    data class ToggleNotification(
-        val id: NotificationId,
-        val enabled: Boolean,
+
+    @JvmInline
+    value class ToggleNotification(
+        val notificationSetting: NotificationSetting.Content
     ) : NotificationSettingIntent
 }
 
@@ -230,21 +202,23 @@ private fun NotificationSettingScreenPreview() {
     MoaTheme {
         NotificationSettingScreen(
             isNotificationEnabled = true,
-            notifications = persistentListOf(
-                NotificationSetting.Service(
-                    id = NotificationId.COMMUTE,
+            notificationSettings = persistentListOf(
+                NotificationSetting.Title("서비스 알림"),
+                NotificationSetting.Content(
+                    type = "WORK",
                     title = "출퇴근 알림",
-                    enabled = true,
+                    checked = true,
                 ),
-                NotificationSetting.Service(
-                    id = NotificationId.SALARY_DAY,
+                NotificationSetting.Content(
+                    type = "PAYDAY",
                     title = "월급날 알림",
-                    enabled = false,
+                    checked = true,
                 ),
-                NotificationSetting.Marketing(
-                    id = NotificationId.BENEFITS,
+                NotificationSetting.Title("광고성 정보 알림"),
+                NotificationSetting.Content(
+                    type = "MARKETING",
                     title = "혜택 및 이벤트 알림",
-                    enabled = true,
+                    checked = true,
                 ),
             ),
             onIntent = {},

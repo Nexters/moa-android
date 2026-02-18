@@ -7,7 +7,7 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toData
-import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.mapper.toTermDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -18,7 +18,7 @@ class OnboardingRepositoryImpl @Inject constructor(
     private val onboardingService: OnboardingService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
-        return onboardingService.getStatus().toDomain()
+        return onboardingService.getStatus().toTermDomain()
     }
 
     override suspend fun postToken(
@@ -42,7 +42,7 @@ class OnboardingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTerms(): ImmutableList<Term> {
-        return onboardingService.getTerms().terms.toDomain()
+        return onboardingService.getTerms().terms.toTermDomain()
     }
 
     override suspend fun patchWorkPolicy(workPolicy: WorkPolicy) {

@@ -92,6 +92,10 @@ fun MainScreen(
                     viewModel.onIntent(MainIntent.SetDialog(it.dialog))
                 }
 
+                is MoaSideEffect.Toast -> {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                }
+
                 is MoaSideEffect.Loading -> {
                     viewModel.onIntent(MainIntent.SetLoading(it.isLoading))
                 }
@@ -120,11 +124,11 @@ fun MainScreen(
                             val code = it.exception.code
                             val message = it.exception.message
                             // TODO 필요하다면 code에 따른 처리
-                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
 
                         else -> {
-                            Toast.makeText(context, "일시적인 오류가 발생했어요", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "일시적인 오류가 발생했어요", Toast.LENGTH_LONG).show()
                         }
                     }
                 }

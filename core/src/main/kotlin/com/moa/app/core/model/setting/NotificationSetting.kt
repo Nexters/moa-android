@@ -1,35 +1,15 @@
 package com.moa.app.core.model.setting
 
 import androidx.compose.runtime.Stable
-import kotlinx.serialization.Serializable
 
 @Stable
-@Serializable
-sealed class NotificationSetting {
-    abstract val id: NotificationId
-    abstract val title: String
-    abstract val enabled: Boolean
+sealed interface NotificationSetting {
+    @JvmInline
+    value class Title(val title: String) : NotificationSetting
 
-    @Stable
-    @Serializable
-    data class Service(
-        override val id: NotificationId,
-        override val title: String,
-        override val enabled: Boolean,
-    ) : NotificationSetting()
-
-    @Stable
-    @Serializable
-    data class Marketing(
-        override val id: NotificationId,
-        override val title: String,
-        override val enabled: Boolean,
-    ) : NotificationSetting()
-}
-
-@Serializable
-enum class NotificationId {
-    COMMUTE,
-    SALARY_DAY,
-    BENEFITS,
+    data class Content(
+        val type: String,
+        val title: String,
+        val checked: Boolean,
+    ) : NotificationSetting
 }

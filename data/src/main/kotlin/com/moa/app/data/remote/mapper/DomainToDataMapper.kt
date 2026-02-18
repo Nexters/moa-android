@@ -4,8 +4,10 @@ import com.moa.app.core.extensions.makeTimeString
 import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.WorkPolicy
+import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.data.remote.model.request.AgreementRequest
 import com.moa.app.data.remote.model.request.AgreementsRequest
+import com.moa.app.data.remote.model.request.NotificationSettingRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -36,4 +38,9 @@ fun ImmutableList<Term>.toData(): AgreementsRequest = AgreementsRequest(
                 agreed = it.checked,
             )
         }
+)
+
+fun NotificationSetting.Content.toData(): NotificationSettingRequest = NotificationSettingRequest(
+    type = type,
+    checked = checked,
 )
