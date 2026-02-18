@@ -1,6 +1,8 @@
 package com.moa.app.presentation.model
 
 import androidx.navigation3.runtime.NavKey
+import com.moa.app.core.model.history.LocalDateModel
+import com.moa.app.core.model.history.Schedule
 import kotlinx.serialization.Serializable
 
 sealed interface RootNavigation : NavKey {
@@ -18,6 +20,12 @@ sealed interface RootNavigation : NavKey {
 
     @Serializable
     data object History : RootNavigation
+
+    @Serializable
+    data class ScheduleForm(
+        val date: LocalDateModel,
+        val schedule: Schedule? = null,
+    ) : RootNavigation
 
     @Serializable
     data object Setting : RootNavigation
