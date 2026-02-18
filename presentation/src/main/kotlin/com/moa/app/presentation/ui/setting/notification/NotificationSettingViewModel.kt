@@ -3,6 +3,7 @@ package com.moa.app.presentation.ui.setting.notification
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.extensions.toYearMonthDayString
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.data.repository.SettingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
@@ -81,12 +82,21 @@ class NotificationSettingViewModel @Inject constructor(
     }
 
     private fun sendNotificationToast(notificationSetting: NotificationSetting.Content) {
-        val date = LocalDate.now()
-        val title = notificationSetting.title
-        val message = if (notificationSetting.checked) "에 동의했어요." else "을 거부했어요."
+        val toastMessage = buildString {
+            append(LocalDate.now().toYearMonthDayString())
+            append(" ")
+
+            if (notificationSetting.type == "MARKETING") {
+                val status = if (notificationSetting.checked) "수신 동의 완료" else "수신 동의 철회"
+                append("마케팅 정보 $status\n")
+            }
+
+            val status = if (notificationSetting.checked) "을 켰어요." else "을 껐어요."
+            append("${notificationSetting.title}$status")
+        }
 
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Toast("$date $title$message"))
+            moaSideEffectBus.emit(MoaSideEffect.Toast(toastMessage))
         }
     }
 
