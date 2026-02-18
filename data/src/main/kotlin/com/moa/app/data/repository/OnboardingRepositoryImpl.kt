@@ -16,7 +16,6 @@ import com.moa.app.data.remote.model.request.TokenRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import kotlinx.collections.immutable.ImmutableList
 import javax.inject.Inject
-import kotlin.random.Random
 
 class OnboardingRepositoryImpl @Inject constructor(
     private val tokenService: TokenService,
@@ -36,10 +35,6 @@ class OnboardingRepositoryImpl @Inject constructor(
                 fcmDeviceToken = fcmDeviceToken,
             )
         ).accessToken
-    }
-
-    override fun getRandomNickName(): String {
-        return "집계사장${Random.nextInt(10)}"
     }
 
     override suspend fun patchNickName(nickName: String) {
