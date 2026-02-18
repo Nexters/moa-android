@@ -94,16 +94,13 @@ class WorkInfoViewModel @Inject constructor(
 
     private fun companyName() {
         viewModelScope.launch {
-            val companyName = _uiState.value.workInfo?.companyName
-            if (companyName != null) {
-                moaSideEffectBus.emit(
-                    MoaSideEffect.Navigate(
-                        SettingNavigation.CompanyName(
-                            companyName
-                        )
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    SettingNavigation.CompanyName(
+                        _uiState.value.workInfo?.companyName ?: ""
                     )
                 )
-            }
+            )
         }
     }
 

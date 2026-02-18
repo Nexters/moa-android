@@ -11,7 +11,7 @@ import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.model.request.AgreementRequest
 import com.moa.app.data.remote.model.request.AgreementsRequest
 import com.moa.app.data.remote.model.request.PayrollRequest
-import com.moa.app.data.remote.model.request.ProfileRequest
+import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.TokenRequest
 import com.moa.app.data.remote.model.request.WorkPolicyRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -37,8 +37,8 @@ class OnboardingRepositoryImpl @Inject constructor(
         ).accessToken
     }
 
-    override suspend fun patchNickName(nickName: String) {
-        onboardingService.patchProfile(ProfileRequest(nickname = nickName))
+    override suspend fun patchNickname(nickName: String) {
+        onboardingService.patchProfile(NicknameRequest(nickname = nickName))
     }
 
     override suspend fun patchPayroll(payroll: Payroll) {

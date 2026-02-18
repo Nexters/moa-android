@@ -76,7 +76,7 @@ class SettingMenuViewModel @Inject constructor(
                         destination = RootNavigation.Onboarding(
                             startDestination = OnboardingNavigation.Nickname(
                                 args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                    nickName = nickName,
+                                    nickname = nickName,
                                     isOnboarding = false,
                                 )
                             )

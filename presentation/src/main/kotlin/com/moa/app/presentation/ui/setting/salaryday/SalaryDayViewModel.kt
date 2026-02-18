@@ -54,7 +54,7 @@ class SalaryDayViewModel @AssistedInject constructor(
 
     private fun setSalaryDay(day: Int) {
         suspend {
-            settingRepository.putSalaryDay(day)
+            settingRepository.patchPaydayDay(day)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,

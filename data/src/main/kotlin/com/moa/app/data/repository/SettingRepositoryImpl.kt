@@ -7,7 +7,11 @@ import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import com.moa.app.data.remote.api.MoaService
+import com.moa.app.data.remote.api.SettingService
 import com.moa.app.data.remote.mapper.toDomain
+import com.moa.app.data.remote.model.request.NicknameRequest
+import com.moa.app.data.remote.model.request.PaydayDayRequest
+import com.moa.app.data.remote.model.request.WorkplaceRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.async
@@ -16,6 +20,7 @@ import javax.inject.Inject
 
 class SettingRepositoryImpl @Inject constructor(
     private val moaService: MoaService,
+    private val settingService: SettingService,
 ) : SettingRepository {
     override suspend fun getSettingMenu(): SettingMenu {
         return coroutineScope {
@@ -54,12 +59,16 @@ class SettingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun putSalaryDay(day: Int) {
-        // TODO put salaryday
+    override suspend fun patchNickname(nickname: String) {
+        settingService.patchNickname(NicknameRequest(nickname))
     }
 
-    override suspend fun putCompanyName(companyName: String) {
-        // TODO put companyname
+    override suspend fun patchCompanyName(companyName: String) {
+        settingService.patchWorkplace(WorkplaceRequest(companyName))
+    }
+
+    override suspend fun patchPaydayDay(paydayDay: Int) {
+        settingService.patchPaydayDay(PaydayDayRequest(paydayDay))
     }
 
     override suspend fun getNotificationSettings(): ImmutableList<NotificationSetting> {

@@ -45,24 +45,24 @@ import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
-fun NickNameScreen(
+fun NicknameScreen(
     args: OnboardingNavigation.Nickname.NicknameNavigationArgs,
-    viewModel: NickNameViewModel = hiltViewModel(
-        creationCallback = { factory: NickNameViewModel.Factory ->
+    viewModel: NicknameViewModel = hiltViewModel(
+        creationCallback = { factory: NicknameViewModel.Factory ->
             factory.create(args)
         }
     )
 ) {
-    NickNameScreen(
-        nickNameTextFieldState = viewModel.nickNameTextFieldState,
+    NicknameScreen(
+        nickNameTextFieldState = viewModel.nicknameTextFieldState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
-private fun NickNameScreen(
+private fun NicknameScreen(
     nickNameTextFieldState: TextFieldState,
-    onIntent: (NickNameIntent) -> Unit,
+    onIntent: (NicknameIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -76,7 +76,7 @@ private fun NickNameScreen(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(NickNameIntent.ClickBack) }) {
+                    IconButton(onClick = { onIntent(NicknameIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = "Back",
@@ -126,7 +126,7 @@ private fun NickNameScreen(
                         vertical = MoaTheme.spacing.spacing8,
                         horizontal = MoaTheme.spacing.spacing12,
                     )
-                    .clickable { onIntent(NickNameIntent.ClickRandom) },
+                    .clickable { onIntent(NicknameIntent.ClickRandom) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -168,7 +168,7 @@ private fun NickNameScreen(
                 enabled = nickNameTextFieldState.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
-                    onIntent(NickNameIntent.ClickNext)
+                    onIntent(NicknameIntent.ClickNext)
                 },
             ) {
                 Text(
@@ -180,17 +180,17 @@ private fun NickNameScreen(
     }
 }
 
-sealed interface NickNameIntent {
-    data object ClickBack : NickNameIntent
-    data object ClickRandom : NickNameIntent
-    data object ClickNext : NickNameIntent
+sealed interface NicknameIntent {
+    data object ClickBack : NicknameIntent
+    data object ClickRandom : NicknameIntent
+    data object ClickNext : NicknameIntent
 }
 
 @Preview
 @Composable
-private fun NickNameScreenPreview() {
+private fun NicknameScreenPreview() {
     MoaTheme {
-        NickNameScreen(
+        NicknameScreen(
             nickNameTextFieldState = rememberTextFieldState(),
             onIntent = {},
         )

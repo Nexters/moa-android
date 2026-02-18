@@ -44,7 +44,7 @@ class SplashViewModel @Inject constructor(
                         RootNavigation.Onboarding(
                             OnboardingNavigation.Nickname(
                                 args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
-                                    nickName = nickName
+                                    nickname = nickName
                                 )
                             )
                         )

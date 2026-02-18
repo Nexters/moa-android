@@ -21,7 +21,7 @@ sealed interface OnboardingNavigation : RootNavigation {
         @Serializable
         data class NicknameNavigationArgs(
             val isOnboarding: Boolean = true,
-            val nickName: String = "",
+            val nickname: String = "",
         )
     }
 
