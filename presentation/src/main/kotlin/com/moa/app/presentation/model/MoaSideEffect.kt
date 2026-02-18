@@ -12,6 +12,8 @@ sealed interface MoaSideEffect {
     @JvmInline
     value class Loading(val isLoading: Boolean) : MoaSideEffect
 
-    @JvmInline
-    value class Failure(val exception: Throwable) : MoaSideEffect
+    data class Failure(
+        val exception: Throwable,
+        val onRetry: () -> Unit,
+    ) : MoaSideEffect
 }

@@ -154,15 +154,16 @@ private fun TermBottomSheetPreview() {
             terms = persistentListOf(
                 Term.All(
                     title = "전체 동의하기",
-                    url = "",
                     checked = true,
                 ),
                 Term.Required(
+                    code = "",
                     title = "(필수) 서비스 이용 약관 동의",
                     url = "https://www.naver.com",
                     checked = true,
                 ),
                 Term.Optional(
+                    code = "",
                     title = "(선택) 서비스 이용 약관 동의",
                     url = "https://www.naver.com",
                     checked = false,
@@ -192,6 +193,7 @@ private fun TermRowPreview() {
 
             TermRow(
                 term = Term.Required(
+                    code = "",
                     title = "(필수) 서비스 이용 약관 동의",
                     url = "https://www.naver.com",
                     checked = true,
@@ -202,6 +204,7 @@ private fun TermRowPreview() {
 
             TermRow(
                 term = Term.Optional(
+                    code = "",
                     title = "(선택) 서비스 이용 약관 동의",
                     url = "https://www.naver.com",
                     checked = false,

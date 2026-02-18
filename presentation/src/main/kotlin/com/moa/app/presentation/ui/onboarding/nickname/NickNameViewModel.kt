@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
+import com.moa.app.presentation.manager.RandomNickManager
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
@@ -63,7 +64,7 @@ class NickNameViewModel @AssistedInject constructor(
     }
 
     private fun random() {
-        val nickName = onboardingRepository.getRandomNickName()
+        val nickName = RandomNickManager.get()
         nickNameTextFieldState.setTextAndPlaceCursorAtEnd(nickName)
     }
 
@@ -81,6 +82,7 @@ class NickNameViewModel @AssistedInject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { nextIfIsOnboarding() }
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Salary()))

@@ -12,10 +12,9 @@ interface OnboardingRepository {
         idToken: String,
         fcmDeviceToken: String,
     ): String
-    fun getRandomNickName(): String
     suspend fun patchNickName(nickName: String)
     suspend fun patchPayroll(payroll: Payroll)
-    suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
     suspend fun getTerms(): ImmutableList<Term>
+    suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
     suspend fun putTerms(terms: ImmutableList<Term>)
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.then
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.moa.app.core.extensions.isKoreanOrEnglish
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
@@ -103,7 +105,13 @@ private fun NickNameScreen(
                 state = nickNameTextFieldState,
                 description2 = "로 가입할래요",
                 placeholder = "닉네임을 입력해주세요",
-                inputTransformation = InputTransformation.maxLength(10),
+                inputTransformation = InputTransformation
+                    .maxLength(10)
+                    .then {
+                        val filtered = asCharSequence().filter { it.isKoreanOrEnglish() }
+
+                        replace(0, length, filtered)
+                    },
             )
 
             Spacer(Modifier.height(32.dp))

@@ -83,7 +83,7 @@ private fun LoginScreen(
                     isProgrammaticScroll = false
 
                     if (!isAutoPagingEnabled) {
-                        delay(5000)
+                        delay(2000)
                         isAutoPagingEnabled = true
                     }
                 }
@@ -127,7 +127,7 @@ private fun LoginScreen(
                     Spacer(Modifier.width(12.dp))
 
                     Text(
-                        text = "카카오 로그인",
+                        text = "카카오로 계속하기",
                         style = MoaTheme.typography.t3_700,
                         color = MoaTheme.colors.textHighEmphasisReverse,
                     )

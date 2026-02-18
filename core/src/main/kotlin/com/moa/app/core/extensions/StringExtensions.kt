@@ -10,6 +10,10 @@ fun makeTimeString(hour: Int, minute: Int): String {
 fun String.makePriceString(): String {
     val value = this.toDoubleOrNull() ?: return ""
 
+    if (value < PayrollConstants.MAN) {
+        return ""
+    }
+
     if (value < PayrollConstants.EOK) {
         val divided = value / PayrollConstants.MAN
         var formatted = String.format(Locale.getDefault(), "%.1f", divided)
@@ -29,4 +33,22 @@ fun String.makePriceString(): String {
             }
         }
     }
+}
+
+fun String.toHourMinute(): Pair<Int, Int> {
+    val parts = this.split(":")
+    require(parts.size >= 2) { "Invalid time format: $this" }
+
+    val hour = parts[0].toInt()
+    val minute = parts[1].toInt()
+
+    return Pair(hour, minute)
+}
+
+fun Char.isKoreanOrEnglish(): Boolean {
+    return this in 'a'..'z' ||
+            this in 'A'..'Z' ||
+            this in '\uAC00'..'\uD7AF' || // 완성형 한글
+            this in '\u1100'..'\u11FF' || // 한글 자음/모음 (조합 중일 때)
+            this in '\u3130'..'\u318F'    // 한글 호환 자모
 }

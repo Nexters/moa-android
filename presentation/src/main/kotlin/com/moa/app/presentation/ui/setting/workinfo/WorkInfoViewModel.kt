@@ -85,9 +85,9 @@ class WorkInfoViewModel @Inject constructor(
 
     private fun salaryDate() {
         viewModelScope.launch {
-            val payroll = _uiState.value.workInfo?.payroll
-            if (payroll != null) {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.SalaryDay(payroll.paydayDay)))
+            val paydayDay = _uiState.value.workInfo?.paydayDay
+            if (paydayDay != null) {
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.SalaryDay(paydayDay)))
             }
         }
     }

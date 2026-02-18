@@ -63,6 +63,7 @@ class LoginViewModel @Inject constructor(
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { postToken(idToken, fcmDeviceToken) }
         ) {
             saveToken(it)
         }

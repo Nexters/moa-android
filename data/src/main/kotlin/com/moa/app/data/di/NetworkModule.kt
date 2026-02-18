@@ -1,7 +1,9 @@
 package com.moa.app.data.di
 
 import com.moa.app.data.BuildConfig
+import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.TokenService
+import com.moa.app.data.remote.converter.ContentOnlyConverterFactory
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -66,6 +68,7 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
+            .addConverterFactory(ContentOnlyConverterFactory(json))
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
@@ -74,4 +77,9 @@ object NetworkModule {
     @Singleton
     fun provideTokenService(retrofit: Retrofit): TokenService =
         retrofit.create(TokenService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOnboardingService(retrofit: Retrofit): OnboardingService =
+        retrofit.create(OnboardingService::class.java)
 }
