@@ -4,8 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PayrollResponse(
-    val effectiveFrom: String,
     val salaryInputType: String,
     val salaryAmount: Long,
-    val paydayDay: Int,
 )

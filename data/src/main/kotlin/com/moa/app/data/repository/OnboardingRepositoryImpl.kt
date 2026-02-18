@@ -46,7 +46,6 @@ class OnboardingRepositoryImpl @Inject constructor(
             PayrollRequest(
                 salaryInputType = payroll.salaryType.name,
                 salaryAmount = payroll.salary.toLong(),
-                paydayDay = payroll.paydayDay,
             )
         )
     }

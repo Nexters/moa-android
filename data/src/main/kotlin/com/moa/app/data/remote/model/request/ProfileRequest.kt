@@ -5,5 +5,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProfileRequest(
     val nickname: String,
-    val workplace: String? = null,
 )
