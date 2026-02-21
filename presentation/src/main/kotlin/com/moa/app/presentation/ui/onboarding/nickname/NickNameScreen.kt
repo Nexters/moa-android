@@ -54,6 +54,7 @@ fun NicknameScreen(
     )
 ) {
     NicknameScreen(
+        isOnboarding = args.isOnboarding,
         nickNameTextFieldState = viewModel.nicknameTextFieldState,
         onIntent = viewModel::onIntent,
     )
@@ -61,6 +62,7 @@ fun NicknameScreen(
 
 @Composable
 private fun NicknameScreen(
+    isOnboarding: Boolean,
     nickNameTextFieldState: TextFieldState,
     onIntent: (NicknameIntent) -> Unit,
 ) {
@@ -75,6 +77,15 @@ private fun NicknameScreen(
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    if (!isOnboarding) {
+                        Text(
+                            text = "닉네임 수정",
+                            color = MoaTheme.colors.textHighEmphasis,
+                            style = MoaTheme.typography.t3_500,
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(NicknameIntent.ClickBack) }) {
                         Icon(
@@ -83,7 +94,7 @@ private fun NicknameScreen(
                             tint = MoaTheme.colors.textHighEmphasis,
                         )
                     }
-                }
+                },
             )
         },
         containerColor = MoaTheme.colors.bgPrimary,
@@ -103,7 +114,7 @@ private fun NicknameScreen(
                     .padding(horizontal = MoaTheme.spacing.spacing20),
                 description1 = "닉네임",
                 state = nickNameTextFieldState,
-                description2 = "로 가입할래요",
+                description2 = if (isOnboarding) "로 가입할래요" else "로 수정할게요",
                 placeholder = "닉네임을 입력해주세요",
                 inputTransformation = InputTransformation
                     .maxLength(10)
@@ -191,6 +202,7 @@ sealed interface NicknameIntent {
 private fun NicknameScreenPreview() {
     MoaTheme {
         NicknameScreen(
+            isOnboarding = false,
             nickNameTextFieldState = rememberTextFieldState(),
             onIntent = {},
         )
