@@ -22,4 +22,11 @@ data class LocalDateModel(
     val day: Int,
 ) {
     fun toDisplayString(): String = "${year}년 ${month}월 ${day}일"
+
+    companion object {
+        fun today(): LocalDateModel {
+            val now = java.time.LocalDate.now()
+            return LocalDateModel(now.year, now.monthValue, now.dayOfMonth)
+        }
+    }
 }

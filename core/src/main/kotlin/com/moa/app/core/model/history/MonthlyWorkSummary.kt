@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Stable
 data class MonthlyWorkSummary(
-    val currentWorkHours: Int,
-    val totalWorkHours: Int,
-    val currentSalary: Long,
-    val totalSalary: Long,
+    val workedMinutes: Int,
+    val standardMinutes: Int,
+    val workedEarnings: Long,
+    val standardSalary: Long,
 )

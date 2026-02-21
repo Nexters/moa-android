@@ -31,6 +31,7 @@ fun ScheduleFormContent(
     modifier: Modifier = Modifier,
     title: String,
     date: LocalDateModel,
+    isDateSelected: Boolean,
     scheduleType: ScheduleInputType,
     time: Time,
     onDateClick: () -> Unit,
@@ -67,8 +68,8 @@ fun ScheduleFormContent(
             leadingContent = {
                 Text(
                     text = date.toDisplayString(),
-                    style = MoaTheme.typography.t2_700,
-                    color = MoaTheme.colors.textHighEmphasis,
+                    style = if (isDateSelected) MoaTheme.typography.t2_700 else MoaTheme.typography.t2_400,
+                    color = if (isDateSelected) MoaTheme.colors.textHighEmphasis else MoaTheme.colors.textLowEmphasis,
                 )
             },
         )
@@ -163,6 +164,7 @@ fun ScheduleFormContent(
                     .weight(1f)
                     .height(64.dp),
                 onClick = onConfirmClick,
+                enabled = isDateSelected,
             ) {
                 Text(
                     text = stringResource(R.string.schedule_form_confirm),

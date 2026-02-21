@@ -5,6 +5,7 @@ import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.SettingService
 import com.moa.app.data.remote.api.TokenService
+import com.moa.app.data.remote.api.WorkdayService
 import com.moa.app.data.remote.converter.ContentOnlyConverterFactory
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
@@ -94,4 +95,9 @@ object NetworkModule {
     @Singleton
     fun provideSettingService(retrofit: Retrofit): SettingService =
         retrofit.create(SettingService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWorkdayService(retrofit: Retrofit): WorkdayService =
+        retrofit.create(WorkdayService::class.java)
 }
