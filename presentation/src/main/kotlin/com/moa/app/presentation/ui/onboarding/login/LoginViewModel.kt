@@ -12,6 +12,7 @@ import com.moa.app.presentation.manager.FcmTokenManager
 import com.moa.app.presentation.manager.KakaoLoginManager
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
+import com.moa.app.presentation.model.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -73,9 +74,84 @@ class LoginViewModel @Inject constructor(
         suspend {
             tokenRepository.saveAccessToken(accessToken)
         }.execute(scope = viewModelScope) {
-            viewModelScope.launch {
-                moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Nickname()))
+            getOnboardingStatus()
+        }
+    }
+
+    private fun getOnboardingStatus() {
+        viewModelScope.launch {
+            runCatching {
+                onboardingRepository.getOnboardingStatus()
+            }.onSuccess { onboardingStatus ->
+                if (onboardingStatus.hasRequiredTermsAgreed) {
+                    navigate(RootNavigation.Home)
+                    return@launch
+                }
+
+                val nickName = onboardingStatus.profile?.nickname
+                if (nickName == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Nickname(
+                                args = OnboardingNavigation.Nickname.NicknameNavigationArgs(
+                                    nickname = nickName
+                                )
+                            )
+                        )
+                    )
+                }
+
+                val payroll = onboardingStatus.payroll
+                if (payroll == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.Salary()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.Salary(
+                                OnboardingNavigation.Salary.SalaryNavigationArgs(
+                                    salary = payroll.salary,
+                                    salaryType = payroll.salaryType,
+                                )
+                            )
+                        )
+                    )
+                }
+
+                val workPolicy = onboardingStatus.workPolicy
+                if (workPolicy == null) {
+                    navigate(RootNavigation.Onboarding(OnboardingNavigation.WorkSchedule()))
+                    return@launch
+                } else {
+                    navigate(
+                        RootNavigation.Onboarding(
+                            OnboardingNavigation.WorkSchedule(
+                                OnboardingNavigation.WorkSchedule.WorkScheduleNavigationArgs(
+                                    workScheduleDays = workPolicy.workScheduleDays,
+                                    time = workPolicy.time,
+                                )
+                            )
+                        )
+                    )
+                }
+            }.onFailure {
+                toast()
             }
+        }
+    }
+
+    private fun navigate(destination: RootNavigation) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
+        }
+    }
+
+    private fun toast() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
         }
     }
 }
