@@ -16,7 +16,6 @@ import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
 import com.moa.app.presentation.model.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -122,27 +121,14 @@ class SettingMenuViewModel @Inject constructor(
     }
 
     private fun logout() {
-        viewModelScope.launch {
-            val fcmTokenDeferred = async {
-                FcmTokenManager.getFcmToken()
-            }
-
-            authRepository.logout(fcmTokenDeferred.await())
-        }.invokeOnCompletion {
-            if (it == null) {
-                clearToken()
-            } else {
-                toast()
-            }
-        }
-    }
-
-    private fun clearToken() {
         suspend {
+            val fcmTokenDeferred = FcmTokenManager.getFcmToken()
+            authRepository.logout(fcmTokenDeferred)
             tokenRepository.clearToken()
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { logout() }
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(
@@ -159,12 +145,6 @@ class SettingMenuViewModel @Inject constructor(
     private fun withdraw() {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Navigate(SettingNavigation.WithDraw))
-        }
-    }
-
-    private fun toast() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
         }
     }
 }
