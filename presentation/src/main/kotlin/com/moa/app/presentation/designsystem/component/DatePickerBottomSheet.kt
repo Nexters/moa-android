@@ -132,7 +132,7 @@ private fun MonthNavigator(
     ) {
         IconButton(onClick = onPreviousMonth) {
             Icon(
-                painter = painterResource(R.drawable.ic_16_chevron_left),
+                painter = painterResource(R.drawable.ic_24_chevron_left),
                 contentDescription = "Previous Month",
                 tint = MoaTheme.colors.textHighEmphasis,
             )
@@ -146,7 +146,7 @@ private fun MonthNavigator(
 
         IconButton(onClick = onNextMonth) {
             Icon(
-                painter = painterResource(R.drawable.ic_16_chevron_right),
+                painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Next Month",
                 tint = MoaTheme.colors.textHighEmphasis,
             )
