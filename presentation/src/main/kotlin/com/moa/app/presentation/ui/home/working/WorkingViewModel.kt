@@ -3,11 +3,12 @@ package com.moa.app.presentation.ui.home.working
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
-import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.HomeNavigation
+import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.ui.home.working.model.WorkStatus
 import com.moa.app.presentation.ui.home.working.model.WorkingIntent
 import com.moa.app.presentation.ui.home.working.model.WorkingUiState
+import com.moa.app.presentation.ui.widget.util.WidgetUpdateManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -23,12 +24,12 @@ import java.time.LocalTime
 private const val TOOLTIP_COUNT = 3
 private const val TOOLTIP_ROTATION_INTERVAL_MS = 5000L
 private const val SALARY_PER_SECOND = 1L
-private const val MAX_COIN_HEIGHT_FRACTION = 0.7f
 
 @HiltViewModel(assistedFactory = WorkingViewModel.Factory::class)
 class WorkingViewModel @AssistedInject constructor(
     @Assisted private val args: HomeNavigation.Working,
     private val moaSideEffectBus: MoaSideEffectBus,
+    val widgetUpdateManager: WidgetUpdateManager,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -128,7 +129,8 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { state ->
             val newTodaySalary = elapsedSeconds.toLong() * SALARY_PER_SECOND
             val endTime = LocalTime.of(state.endHour, state.endMinute)
-            val remainingSeconds = java.time.Duration.between(now, endTime).seconds.toInt().coerceAtLeast(0)
+            val remainingSeconds =
+                java.time.Duration.between(now, endTime).seconds.toInt().coerceAtLeast(0)
             val remainingHours = remainingSeconds / 3600
 
             state.copy(

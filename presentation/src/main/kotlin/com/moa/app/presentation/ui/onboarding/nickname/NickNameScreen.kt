@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.moa.app.core.extensions.isKoreanOrEnglish
+import com.moa.app.core.extensions.isKoreanEnglishOrDigit
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.app.presentation.designsystem.component.MoaTextFieldWithDescription
@@ -119,7 +119,7 @@ private fun NicknameScreen(
                 inputTransformation = InputTransformation
                     .maxLength(10)
                     .then {
-                        val filtered = asCharSequence().filter { it.isKoreanOrEnglish() }
+                        val filtered = asCharSequence().filter { it.isKoreanEnglishOrDigit() }
 
                         replace(0, length, filtered)
                     },

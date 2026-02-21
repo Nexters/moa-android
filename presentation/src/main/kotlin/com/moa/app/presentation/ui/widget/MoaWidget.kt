@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -55,7 +55,7 @@ class MoaWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val scope = rememberCoroutineScope()
-            var uiState by rememberSaveable { mutableStateOf<MoaWidgetUiState>(MoaWidgetUiState.Loading) }
+            var uiState by remember { mutableStateOf<MoaWidgetUiState>(MoaWidgetUiState.Loading) }
             val entryPoint = EntryPointAccessors.fromApplication(
                 context.applicationContext,
                 MoaWidgetEntryPoint::class.java
