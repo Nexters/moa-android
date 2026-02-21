@@ -7,10 +7,17 @@ import com.moa.app.core.model.history.LocalDateModel
 import com.moa.app.core.model.history.MonthlyWorkSummary
 import com.moa.app.core.model.history.Schedule
 import com.moa.app.core.model.history.ScheduleType
+import com.moa.app.core.model.history.Workday
+import com.moa.app.core.model.history.WorkdayDetail
+import com.moa.app.core.model.history.WorkdayType
 import com.moa.app.core.model.onboarding.Time
+import com.moa.app.data.local.PreferencesDataStore
+import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.WorkdayRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.model.SettingNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -19,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
@@ -34,13 +40,17 @@ data class HistoryUiState(
         day = LocalDate.now().dayOfMonth,
     ),
     val monthlyWorkSummary: MonthlyWorkSummary = MonthlyWorkSummary(
-        currentWorkHours = 0,
-        totalWorkHours = 0,
-        currentSalary = 0,
-        totalSalary = 0,
+        workedMinutes = 0,
+        standardMinutes = 0,
+        workedEarnings = 0,
+        standardSalary = 0,
     ),
     val schedules: ImmutableList<Schedule> = persistentListOf(),
     val calendarDays: ImmutableList<CalendarDay> = persistentListOf(),
+    val workdays: ImmutableList<Workday> = persistentListOf(),
+    val paydayDay: Int? = null,
+    val defaultWorkTime: Time = Time(9, 0, 18, 0),
+    val selectedWorkdayDetail: WorkdayDetail? = null,
 )
 
 @Stable
@@ -67,21 +77,58 @@ sealed interface HistoryIntent {
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val workdayRepository: WorkdayRepository,
+    private val preferencesDataStore: PreferencesDataStore,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
-
-    private val workScheduleDays = setOf(
-        DayOfWeek.MONDAY,
-        DayOfWeek.TUESDAY,
-        DayOfWeek.WEDNESDAY,
-        DayOfWeek.THURSDAY,
-        DayOfWeek.FRIDAY,
-    )
 
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        loadMockData()
+        loadPaydayDay()
+        loadWorkInfo()
+        fetchEarnings()
+        fetchWorkdays()
+        fetchWorkdayDetail(_uiState.value.selectedDate)
+    }
+
+    fun refresh() {
+        loadPaydayDay()
+        fetchEarnings()
+        fetchWorkdays()
+        fetchWorkdayDetail(_uiState.value.selectedDate)
+    }
+
+    private fun loadWorkInfo() {
+        viewModelScope.launch {
+            try {
+                val workInfo = settingRepository.getWorkInfo()
+                _uiState.update { it.copy(defaultWorkTime = workInfo.workPolicy.time) }
+            } catch (_: Exception) {
+                // Use default time
+            }
+        }
+    }
+
+    private fun loadPaydayDay() {
+        viewModelScope.launch {
+            val paydayDay = preferencesDataStore.getPaydayDay()
+            _uiState.update { it.copy(paydayDay = paydayDay) }
+            updateCalendarDays()
+        }
+    }
+
+    private fun fetchWorkdays() {
+        viewModelScope.launch {
+            try {
+                val state = _uiState.value
+                val workdays = workdayRepository.getWorkdays(state.currentYear, state.currentMonth)
+                _uiState.update { it.copy(workdays = workdays) }
+                updateCalendarDays()
+            } catch (_: Exception) {
+            }
+        }
     }
 
     fun onIntent(intent: HistoryIntent) {
@@ -103,7 +150,8 @@ class HistoryViewModel @Inject constructor(
                 currentMonth = month,
             )
         }
-        updateCalendarDays()
+        fetchEarnings()
+        fetchWorkdays()
     }
 
     private fun back() {
@@ -121,7 +169,8 @@ class HistoryViewModel @Inject constructor(
                 currentMonth = previous.monthValue,
             )
         }
-        updateCalendarDays()
+        fetchEarnings()
+        fetchWorkdays()
     }
 
     private fun nextMonth() {
@@ -133,7 +182,8 @@ class HistoryViewModel @Inject constructor(
                 currentMonth = next.monthValue,
             )
         }
-        updateCalendarDays()
+        fetchEarnings()
+        fetchWorkdays()
     }
 
     private fun addSchedule() {
@@ -147,71 +197,43 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun selectDate(date: LocalDateModel) {
-        _uiState.update { it.copy(selectedDate = date) }
+        _uiState.update { it.copy(selectedDate = date, selectedWorkdayDetail = null) }
         updateCalendarDays()
+        fetchWorkdayDetail(date)
+    }
+
+    private fun fetchWorkdayDetail(date: LocalDateModel) {
+        viewModelScope.launch {
+            try {
+                val dateString = "%04d-%02d-%02d".format(date.year, date.month, date.day)
+                val detail = workdayRepository.getWorkdayDetail(dateString)
+                _uiState.update { it.copy(selectedWorkdayDetail = detail) }
+            } catch (_: Exception) {
+                _uiState.update { it.copy(selectedWorkdayDetail = null) }
+            }
+        }
     }
 
     private fun editSchedule(schedule: Schedule) {
         viewModelScope.launch {
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    RootNavigation.ScheduleForm(date = schedule.date, schedule = schedule)
-                )
-            )
+            val destination = if (schedule.type == ScheduleType.PAYDAY) {
+                SettingNavigation.WorkInfo
+            } else {
+                RootNavigation.ScheduleForm(date = schedule.date, schedule = schedule)
+            }
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
         }
     }
 
-    private fun loadMockData() {
-        val today = LocalDate.now()
-        val mockSchedules = listOf(
-            Schedule(
-                id = 1,
-                date = LocalDateModel(today.year, today.monthValue, 14),
-                type = ScheduleType.WORK_SCHEDULED,
-                time = Time(8, 0, 20, 0),
-            ),
-            Schedule(
-                id = 2,
-                date = LocalDateModel(today.year, today.monthValue, 15),
-                type = ScheduleType.WORK_SCHEDULED,
-                time = Time(8, 0, 20, 0),
-            ),
-            Schedule(
-                id = 3,
-                date = LocalDateModel(today.year, today.monthValue, 20),
-                type = ScheduleType.WORK_COMPLETED,
-                time = Time(9, 0, 18, 0),
-            ),
-            Schedule(
-                id = 4,
-                date = LocalDateModel(today.year, today.monthValue, 21),
-                type = ScheduleType.VACATION,
-            ),
-            Schedule(
-                id = 5,
-                date = LocalDateModel(today.year, today.monthValue, 25),
-                type = ScheduleType.PAYDAY,
-                amount = 2000000,
-            ),
-            Schedule(
-                id = 6,
-                date = LocalDateModel(today.year, today.monthValue, 25),
-                type = ScheduleType.VACATION,
-            ),
-        ).toImmutableList()
-
-        _uiState.update {
-            it.copy(
-                schedules = mockSchedules,
-                monthlyWorkSummary = MonthlyWorkSummary(
-                    currentWorkHours = 120,
-                    totalWorkHours = 150,
-                    currentSalary = 3000,
-                    totalSalary = 4000,
-                ),
-            )
+    private fun fetchEarnings() {
+        viewModelScope.launch {
+            try {
+                val state = _uiState.value
+                val earnings = workdayRepository.getEarnings(state.currentYear, state.currentMonth)
+                _uiState.update { it.copy(monthlyWorkSummary = earnings) }
+            } catch (_: Exception) {
+            }
         }
-        updateCalendarDays()
     }
 
     private fun updateCalendarDays() {
@@ -225,6 +247,8 @@ class HistoryViewModel @Inject constructor(
         val today = LocalDate.now()
         val selectedDate = _uiState.value.selectedDate
         val schedules = _uiState.value.schedules
+        val workdays = _uiState.value.workdays
+        val paydayDay = _uiState.value.paydayDay
 
         val calendarDays = mutableListOf<CalendarDay>()
 
@@ -235,84 +259,143 @@ class HistoryViewModel @Inject constructor(
         for (day in 1..daysInMonth) {
             val date = LocalDateModel(year, month, day)
             val localDate = LocalDate.of(year, month, day)
+            val dateString = localDate.toString()
             val isFutureDate = localDate.isAfter(today)
             val isPastDate = localDate.isBefore(today)
-            val isWorkDay = workScheduleDays.contains(localDate.dayOfWeek)
+            val isToday = localDate.isEqual(today)
+
+            val workday = workdays.find { it.date == dateString }
 
             val daySchedules = schedules.filter {
                 it.date.year == year && it.date.month == month && it.date.day == day
             }
 
-            val hasVacation = daySchedules.any { it.type == ScheduleType.VACATION }
+            val hasVacationFromApi = workday?.type == WorkdayType.VACATION
+            val hasVacation = hasVacationFromApi || daySchedules.any { it.type == ScheduleType.VACATION }
+
+            val isWorkDayFromApi = workday?.type == WorkdayType.WORK
 
             val hasWorkScheduled = if (hasVacation) {
                 false
             } else {
-                daySchedules.any { it.type == ScheduleType.WORK_SCHEDULED } || (isFutureDate && isWorkDay)
+                daySchedules.any { it.type == ScheduleType.WORK_SCHEDULED } || ((isFutureDate || isToday) && isWorkDayFromApi)
             }
 
             val hasWorkCompleted = if (hasVacation) {
                 false
             } else {
-                daySchedules.any { it.type == ScheduleType.WORK_COMPLETED } || (isPastDate && isWorkDay)
+                daySchedules.any { it.type == ScheduleType.WORK_COMPLETED } || (isPastDate && isWorkDayFromApi)
             }
 
-            calendarDays.add(
-                CalendarDay(
-                    date = date,
-                    isToday = today.year == year && today.monthValue == month && today.dayOfMonth == day,
-                    isSelected = selectedDate.year == year && selectedDate.month == month && selectedDate.day == day,
-                    hasWorkScheduled = hasWorkScheduled,
-                    hasWorkCompleted = hasWorkCompleted,
-                    hasVacation = hasVacation,
-                    hasPayday = daySchedules.any { it.type == ScheduleType.PAYDAY },
-                )
+            val calendarDay = CalendarDay(
+                date = date,
+                isToday = today.year == year && today.monthValue == month && today.dayOfMonth == day,
+                isSelected = selectedDate.year == year && selectedDate.month == month && selectedDate.day == day,
+                hasWorkScheduled = hasWorkScheduled,
+                hasWorkCompleted = hasWorkCompleted,
+                hasVacation = hasVacation,
+                hasPayday = paydayDay == day,
             )
+
+            calendarDays.add(calendarDay)
         }
 
         _uiState.update { it.copy(calendarDays = calendarDays.toImmutableList()) }
     }
 
     fun getSchedulesForSelectedDate(): ImmutableList<Schedule> {
-        val selectedDate = _uiState.value.selectedDate
+        val state = _uiState.value
+        val selectedDate = state.selectedDate
         val localDate = LocalDate.of(selectedDate.year, selectedDate.month, selectedDate.day)
         val today = LocalDate.now()
-        val isWorkDay = workScheduleDays.contains(localDate.dayOfWeek)
+        val dateString = localDate.toString()
+        val defaultWorkTime = state.defaultWorkTime
+        val workdayDetail = state.selectedWorkdayDetail
 
-        val existingSchedules = _uiState.value.schedules.filter {
+        val workday = state.workdays.find { it.date == dateString }
+        val detailType = workdayDetail?.type
+        val isWorkDayFromApi = detailType == WorkdayType.WORK || workday?.type == WorkdayType.WORK
+        val hasVacationFromApi = detailType == WorkdayType.VACATION || workday?.type == WorkdayType.VACATION
+
+        val workTime = if (workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
+            parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
+        } else {
+            defaultWorkTime
+        }
+
+        val existingSchedules = state.schedules.filter {
             it.date.year == selectedDate.year &&
                     it.date.month == selectedDate.month &&
                     it.date.day == selectedDate.day
         }
 
-        val hasVacation = existingSchedules.any { it.type == ScheduleType.VACATION }
+        val hasVacation = hasVacationFromApi || existingSchedules.any { it.type == ScheduleType.VACATION }
         val hasExistingWorkSchedule = existingSchedules.any {
             it.type == ScheduleType.WORK_SCHEDULED || it.type == ScheduleType.WORK_COMPLETED
         }
 
-        val autoSchedule = if (!hasVacation && !hasExistingWorkSchedule && isWorkDay) {
+        val hasExistingVacation = existingSchedules.any { it.type == ScheduleType.VACATION }
+
+        val autoWorkSchedule = if (!hasVacation && !hasExistingWorkSchedule && isWorkDayFromApi) {
             val scheduleType = if (localDate.isBefore(today)) {
                 ScheduleType.WORK_COMPLETED
-            } else if (localDate.isAfter(today)) {
-                ScheduleType.WORK_SCHEDULED
             } else {
-                null
+                ScheduleType.WORK_SCHEDULED
             }
 
-            scheduleType?.let {
-                listOf(
-                    Schedule(
-                        id = -1,
-                        date = selectedDate,
-                        type = it,
-                        time = Time(9, 0, 18, 0),
-                    )
+            listOf(
+                Schedule(
+                    id = -1,
+                    date = selectedDate,
+                    type = scheduleType,
+                    time = workTime,
                 )
-            } ?: emptyList()
+            )
         } else {
             emptyList()
         }
 
-        return (existingSchedules + autoSchedule).toImmutableList()
+        val autoVacationSchedule = if (hasVacationFromApi && !hasExistingVacation) {
+            listOf(
+                Schedule(
+                    id = -3,
+                    date = selectedDate,
+                    type = ScheduleType.VACATION,
+                    time = workTime,
+                )
+            )
+        } else {
+            emptyList()
+        }
+
+        val paydayDay = _uiState.value.paydayDay
+        val paydaySchedule = if (paydayDay == selectedDate.day) {
+            listOf(
+                Schedule(
+                    id = -2,
+                    date = selectedDate,
+                    type = ScheduleType.PAYDAY,
+                )
+            )
+        } else {
+            emptyList()
+        }
+
+        return (existingSchedules + autoWorkSchedule + autoVacationSchedule + paydaySchedule).toImmutableList()
+    }
+
+    private fun parseTimeRange(clockInTime: String, clockOutTime: String): Time {
+        return try {
+            val inParts = clockInTime.split(":")
+            val outParts = clockOutTime.split(":")
+            Time(
+                startHour = inParts[0].toInt(),
+                startMinute = inParts[1].toInt(),
+                endHour = outParts[0].toInt(),
+                endMinute = outParts[1].toInt(),
+            )
+        } catch (e: Exception) {
+            _uiState.value.defaultWorkTime
+        }
     }
 }
