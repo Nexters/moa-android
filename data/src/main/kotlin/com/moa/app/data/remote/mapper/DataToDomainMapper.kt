@@ -8,6 +8,7 @@ import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.Time
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationSetting
+import com.moa.app.core.model.setting.SettingTerm
 import com.moa.app.data.remote.model.response.NotificationSettingResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
@@ -17,25 +18,25 @@ import com.moa.app.data.remote.model.response.WorkPolicyResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-fun StatusResponse.toTermDomain(): OnboardingStatus = OnboardingStatus(
-    profile = profile?.toTermDomain(),
-    payroll = payroll?.toTermDomain(),
-    workPolicy = workPolicy?.toTermDomain(),
+fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
+    profile = profile?.toDomain(),
+    payroll = payroll?.toDomain(),
+    workPolicy = workPolicy?.toDomain(),
     hasRequiredTermsAgreed = hasRequiredTermsAgreed,
 )
 
-fun ProfileResponse.toTermDomain(): Profile = Profile(
+fun ProfileResponse.toDomain(): Profile = Profile(
     nickname = nickname,
     companyName = workplace,
     paydayDay = paydayDay,
 )
 
-fun PayrollResponse.toTermDomain(): Payroll = Payroll(
+fun PayrollResponse.toDomain(): Payroll = Payroll(
     salaryType = Payroll.SalaryType.valueOf(salaryInputType),
     salary = salaryAmount.toString(),
 )
 
-fun WorkPolicyResponse.toTermDomain(): WorkPolicy {
+fun WorkPolicyResponse.toDomain(): WorkPolicy {
     val (startHour, startMinute) = clockInTime.toHourMinute()
     val (endHour, endMinute) = clockOutTime.toHourMinute()
 
@@ -51,7 +52,7 @@ fun WorkPolicyResponse.toTermDomain(): WorkPolicy {
     )
 }
 
-fun List<TermResponse>.toTermDomain(): ImmutableList<Term> {
+fun List<TermResponse>.toOnboardingTermDomain(): ImmutableList<Term> {
     val list = mutableListOf<Term>()
     list.add(Term.All(title = "전체 동의하기", checked = false))
 
@@ -78,6 +79,15 @@ fun List<TermResponse>.toTermDomain(): ImmutableList<Term> {
     }
 
     return list.sortedBy { it.order }.toImmutableList()
+}
+
+fun List<TermResponse>.toSettingTermDomain(): ImmutableList<SettingTerm> {
+    return this.map {
+        SettingTerm(
+            title = it.title,
+            url = it.contentUrl,
+        )
+    }.toImmutableList()
 }
 
 fun List<NotificationSettingResponse>.toNotificationSettingDomain(): ImmutableList<NotificationSetting> {
