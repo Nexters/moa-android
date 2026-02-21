@@ -40,6 +40,7 @@ class MoaFirebaseMessagingService : FirebaseMessagingService() {
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
 
             val notificationManager: NotificationManager =
                 getSystemService(NOTIFICATION_SERVICE) as NotificationManager
