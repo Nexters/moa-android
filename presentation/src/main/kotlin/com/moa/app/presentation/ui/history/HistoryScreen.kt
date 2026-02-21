@@ -23,9 +23,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,7 +66,26 @@ import java.util.Locale
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedDateSchedules = viewModel.getSchedulesForSelectedDate()
+    val selectedDateSchedules = remember(
+        uiState.selectedDate,
+        uiState.selectedWorkdayDetail,
+        uiState.paydayDay,
+    ) {
+        viewModel.getSchedulesForSelectedDate()
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refresh()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     HistoryScreen(
         uiState = uiState,
@@ -193,7 +217,7 @@ private fun HistoryScreen(
             item {
                 Text(
                     text = "${uiState.selectedDate.year}.${uiState.selectedDate.month}.${uiState.selectedDate.day}",
-                    style = MoaTheme.typography.b2_500,
+                    style = MoaTheme.typography.b1_500,
                     color = MoaTheme.colors.textLowEmphasis,
                 )
             }
@@ -207,7 +231,7 @@ private fun HistoryScreen(
                     schedule = schedule,
                     onClick = { onIntent(HistoryIntent.ClickSchedule(schedule)) },
                 )
-                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+                Spacer(Modifier.height(MoaTheme.spacing.spacing12))
             }
 
             if (selectedDateSchedules.isEmpty()) {
@@ -290,6 +314,12 @@ private fun MonthNavigator(
 
 @Composable
 private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
+    val workedTimeText = formatMinutesToTime(summary.workedMinutes)
+    val standardTimeText = formatMinutesToTime(summary.standardMinutes)
+
+    val workedSalaryText = "${summary.workedEarnings / 10000}만원"
+    val standardSalaryText = "${summary.standardSalary / 10000}만원"
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -308,12 +338,12 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
             )
             Row {
                 Text(
-                    text = "${summary.currentWorkHours}",
+                    text = workedTimeText,
                     style = MoaTheme.typography.b1_600,
                     color = MoaTheme.colors.textGreen,
                 )
                 Text(
-                    text = stringResource(R.string.history_work_hours_format, summary.totalWorkHours),
+                    text = " / $standardTimeText",
                     style = MoaTheme.typography.b1_400,
                     color = MoaTheme.colors.textMediumEmphasis,
                 )
@@ -337,12 +367,12 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
             )
             Row {
                 Text(
-                    text = "${summary.currentSalary}",
+                    text = workedSalaryText,
                     style = MoaTheme.typography.b1_600,
                     color = MoaTheme.colors.textGreen,
                 )
                 Text(
-                    text = stringResource(R.string.history_salary_format, summary.totalSalary),
+                    text = " / $standardSalaryText",
                     style = MoaTheme.typography.b1_400,
                     color = MoaTheme.colors.textMediumEmphasis,
                 )
@@ -351,6 +381,16 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
     }
 }
 
+private fun formatMinutesToTime(totalMinutes: Int): String {
+    val remainingMins = totalMinutes % 60
+    val baseHours = totalMinutes / 60
+
+    return when {
+        remainingMins >= 45 -> "${baseHours + 1}시간"
+        remainingMins >= 15 -> "${baseHours}시간 30분"
+        else -> "${baseHours}시간"
+    }
+}
 
 @Composable
 private fun ScheduleItem(
@@ -388,7 +428,7 @@ private fun ScheduleItem(
                 text = when (schedule.type) {
                     ScheduleType.WORK_SCHEDULED,
                     ScheduleType.WORK_COMPLETED -> schedule.time?.getFormattedTimeRange() ?: ""
-                    ScheduleType.VACATION -> schedule.time?.getFormattedTimeRange() ?: stringResource(R.string.history_schedule_all_day)
+                    ScheduleType.VACATION -> schedule.time?.getFormattedTimeRange() ?: ""
                     ScheduleType.PAYDAY -> "+ ${formatCurrency(schedule.amount ?: 0)}원"
                 },
                 style = MoaTheme.typography.t2_700,
@@ -433,10 +473,10 @@ private fun HistoryScreenPreview() {
             uiState = HistoryUiState(
                 currentMonth = 1,
                 monthlyWorkSummary = MonthlyWorkSummary(
-                    currentWorkHours = 120,
-                    totalWorkHours = 150,
-                    currentSalary = 3000,
-                    totalSalary = 4000,
+                    workedMinutes = 7200,
+                    standardMinutes = 9000,
+                    workedEarnings = 3000000,
+                    standardSalary = 4000000,
                 ),
             ),
             selectedDateSchedules = persistentListOf(
