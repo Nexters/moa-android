@@ -5,13 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
+import com.moa.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.ui.onboarding.login.LoginScreen
@@ -25,7 +23,7 @@ fun OnboardingScreen(
     startDestination: OnboardingNavigation,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
-    val backstack = rememberNavBackStack(startDestination)
+    val backStack = rememberNavBackStack(startDestination)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
@@ -33,14 +31,14 @@ fun OnboardingScreen(
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
                         OnboardingNavigation.Back -> {
-                            if (backstack.size == 1) {
+                            if (backStack.size == 1) {
                                 viewModel.onIntent(OnboardingIntent.RootBack)
                             } else {
-                                backstack.removeAt(backstack.lastIndex)
+                                backStack.removeAt(backStack.lastIndex)
                             }
                         }
 
-                        is OnboardingNavigation -> backstack.add(it.destination)
+                        is OnboardingNavigation -> backStack.add(it.destination)
 
                         else -> Unit
                     }
@@ -53,22 +51,18 @@ fun OnboardingScreen(
 
     OnboardingNavHost(
         modifier = Modifier.fillMaxSize(),
-        backstack = backstack,
+        backStack = backStack,
     )
 }
 
 @Composable
 private fun OnboardingNavHost(
     modifier: Modifier,
-    backstack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavKey>,
 ) {
-    NavDisplay(
+    MoaNavDisplay(
         modifier = modifier,
-        backStack = backstack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
+        backStack = backStack,
         entryProvider = entryProvider {
             entry<OnboardingNavigation.Login> {
                 LoginScreen()

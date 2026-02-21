@@ -5,13 +5,15 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.core.model.setting.SettingTerm
 import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.SettingService
 import com.moa.app.data.remote.mapper.toData
-import com.moa.app.data.remote.mapper.toTermDomain
+import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.mapper.toNotificationSettingDomain
+import com.moa.app.data.remote.mapper.toSettingTermDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
 import com.moa.app.data.remote.model.request.PaydayDayRequest
 import com.moa.app.data.remote.model.request.WorkplaceRequest
@@ -28,13 +30,12 @@ class SettingRepositoryImpl @Inject constructor(
         return coroutineScope {
             val memberDeferred = async { moaService.getMember() }
             val profileDeferred = async { moaService.getProfile() }
-            // TODO version api
-            val versionDeferred = "1.0.0"
+            val versionDeferred = async { moaService.getVersion() }
 
             SettingMenu(
                 oAuthType = OAuthType.valueOf(memberDeferred.await().provider),
                 nickName = profileDeferred.await().nickname,
-                latestAppVersion = versionDeferred
+                latestVersion = versionDeferred.await().latestVersion,
             )
         }
     }
@@ -47,9 +48,9 @@ class SettingRepositoryImpl @Inject constructor(
             val workPolicyDeferred = async { moaService.getWorkPolicy() }
 
             val member = memberDeferred.await()
-            val profile = profileDeferred.await().toTermDomain()
-            val payroll = payrollDeferred.await().toTermDomain()
-            val workPolicy = workPolicyDeferred.await().toTermDomain()
+            val profile = profileDeferred.await().toDomain()
+            val payroll = payrollDeferred.await().toDomain()
+            val workPolicy = workPolicyDeferred.await().toDomain()
 
             WorkInfo(
                 oAuthType = OAuthType.valueOf(member.provider),
@@ -59,6 +60,10 @@ class SettingRepositoryImpl @Inject constructor(
                 workPolicy = workPolicy,
             )
         }
+    }
+
+    override suspend fun getTerms(): ImmutableList<SettingTerm> {
+        return settingService.getTerms().terms.toSettingTermDomain()
     }
 
     override suspend fun patchNickname(nickname: String) {

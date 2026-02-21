@@ -2,36 +2,43 @@ package com.moa.app.presentation.ui.setting.terms
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moa.app.core.model.setting.SettingTerm
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.component.MoaRow
 import com.moa.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.app.presentation.designsystem.theme.MoaTheme
-import com.moa.app.core.model.setting.Terms
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TermsScreen(viewModel: TermsViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     TermsScreen(
+        uiState = uiState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
 private fun TermsScreen(
+    uiState: TermsUiState,
     onIntent: (TermsIntent) -> Unit,
 ) {
     Scaffold(
@@ -57,20 +64,19 @@ private fun TermsScreen(
         },
         containerColor = MoaTheme.colors.bgPrimary,
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
+                .padding(MoaTheme.spacing.spacing20),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-
-            Terms.entries.forEachIndexed { index, term ->
+            items(uiState.terms) {
                 MoaRow(
-                    modifier = Modifier.clickable { onIntent(TermsIntent.ClickTerm(term)) },
+                    modifier = Modifier.clickable { onIntent(TermsIntent.ClickTerm(it)) },
                     leadingContent = {
                         Text(
-                            text = term.title,
+                            text = it.title,
                             style = MoaTheme.typography.b1_500,
                             color = MoaTheme.colors.textHighEmphasis,
                         )
@@ -82,10 +88,6 @@ private fun TermsScreen(
                         )
                     }
                 )
-
-                if (index != Terms.entries.lastIndex) {
-                    Spacer(Modifier.height(10.dp))
-                }
             }
         }
     }
@@ -95,7 +97,7 @@ sealed interface TermsIntent {
     data object ClickBack : TermsIntent
 
     @JvmInline
-    value class ClickTerm(val term: Terms) : TermsIntent
+    value class ClickTerm(val term: SettingTerm) : TermsIntent
 }
 
 @Preview
@@ -103,6 +105,18 @@ sealed interface TermsIntent {
 private fun TermsScreenPreview() {
     MoaTheme {
         TermsScreen(
+            uiState = TermsUiState(
+                terms = persistentListOf(
+                    SettingTerm(
+                        title = "이용약관",
+                        url = "",
+                    ),
+                    SettingTerm(
+                        title = "개인정보처리방침",
+                        url = "",
+                    )
+                )
+            ),
             onIntent = {},
         )
     }

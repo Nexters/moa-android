@@ -60,6 +60,7 @@ fun SalaryScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SalaryScreen(
+        isOnboarding = args.isOnboarding,
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
@@ -67,6 +68,7 @@ fun SalaryScreen(
 
 @Composable
 private fun SalaryScreen(
+    isOnboarding: Boolean,
     uiState: SalaryUiState,
     onIntent: (SalaryIntent) -> Unit,
 ) {
@@ -80,6 +82,15 @@ private fun SalaryScreen(
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    if (!isOnboarding) {
+                        Text(
+                            text = "급여",
+                            color = MoaTheme.colors.textHighEmphasis,
+                            style = MoaTheme.typography.t3_500,
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(SalaryIntent.ClickBack) }) {
                         Icon(
@@ -243,6 +254,7 @@ sealed interface SalaryIntent {
 private fun SalaryScreenPreview() {
     MoaTheme {
         SalaryScreen(
+            isOnboarding = false,
             uiState = SalaryUiState(),
             onIntent = {},
         )

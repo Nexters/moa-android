@@ -1,6 +1,8 @@
 package com.moa.app.presentation.ui.onboarding.login
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,7 +70,13 @@ private fun LoginScreen(
         while (isAutoPagingEnabled) {
             delay(3000)
             isProgrammaticScroll = true
-            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            pagerState.animateScrollToPage(
+                page = pagerState.currentPage + 1,
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = EaseIn
+                )
+            )
         }
     }
 
