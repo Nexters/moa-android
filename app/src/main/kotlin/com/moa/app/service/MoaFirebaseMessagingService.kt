@@ -35,12 +35,15 @@ class MoaFirebaseMessagingService : FirebaseMessagingService() {
 
         val title = message.notification?.title
         val body = message.notification?.body
+        val tag = message.notification?.tag
 
         if (title != null && body != null) {
             showNotification(title, body)
 
             serviceScope.launch {
-                widgetUpdateManager.updateAllWidgets()
+                if (tag == "CLOCK_IN" || tag == "CLOCK_OUT") {
+                    widgetUpdateManager.updateAllWidgets()
+                }
             }
         }
     }
