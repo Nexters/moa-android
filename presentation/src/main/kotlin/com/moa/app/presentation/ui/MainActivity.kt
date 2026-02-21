@@ -7,11 +7,19 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.ui.widget.util.WidgetUpdateManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var widgetUpdateManager: WidgetUpdateManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,6 +34,14 @@ class MainActivity : ComponentActivity() {
             MoaTheme {
                 MainScreen(onFinish = { finish() })
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        lifecycleScope.launch {
+            widgetUpdateManager.updateAllWidgets()
         }
     }
 }
