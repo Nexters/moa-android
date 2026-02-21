@@ -2,6 +2,7 @@ package com.moa.app.presentation.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.local.PreferencesDataStore
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
@@ -17,6 +18,7 @@ class SplashViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val tokenRepository: TokenRepository,
     private val onboardingRepository: OnboardingRepository,
+    private val preferencesDataStore: PreferencesDataStore,
 ) : ViewModel() {
     fun getOnboardingStatus() {
         viewModelScope.launch {
@@ -30,6 +32,10 @@ class SplashViewModel @Inject constructor(
             runCatching {
                 onboardingRepository.getOnboardingStatus()
             }.onSuccess { onboardingStatus ->
+                onboardingStatus.profile?.paydayDay?.let { paydayDay ->
+                    preferencesDataStore.setPaydayDay(paydayDay)
+                }
+
                 if (onboardingStatus.hasRequiredTermsAgreed) {
                     navigate(RootNavigation.Home)
                     return@launch
