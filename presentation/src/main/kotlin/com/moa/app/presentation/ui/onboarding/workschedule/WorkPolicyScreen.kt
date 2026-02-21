@@ -53,6 +53,7 @@ fun WorkScheduleScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     WorkScheduleScreen(
+        isOnboarding = args.isOnboarding,
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
@@ -81,12 +82,22 @@ fun WorkScheduleScreen(
 
 @Composable
 private fun WorkScheduleScreen(
+    isOnboarding: Boolean,
     uiState: WorkScheduleUiState,
     onIntent: (WorkScheduleIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    if (!isOnboarding) {
+                        Text(
+                            text = "근무 시간",
+                            color = MoaTheme.colors.textHighEmphasis,
+                            style = MoaTheme.typography.t3_500,
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(WorkScheduleIntent.ClickBack) }) {
                         Icon(
@@ -307,6 +318,7 @@ sealed interface WorkScheduleIntent {
 private fun WorkScheduleScreenPreview() {
     MoaTheme {
         WorkScheduleScreen(
+            isOnboarding = false,
             uiState = WorkScheduleUiState(
                 selectedWorkScheduleDays = persistentListOf(
                     WorkPolicy.WorkScheduleDay.MON,
