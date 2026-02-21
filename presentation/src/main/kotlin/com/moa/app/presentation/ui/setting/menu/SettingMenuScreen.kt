@@ -99,7 +99,7 @@ private fun SettingMenuScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
             SettingMenuAppInfoContent(
-                latestAppVersion = uiState.settingMenu?.latestAppVersion ?: "",
+                latestAppVersion = uiState.settingMenu?.latestVersion ?: "",
                 onIntent = onIntent,
             )
 
@@ -352,7 +352,7 @@ private fun SettingMenuScreenPreview() {
                 settingMenu = SettingMenu(
                     oAuthType = OAuthType.KAKAO,
                     nickName = "집계사장",
-                    latestAppVersion = "1.0.0",
+                    latestVersion = "1.0.0",
                 )
             ),
             onIntent = {},

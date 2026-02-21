@@ -28,13 +28,12 @@ class SettingRepositoryImpl @Inject constructor(
         return coroutineScope {
             val memberDeferred = async { moaService.getMember() }
             val profileDeferred = async { moaService.getProfile() }
-            // TODO version api
-            val versionDeferred = "1.0.0"
+            val versionDeferred = async { moaService.getVersion() }
 
             SettingMenu(
                 oAuthType = OAuthType.valueOf(memberDeferred.await().provider),
                 nickName = profileDeferred.await().nickname,
-                latestAppVersion = versionDeferred
+                latestVersion = versionDeferred.await().latestVersion,
             )
         }
     }
