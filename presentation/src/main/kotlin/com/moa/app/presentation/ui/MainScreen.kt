@@ -32,6 +32,9 @@ import com.moa.app.presentation.ui.history.scheduleform.ScheduleFormScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
+import com.moa.app.presentation.ui.setting.companyname.CompanyNameScreen
+import com.moa.app.presentation.ui.setting.salaryday.SalaryDayScreen
+import com.moa.app.presentation.ui.setting.workinfo.WorkInfoScreen
 import com.moa.app.presentation.ui.splash.SplashScreen
 import com.moa.app.presentation.ui.webview.WebViewScreen
 
@@ -79,7 +82,13 @@ fun MainScreen(
 
                         is OnboardingNavigation -> Unit
 
-                        is SettingNavigation -> Unit
+                        is SettingNavigation.Back -> {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                        }
+
+                        is SettingNavigation -> backStack.add(it.destination)
 
                         is HomeNavigation -> Unit
 
@@ -192,6 +201,18 @@ private fun MainNavHost(
 
             entry<RootNavigation.Setting> {
                 SettingScreen()
+            }
+
+            entry<SettingNavigation.WorkInfo> {
+                WorkInfoScreen()
+            }
+
+            entry<SettingNavigation.SalaryDay> { key ->
+                SalaryDayScreen(day = key.day)
+            }
+
+            entry<SettingNavigation.CompanyName> { key ->
+                CompanyNameScreen(companyName = key.companyName)
             }
 
             entry<RootNavigation.Webview> { key ->
