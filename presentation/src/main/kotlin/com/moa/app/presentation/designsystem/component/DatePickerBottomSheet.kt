@@ -36,8 +36,11 @@ import com.moa.app.core.model.history.LocalDateModel
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.Green40Main
 import com.moa.app.presentation.designsystem.theme.MoaTheme
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,46 +67,19 @@ fun DatePickerBottomSheet(
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-            // Month Navigator
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(
-                    onClick = {
-                        val yearMonth = YearMonth.of(currentYear, currentMonth).minusMonths(1)
-                        currentYear = yearMonth.year
-                        currentMonth = yearMonth.monthValue
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_16_chevron_left),
-                        contentDescription = "Previous Month",
-                        tint = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-
-                Text(
-                    text = "${currentMonth}월",
-                    style = MoaTheme.typography.t2_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-
-                IconButton(
-                    onClick = {
-                        val yearMonth = YearMonth.of(currentYear, currentMonth).plusMonths(1)
-                        currentYear = yearMonth.year
-                        currentMonth = yearMonth.monthValue
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_16_chevron_right),
-                        contentDescription = "Next Month",
-                        tint = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-            }
+            MonthNavigator(
+                currentMonth = currentMonth,
+                onPreviousMonth = {
+                    val yearMonth = YearMonth.of(currentYear, currentMonth).minusMonths(1)
+                    currentYear = yearMonth.year
+                    currentMonth = yearMonth.monthValue
+                },
+                onNextMonth = {
+                    val yearMonth = YearMonth.of(currentYear, currentMonth).plusMonths(1)
+                    currentYear = yearMonth.year
+                    currentMonth = yearMonth.monthValue
+                },
+            )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
@@ -144,15 +120,50 @@ fun DatePickerBottomSheet(
 }
 
 @Composable
+private fun MonthNavigator(
+    currentMonth: Int,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = onPreviousMonth) {
+            Icon(
+                painter = painterResource(R.drawable.ic_16_chevron_left),
+                contentDescription = "Previous Month",
+                tint = MoaTheme.colors.textHighEmphasis,
+            )
+        }
+
+        Text(
+            text = "${currentMonth}월",
+            style = MoaTheme.typography.t2_700,
+            color = MoaTheme.colors.textHighEmphasis,
+        )
+
+        IconButton(onClick = onNextMonth) {
+            Icon(
+                painter = painterResource(R.drawable.ic_16_chevron_right),
+                contentDescription = "Next Month",
+                tint = MoaTheme.colors.textHighEmphasis,
+            )
+        }
+    }
+}
+
+@Composable
 private fun CalendarHeader() {
-    val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
+    val daysOfWeek = listOf(DayOfWeek.SUNDAY) + DayOfWeek.entries.dropLast(1)
     Row(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        weekDays.forEach { day ->
+        daysOfWeek.forEach { day ->
             Text(
                 modifier = Modifier.weight(1f),
-                text = day,
+                text = day.getDisplayName(TextStyle.SHORT, Locale.KOREAN),
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textLowEmphasis,
                 textAlign = TextAlign.Center,
@@ -259,33 +270,11 @@ private fun DatePickerBottomSheetPreview() {
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_16_chevron_left),
-                        contentDescription = "Previous Month",
-                        tint = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-
-                Text(
-                    text = "1월",
-                    style = MoaTheme.typography.t2_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_16_chevron_right),
-                        contentDescription = "Next Month",
-                        tint = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-            }
+            MonthNavigator(
+                currentMonth = 1,
+                onPreviousMonth = {},
+                onNextMonth = {},
+            )
 
             CalendarHeader()
 
