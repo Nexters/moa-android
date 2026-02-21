@@ -99,36 +99,19 @@ fun Day(
             )
         }
 
-        Spacer(Modifier.height(6.dp))
-
-        when {
-            calendarDay?.hasWorkScheduled == true && isFutureDate -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(MoaTheme.colors.textLowEmphasis),
-                )
-            }
-            calendarDay?.hasWorkCompleted == true -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Green40Main),
-                )
-            }
-            calendarDay?.hasWorkScheduled == true -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Green40Main),
-                )
-            }
+        if (calendarDay?.hasPayday == true || calendarDay?.hasVacation == true) {
+            Spacer(Modifier.height(2.dp))
         }
 
         when {
+            calendarDay?.hasPayday == true && (calendarDay.hasWorkScheduled || calendarDay.hasWorkCompleted) -> {
+                Text(
+                    text = stringResource(R.string.history_calendar_payday),
+                    style = MoaTheme.typography.c1_400,
+                    color = MoaTheme.colors.textGreen,
+                    maxLines = 1,
+                )
+            }
             calendarDay?.hasPayday == true && calendarDay.hasVacation -> {
                 Row(modifier = Modifier.wrapContentWidth(unbounded = true)) {
                     Text(
@@ -164,6 +147,35 @@ fun Day(
                     style = MoaTheme.typography.c1_400,
                     color = MoaTheme.colors.textMediumEmphasis,
                     maxLines = 1,
+                )
+            }
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+        when {
+            calendarDay?.hasWorkScheduled == true && isFutureDate -> {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(MoaTheme.colors.textLowEmphasis),
+                )
+            }
+            calendarDay?.hasWorkCompleted == true -> {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(Green40Main),
+                )
+            }
+            calendarDay?.hasWorkScheduled == true -> {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(Green40Main),
                 )
             }
         }
