@@ -10,19 +10,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
 import com.moa.app.core.exception.ApiErrorException
 import com.moa.app.core.exception.NetworkException
 import com.moa.app.core.exception.ServerException
 import com.moa.app.presentation.designsystem.component.MoaDialog
 import com.moa.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.app.presentation.designsystem.component.MoaFullScreenProgress
+import com.moa.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
@@ -42,7 +40,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     onFinish: () -> Unit,
 ) {
-    val backstack = rememberNavBackStack(RootNavigation.Splash)
+    val backStack = rememberNavBackStack(RootNavigation.Splash)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -55,8 +53,8 @@ fun MainScreen(
 
                     when (it.destination) {
                         is RootNavigation.Back -> {
-                            if (backstack.size > 1) {
-                                backstack.removeAt(backstack.lastIndex)
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
                             } else {
                                 onFinish()
                             }
@@ -69,14 +67,14 @@ fun MainScreen(
                                 is OnboardingNavigation.Nickname -> startDestination.args.isOnboarding
                                 else -> false
                             }
-                            if (shouldClear) backstack.clear()
+                            if (shouldClear) backStack.clear()
 
-                            backstack.add(it.destination)
+                            backStack.add(it.destination)
                         }
 
                         is RootNavigation.Home -> {
-                            backstack.clear()
-                            backstack.add(it.destination)
+                            backStack.clear()
+                            backStack.add(it.destination)
                         }
 
                         is OnboardingNavigation -> Unit
@@ -85,7 +83,7 @@ fun MainScreen(
 
                         is HomeNavigation -> Unit
 
-                        else -> backstack.add(it.destination)
+                        else -> backStack.add(it.destination)
                     }
                 }
 
@@ -139,7 +137,7 @@ fun MainScreen(
 
     MainNavHost(
         modifier = Modifier.fillMaxSize(),
-        backstack = backstack,
+        backStack = backStack,
     )
 
     uiState.dialog?.let {
@@ -166,15 +164,11 @@ fun MainScreen(
 @Composable
 private fun MainNavHost(
     modifier: Modifier,
-    backstack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavKey>,
 ) {
-    NavDisplay(
+    MoaNavDisplay(
         modifier = modifier,
-        backStack = backstack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
+        backStack = backStack,
         entryProvider = entryProvider {
             entry<RootNavigation.Splash> {
                 SplashScreen()
