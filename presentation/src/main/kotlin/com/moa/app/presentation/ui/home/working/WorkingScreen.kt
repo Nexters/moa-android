@@ -23,9 +23,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,21 +43,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moa.app.core.model.onboarding.Time
-import com.moa.app.presentation.R
-import com.moa.app.presentation.model.HomeNavigation
-import com.moa.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
-import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
-import com.moa.app.presentation.designsystem.component.MoaTertiaryButton
-import com.moa.app.presentation.designsystem.component.MoaVacationButton
-import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
-import com.moa.app.presentation.designsystem.component.MoaTooltipBanner
-import com.moa.app.presentation.designsystem.component.ScheduleAdjustOption
-import com.moa.app.presentation.designsystem.theme.MoaTheme
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.moa.app.core.model.onboarding.Time
+import com.moa.app.presentation.R
+import com.moa.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
+import com.moa.app.presentation.designsystem.component.MoaTertiaryButton
+import com.moa.app.presentation.designsystem.component.MoaTimeBottomSheet
+import com.moa.app.presentation.designsystem.component.MoaTooltipBanner
+import com.moa.app.presentation.designsystem.component.MoaVacationButton
+import com.moa.app.presentation.designsystem.component.ScheduleAdjustOption
+import com.moa.app.presentation.designsystem.theme.MoaTheme
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.ui.home.working.model.WorkStatus
 import com.moa.app.presentation.ui.home.working.model.WorkingIntent
 import com.moa.app.presentation.ui.home.working.model.WorkingUiState
@@ -70,6 +70,10 @@ fun WorkingScreen(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.isOnVacation) {
+        viewModel.widgetUpdateManager.updateAllWidgets()
+    }
 
     WorkingScreen(
         uiState = uiState,
@@ -158,73 +162,73 @@ private fun WorkingScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = MoaTheme.spacing.spacing20),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        val animatedHeightFraction by animateFloatAsState(
-            targetValue = uiState.coinHeightFraction,
-            animationSpec = tween(durationMillis = 2000),
-            label = "coinHeightAnimation",
-        )
-
-        BoxWithConstraints(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.BottomCenter,
+                .fillMaxSize()
+                .padding(horizontal = MoaTheme.spacing.spacing20),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val totalHeight = maxHeight
-            val coinGraphHeight = totalHeight * animatedHeightFraction
+            val animatedHeightFraction by animateFloatAsState(
+                targetValue = uiState.coinHeightFraction,
+                animationSpec = tween(durationMillis = 2000),
+                label = "coinHeightAnimation",
+            )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            BoxWithConstraints(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.BottomCenter,
             ) {
-                if (!uiState.showWorkCompletionOverlay) {
-                    RollingTooltipBanner(
-                        monthSalary = uiState.monthSalary,
-                        todaySalary = uiState.todaySalary,
-                        remainingHours = uiState.remainingHours,
-                        currentIndex = uiState.currentTooltipIndex,
-                        isOnVacation = uiState.isOnVacation,
+                val totalHeight = maxHeight
+                val coinGraphHeight = totalHeight * animatedHeightFraction
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    if (!uiState.showWorkCompletionOverlay) {
+                        RollingTooltipBanner(
+                            monthSalary = uiState.monthSalary,
+                            todaySalary = uiState.todaySalary,
+                            remainingHours = uiState.remainingHours,
+                            currentIndex = uiState.currentTooltipIndex,
+                            isOnVacation = uiState.isOnVacation,
+                        )
+
+                        Spacer(Modifier.height(MoaTheme.spacing.spacing20))
+                    }
+
+                    TodaySalarySection(
+                        todaySalary = uiState.todaySalaryDisplay,
                     )
 
-                    Spacer(Modifier.height(MoaTheme.spacing.spacing20))
+                    Spacer(Modifier.height(22.dp))
+
+                    CoinGraph(
+                        modifier = Modifier.height(coinGraphHeight),
+                        isOnVacation = uiState.isOnVacation,
+                    )
                 }
+            }
 
-                TodaySalarySection(
-                    todaySalary = uiState.todaySalaryDisplay,
+            if (uiState.showWorkCompletionOverlay) {
+                WorkCompletionSection(
+                    accumulatedSalary = uiState.monthSalary,
+                    workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
+                    onContinueWorking = { onIntent(WorkingIntent.ClickContinueWorking) },
+                    onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
+                    onWorkTimeClick = { onIntent(WorkingIntent.ClickWorkTimeEdit) },
                 )
-
-                Spacer(Modifier.height(22.dp))
-
-                CoinGraph(
-                    modifier = Modifier.height(coinGraphHeight),
+            } else {
+                WorkingStatusSection(
+                    workStatus = uiState.workStatus,
+                    elapsedTime = uiState.elapsedTimeDisplay,
+                    progress = uiState.progress,
+                    startTime = uiState.startTimeDisplay,
+                    endTime = uiState.endTimeDisplay,
                     isOnVacation = uiState.isOnVacation,
+                    onAdjustScheduleClick = { onIntent(WorkingIntent.ClickAdjustSchedule) },
                 )
             }
-        }
-
-        if (uiState.showWorkCompletionOverlay) {
-            WorkCompletionSection(
-                accumulatedSalary = uiState.monthSalary,
-                workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
-                onContinueWorking = { onIntent(WorkingIntent.ClickContinueWorking) },
-                onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
-                onWorkTimeClick = { onIntent(WorkingIntent.ClickWorkTimeEdit) },
-            )
-        } else {
-            WorkingStatusSection(
-                workStatus = uiState.workStatus,
-                elapsedTime = uiState.elapsedTimeDisplay,
-                progress = uiState.progress,
-                startTime = uiState.startTimeDisplay,
-                endTime = uiState.endTimeDisplay,
-                isOnVacation = uiState.isOnVacation,
-                onAdjustScheduleClick = { onIntent(WorkingIntent.ClickAdjustSchedule) },
-            )
-        }
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
         }
@@ -353,7 +357,9 @@ private fun RollingDigitsText(
                     targetState = char,
                     transitionSpec = {
                         (slideInVertically { height -> height } + fadeIn(animationSpec = tween(150)))
-                            .togetherWith(slideOutVertically { height -> -height } + fadeOut(animationSpec = tween(150)))
+                            .togetherWith(slideOutVertically { height -> -height } + fadeOut(
+                                animationSpec = tween(150)
+                            ))
                     },
                     label = "digitAnimation",
                 ) { digit ->
@@ -486,16 +492,19 @@ private fun WorkStatusTag(
             Color(0xFF4ADE80),
             Color(0xFF4ADE80),
         )
+
         WorkStatus.LUNCH_TIME -> Triple(
             stringResource(R.string.working_status_lunch),
             Color(0xFF60A5FA),
             Color(0xFF60A5FA),
         )
+
         WorkStatus.VACATION -> Triple(
             stringResource(R.string.working_status_vacation),
             Color(0xFF60A5FA),
             Color(0xFF60A5FA),
         )
+
         WorkStatus.OVERTIME -> Triple(
             stringResource(R.string.working_status_overtime),
             Color(0xFFEF4444),
