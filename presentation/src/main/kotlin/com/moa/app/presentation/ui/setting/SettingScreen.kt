@@ -5,13 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
+import com.moa.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.SettingNavigation
 import com.moa.app.presentation.ui.setting.companyname.CompanyNameScreen
@@ -52,22 +50,18 @@ fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
 
     SettingNavHost(
         modifier = Modifier.fillMaxSize(),
-        backstack = backStack,
+        backStack = backStack,
     )
 }
 
 @Composable
 private fun SettingNavHost(
     modifier: Modifier,
-    backstack: NavBackStack<NavKey>,
+    backStack: NavBackStack<NavKey>,
 ) {
-    NavDisplay(
+    MoaNavDisplay(
         modifier = modifier,
-        backStack = backstack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
+        backStack = backStack,
         entryProvider = entryProvider {
             entry<SettingNavigation.SettingMenu> {
                 SettingMenuScreen()
