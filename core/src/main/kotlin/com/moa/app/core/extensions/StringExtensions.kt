@@ -45,10 +45,11 @@ fun String.toHourMinute(): Pair<Int, Int> {
     return Pair(hour, minute)
 }
 
-fun Char.isKoreanOrEnglish(): Boolean {
+fun Char.isKoreanEnglishOrDigit(): Boolean {
     return this in 'a'..'z' ||
             this in 'A'..'Z' ||
-            this in '\uAC00'..'\uD7AF' || // 완성형 한글
-            this in '\u1100'..'\u11FF' || // 한글 자음/모음 (조합 중일 때)
-            this in '\u3130'..'\u318F'    // 한글 호환 자모
+            this in '0'..'9' ||                 // 숫자 추가
+            this in '\uAC00'..'\uD7AF' ||       // 완성형 한글
+            this in '\u1100'..'\u11FF' ||       // 한글 자음/모음 (조합 중)
+            this in '\u3130'..'\u318F'          // 한글 호환 자모
 }
