@@ -20,5 +20,4 @@ interface SettingRepository {
     suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
     suspend fun getNotificationSettings(): ImmutableList<NotificationSetting>
     suspend fun patchNotificationSetting(notificationSetting: NotificationSetting.Content)
-    suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>)
 }

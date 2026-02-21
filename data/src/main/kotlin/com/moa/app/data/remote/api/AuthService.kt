@@ -5,7 +5,6 @@ import com.moa.app.data.remote.model.request.TokenRequest
 import com.moa.app.data.remote.model.request.WithDrawRequest
 import com.moa.app.data.remote.model.response.TokenResponse
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.POST
 
 interface AuthService {
@@ -15,6 +14,6 @@ interface AuthService {
     @POST("/api/v1/auth/logout")
     suspend fun logout(@Body logoutRequest: LogoutRequest)
 
-    @DELETE("/api/v1/member")
+    @POST("/api/v1/member/withdrawal")
     suspend fun withdraw(@Body withDrawRequest: WithDrawRequest)
 }

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.setting.WithdrawalReason
-import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.AuthRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
@@ -24,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class WithDrawViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
-    private val settingRepository: SettingRepository,
     private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     var selectedReasons by mutableStateOf<ImmutableList<WithdrawalReason>>(persistentListOf())
@@ -58,21 +58,12 @@ class WithDrawViewModel @Inject constructor(
 
     private fun withDraw() {
         suspend {
-            settingRepository.withDraw(selectedReasons)
-        }.execute(
-            bus = moaSideEffectBus,
-            scope = viewModelScope,
-        ) {
-            clearToken()
-        }
-    }
-
-    private fun clearToken() {
-        suspend {
+            authRepository.withdraw(selectedReasons)
             tokenRepository.clearToken()
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { withDraw() }
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(
