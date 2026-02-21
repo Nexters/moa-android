@@ -225,16 +225,19 @@ private fun DayOffInfoCard() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = MoaTheme.radius.radius16, bottomEnd = MoaTheme.radius.radius16))
-                .padding(
-                    horizontal = MoaTheme.spacing.spacing20,
-                    vertical = MoaTheme.spacing.spacing16,
-                ),
+                .clip(
+                    RoundedCornerShape(
+                        bottomStart = MoaTheme.radius.radius16,
+                        bottomEnd = MoaTheme.radius.radius16
+                    )
+                )
+                .padding(vertical = MoaTheme.spacing.spacing20)
+                .padding(start = 16.dp, end = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.before_work_work_time),
-                style = MoaTheme.typography.b1_500,
+                style = MoaTheme.typography.b1_400,
                 color = MoaTheme.colors.textMediumEmphasis,
             )
 
@@ -242,16 +245,8 @@ private fun DayOffInfoCard() {
 
             Text(
                 text = stringResource(R.string.before_work_day_off_no_schedule),
-                style = MoaTheme.typography.t3_700,
+                style = MoaTheme.typography.b1_600,
                 color = MoaTheme.colors.textHighEmphasis,
-            )
-
-            Spacer(Modifier.width(8.dp))
-
-            Icon(
-                painter = painterResource(R.drawable.ic_24_chevron_right),
-                contentDescription = stringResource(R.string.before_work_edit_icon_description),
-                tint = MoaTheme.colors.textLowEmphasis,
             )
         }
     }
@@ -354,15 +349,13 @@ private fun TodayInfoCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = MoaTheme.spacing.spacing20,
-                    vertical = MoaTheme.spacing.spacing16,
-                ),
+                .padding(vertical = MoaTheme.spacing.spacing20)
+                .padding(start = 16.dp, end = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.before_work_today_salary),
-                style = MoaTheme.typography.b1_500,
+                style = MoaTheme.typography.b1_400,
                 color = MoaTheme.colors.textMediumEmphasis,
             )
 
@@ -370,7 +363,7 @@ private fun TodayInfoCard(
 
             Text(
                 text = todaySalary,
-                style = MoaTheme.typography.t3_700,
+                style = MoaTheme.typography.b1_600,
                 color = MoaTheme.colors.textHighEmphasis,
             )
         }
@@ -384,7 +377,12 @@ private fun TodayInfoCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = MoaTheme.radius.radius16, bottomEnd = MoaTheme.radius.radius16))
+                .clip(
+                    RoundedCornerShape(
+                        bottomStart = MoaTheme.radius.radius16,
+                        bottomEnd = MoaTheme.radius.radius16
+                    )
+                )
                 .clickable { onWorkTimeClick() }
                 .padding(
                     horizontal = MoaTheme.spacing.spacing20,
@@ -394,7 +392,7 @@ private fun TodayInfoCard(
         ) {
             Text(
                 text = stringResource(R.string.before_work_work_time),
-                style = MoaTheme.typography.b1_500,
+                style = MoaTheme.typography.b1_400,
                 color = MoaTheme.colors.textMediumEmphasis,
             )
 
@@ -402,7 +400,7 @@ private fun TodayInfoCard(
 
             Text(
                 text = workTime,
-                style = MoaTheme.typography.t3_700,
+                style = MoaTheme.typography.b1_600,
                 color = MoaTheme.colors.textHighEmphasis,
             )
 
