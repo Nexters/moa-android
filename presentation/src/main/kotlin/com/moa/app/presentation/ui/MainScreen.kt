@@ -30,6 +30,7 @@ import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
 import com.moa.app.presentation.model.SettingNavigation
 import com.moa.app.presentation.ui.history.HistoryScreen
+import com.moa.app.presentation.ui.history.scheduleform.ScheduleFormScreen
 import com.moa.app.presentation.ui.home.HomeScreen
 import com.moa.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.app.presentation.ui.setting.SettingScreen
@@ -189,6 +190,10 @@ private fun MainNavHost(
 
             entry<RootNavigation.History> {
                 HistoryScreen()
+            }
+
+            entry<RootNavigation.ScheduleForm> { key ->
+                ScheduleFormScreen(initialDate = key.date, schedule = key.schedule)
             }
 
             entry<RootNavigation.Setting> {
