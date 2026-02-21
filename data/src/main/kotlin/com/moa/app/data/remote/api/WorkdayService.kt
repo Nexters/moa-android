@@ -1,6 +1,8 @@
 package com.moa.app.data.remote.api
 
 import com.moa.app.data.remote.model.request.UpdateWorkdayRequest
+import com.moa.app.data.remote.model.response.EarningsResponse
+import com.moa.app.data.remote.model.response.WorkdayDetailContent
 import com.moa.app.data.remote.model.response.WorkdayItem
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,11 +18,17 @@ interface WorkdayService {
     ): List<WorkdayItem>
 
     @GET("/api/v1/workdays/{date}")
-    suspend fun getWorkday(@Path("date") date: String):
+    suspend fun getWorkday(@Path("date") date: String): WorkdayDetailContent
 
     @PUT("/api/v1/workdays/{date}")
     suspend fun putWorkday(
         @Path("date") date: String,
         @Body request: UpdateWorkdayRequest,
     )
+
+    @GET("/api/v1/workdays/earnings")
+    suspend fun getEarnings(
+        @Query("year") year: Int,
+        @Query("month") month: Int,
+    ): EarningsResponse
 }
