@@ -5,7 +5,6 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.core.model.setting.SettingTerm
-import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import kotlinx.collections.immutable.ImmutableList
 
