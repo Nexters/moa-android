@@ -33,15 +33,16 @@ class MoaFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val title = message.notification?.title
-        val body = message.notification?.body
-        val tag = message.notification?.tag
+        val data = message.data
+        val title = data["title"]
+        val body = data["body"]
+        val type = data["type"]
 
         if (title != null && body != null) {
             showNotification(title, body)
 
             serviceScope.launch {
-                if (tag == "CLOCK_IN" || tag == "CLOCK_OUT") {
+                if (type == "CLOCK_IN" || type == "CLOCK_OUT") {
                     widgetUpdateManager.updateAllWidgets()
                 }
             }
