@@ -4,6 +4,7 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.AuthRepository
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val authRepository: AuthRepository,
     private val onboardingRepository: OnboardingRepository,
     private val tokenRepository: TokenRepository,
 ) : ViewModel() {
@@ -57,7 +59,7 @@ class LoginViewModel @Inject constructor(
         fcmDeviceToken: String,
     ) {
         suspend {
-            onboardingRepository.postToken(
+            authRepository.postToken(
                 idToken = idToken,
                 fcmDeviceToken = fcmDeviceToken,
             )

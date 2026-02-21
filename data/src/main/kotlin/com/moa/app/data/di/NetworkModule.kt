@@ -4,8 +4,8 @@ import com.moa.app.data.BuildConfig
 import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.OnboardingService
 import com.moa.app.data.remote.api.SettingService
-import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.api.WorkdayService
+import com.moa.app.data.remote.api.AuthService
 import com.moa.app.data.remote.converter.ContentOnlyConverterFactory
 import com.moa.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
@@ -78,8 +78,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTokenService(retrofit: Retrofit): TokenService =
-        retrofit.create(TokenService::class.java)
+    fun provideTokenService(retrofit: Retrofit): AuthService =
+        retrofit.create(AuthService::class.java)
 
     @Provides
     @Singleton

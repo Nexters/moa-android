@@ -6,7 +6,6 @@ import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.OAuthType
 import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.core.model.setting.SettingTerm
-import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import com.moa.app.data.remote.api.MoaService
 import com.moa.app.data.remote.api.SettingService
@@ -92,9 +91,5 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun patchNotificationSetting(notificationSetting: NotificationSetting.Content) {
         settingService.patchNotificationSetting(notificationSetting.toData())
-    }
-
-    override suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>) {
-        // TODO withdraw
     }
 }

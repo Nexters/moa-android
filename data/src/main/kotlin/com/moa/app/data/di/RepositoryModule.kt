@@ -1,5 +1,7 @@
 package com.moa.app.data.di
 
+import com.moa.app.data.repository.AuthRepository
+import com.moa.app.data.repository.AuthRepositoryImpl
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.OnboardingRepositoryImpl
 import com.moa.app.data.repository.SettingRepository
@@ -42,6 +44,12 @@ interface RepositoryModule {
     fun bindsWidgetRepository(
         impl: WidgetRepositoryImpl
     ): WidgetRepository
+
+    @Binds
+    @Singleton
+    fun bindsAuthRepository(
+        impl: AuthRepositoryImpl
+    ): AuthRepository
 
     @Binds
     @Singleton
