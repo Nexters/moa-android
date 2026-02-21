@@ -3,10 +3,11 @@ package com.moa.app.presentation.ui.home.afterwork
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.presentation.bus.MoaSideEffectBus
-import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.HomeNavigation
+import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkIntent
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkUiState
+import com.moa.app.presentation.ui.widget.util.WidgetUpdateManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -25,6 +26,7 @@ private const val DATE_CHECK_INTERVAL_MS = 60_000L
 class AfterWorkViewModel @AssistedInject constructor(
     @Assisted private val args: HomeNavigation.AfterWork,
     private val moaSideEffectBus: MoaSideEffectBus,
+    val widgetUpdateManager: WidgetUpdateManager,
 ) : ViewModel() {
 
     @AssistedFactory

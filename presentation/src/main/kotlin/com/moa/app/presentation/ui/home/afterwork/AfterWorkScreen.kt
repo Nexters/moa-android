@@ -49,6 +49,10 @@ fun AfterWorkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.widgetUpdateManager.updateAllWidgets()
+    }
+
     AfterWorkScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
@@ -66,105 +70,105 @@ private fun AfterWorkScreen(
             .padding(horizontal = MoaTheme.spacing.spacing20),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-            MoaDateLocationBar(
-                date = uiState.dateDisplay,
-                location = uiState.location,
+        MoaDateLocationBar(
+            date = uiState.dateDisplay,
+            location = uiState.location,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
+        Box(
+            modifier = Modifier.size(80.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = painterResource(R.drawable.ic_full_coin),
+                contentDescription = stringResource(R.string.after_work_coin_description),
             )
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-            Box(
-                modifier = Modifier.size(80.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(R.drawable.ic_full_coin),
-                    contentDescription = stringResource(R.string.after_work_coin_description),
+            if (uiState.showConfetti) {
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(R.raw.confeti)
+                )
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = 1,
                 )
 
-                if (uiState.showConfetti) {
-                    val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.confeti)
-                    )
-                    val progress by animateLottieCompositionAsState(
-                        composition = composition,
-                        iterations = 1,
-                    )
-
-                    LaunchedEffect(progress) {
-                        if (progress == 1f) {
-                            onIntent(AfterWorkIntent.DismissConfetti)
-                        }
+                LaunchedEffect(progress) {
+                    if (progress == 1f) {
+                        onIntent(AfterWorkIntent.DismissConfetti)
                     }
-
-                    LottieAnimation(
-                        composition = composition,
-                        progress = { progress },
-                        modifier = Modifier
-                            .wrapContentSize(unbounded = true)
-                            .size(200.dp),
-                    )
                 }
-            }
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    modifier = Modifier
+                        .wrapContentSize(unbounded = true)
+                        .size(200.dp),
+                )
+            }
+        }
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+        Text(
+            text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
+            style = MoaTheme.typography.b1_500,
+            color = MoaTheme.colors.textMediumEmphasis,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+
+        Row(
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            Text(
+                text = uiState.accumulatedSalary,
+                style = MoaTheme.typography.h1_700,
+                color = MoaTheme.colors.textGreen,
+            )
+
+            Spacer(Modifier.width(4.dp))
 
             Text(
-                text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
-                style = MoaTheme.typography.b1_500,
-                color = MoaTheme.colors.textMediumEmphasis,
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = stringResource(R.string.after_work_currency_won),
+                style = MoaTheme.typography.t2_700,
+                color = MoaTheme.colors.textHighEmphasis,
             )
+        }
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
 
-            Row(
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
-                    text = uiState.accumulatedSalary,
-                    style = MoaTheme.typography.h1_700,
-                    color = MoaTheme.colors.textGreen,
-                )
+        InfoCard(
+            todaySalaryWithPlus = uiState.todaySalaryWithPlusDisplay,
+            workTimeOrVacation = if (uiState.isOnVacation) {
+                stringResource(R.string.after_work_vacation)
+            } else {
+                uiState.workTimeDisplay
+            },
+        )
 
-                Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.weight(1f))
 
-                Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = stringResource(R.string.after_work_currency_won),
-                    style = MoaTheme.typography.t2_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-            }
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-            InfoCard(
-                todaySalaryWithPlus = uiState.todaySalaryWithPlusDisplay,
-                workTimeOrVacation = if (uiState.isOnVacation) {
-                    stringResource(R.string.after_work_vacation)
-                } else {
-                    uiState.workTimeDisplay
-                },
+        MoaPrimaryButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp),
+            onClick = { onIntent(AfterWorkIntent.ClickCheckWorkHistory) },
+        ) {
+            Text(
+                text = stringResource(R.string.after_work_check_work_history),
+                style = MoaTheme.typography.t3_700,
             )
+        }
 
-            Spacer(Modifier.weight(1f))
-
-            MoaPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
-                onClick = { onIntent(AfterWorkIntent.ClickCheckWorkHistory) },
-            ) {
-                Text(
-                    text = stringResource(R.string.after_work_check_work_history),
-                    style = MoaTheme.typography.t3_700,
-                )
-            }
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
     }
 }
 
