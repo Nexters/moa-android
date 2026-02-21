@@ -110,8 +110,14 @@ private fun WidgetGuideScreen(
                     .height(64.dp)
                     .padding(horizontal = MoaTheme.spacing.spacing20),
                 onClick = {
+                    onIntent(WidgetGuideIntent.ClickNext)
+
                     if (appWidgetManager.isRequestPinAppWidgetSupported) {
-                        appWidgetManager.requestPinAppWidget(moaWidgetReceiver, null, null)
+                        appWidgetManager.requestPinAppWidget(
+                            moaWidgetReceiver,
+                            null,
+                            null
+                        )
                     }
                 },
             ) {
