@@ -41,12 +41,14 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.moa.app.core.model.widget.Widget
+import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.presentation.R
 import com.moa.app.presentation.designsystem.theme.Gray20
 import com.moa.app.presentation.designsystem.theme.Gray70
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 class MoaWidget : GlanceAppWidget() {
 
@@ -60,12 +62,65 @@ class MoaWidget : GlanceAppWidget() {
                 context.applicationContext,
                 MoaWidgetEntryPoint::class.java
             )
-            val repository = entryPoint.getWidgetRepository()
+            val homeRepository = entryPoint.getHomeRepository()
+            val calculateSalaryUseCase = entryPoint.getCalculateAccumulatedSalaryUseCase()
 
             suspend fun getWidgetUiState() {
                 uiState = MoaWidgetUiState.Loading
                 try {
-                    val widget = repository.getWidget()
+                    val homeResponse = homeRepository.getHome()
+                    val now = LocalTime.now()
+                    val currentTimeStr = String.format("%02d:%02d", now.hour, now.minute)
+
+                    val clockIn = homeResponse.clockInTime?.let { parseTime(it) }
+                    val clockOut = homeResponse.clockOutTime?.let { parseTime(it) }
+                    val startHour = clockIn?.first ?: 9
+                    val startMinute = clockIn?.second ?: 0
+                    val endHour = clockOut?.first ?: 18
+                    val endMinute = clockOut?.second ?: 0
+
+                    val clockInTime = LocalTime.of(startHour, startMinute)
+                    val clockOutTime = LocalTime.of(endHour, endMinute)
+
+                    val isBeforeWork = now < clockInTime
+                    val isAfterWork = now >= clockOutTime
+
+                    val widget = when {
+                        homeResponse.type == HomeType.NONE || isBeforeWork || isAfterWork -> {
+                            val monthlySalary = homeResponse.workedEarnings
+                            Widget.Finish(
+                                monthlySalary = formatCurrency(monthlySalary)
+                            )
+                        }
+                        homeResponse.type == HomeType.VACATION -> {
+                            val todaySalary = calculateSalaryUseCase(
+                                startHour = startHour,
+                                startMinute = startMinute,
+                                endHour = endHour,
+                                endMinute = endMinute,
+                                dailyPay = homeResponse.dailyPay,
+                                currentTime = now,
+                            )
+                            Widget.Vacation(
+                                daySalary = formatCurrency(todaySalary),
+                                time = currentTimeStr,
+                            )
+                        }
+                        else -> {
+                            val todaySalary = calculateSalaryUseCase(
+                                startHour = startHour,
+                                startMinute = startMinute,
+                                endHour = endHour,
+                                endMinute = endMinute,
+                                dailyPay = homeResponse.dailyPay,
+                                currentTime = now,
+                            )
+                            Widget.Working(
+                                daySalary = formatCurrency(todaySalary),
+                                time = currentTimeStr,
+                            )
+                        }
+                    }
                     uiState = MoaWidgetUiState.Success(widget)
                 } catch (e: Exception) {
                     uiState = MoaWidgetUiState.Error(e.message ?: "알 수 없는 에러")
@@ -87,6 +142,21 @@ class MoaWidget : GlanceAppWidget() {
                 )
             }
         }
+    }
+
+    private fun parseTime(time: String): Pair<Int, Int>? {
+        return try {
+            val parts = time.split(":")
+            if (parts.size >= 2) {
+                Pair(parts[0].toInt(), parts[1].toInt())
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun formatCurrency(amount: Long): String {
+        return String.format("%,d", amount)
     }
 }
 
