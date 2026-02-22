@@ -33,7 +33,6 @@ kakao = "2.23.2"
 firebase-bom = "34.9.0"
 google-services = "4.4.4"
 firebaseCrashlyticsGradle = "3.0.6"
-material = "1.13.0"
 
 [libraries]
 androidx-annotation-experimental = { module = "androidx.annotation:annotation-experimental", version.ref = "annotationExperimental" }
@@ -117,7 +116,6 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 
 # Calendar
 calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = "calendar" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
