@@ -356,12 +356,18 @@ class HistoryViewModel @Inject constructor(
         }
 
         val autoVacationSchedule = if (hasVacationFromApi && !hasExistingVacation) {
+            val isPastDate = localDate.isBefore(today)
+            val vacationTime = if (isPastDate && workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
+                parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
+            } else {
+                defaultWorkTime
+            }
             listOf(
                 Schedule(
                     id = -3,
                     date = selectedDate,
                     type = ScheduleType.VACATION,
-                    time = workTime,
+                    time = vacationTime,
                 )
             )
         } else {

@@ -3,9 +3,9 @@ package com.moa.app.data.remote.api
 import com.moa.app.data.remote.model.request.ClockOutRequest
 import com.moa.app.data.remote.model.request.WorkdayRequest
 import com.moa.app.data.remote.model.response.EarningsResponse
-import com.moa.app.data.remote.model.response.WorkdayContent
 import com.moa.app.data.remote.model.response.WorkdayDetailResponse
 import com.moa.app.data.remote.model.response.WorkdayListItem
+import com.moa.app.data.remote.model.response.WorkdayResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -18,13 +18,13 @@ interface WorkdayService {
     suspend fun updateWorkday(
         @Path("date") date: String,
         @Body request: WorkdayRequest,
-    ): WorkdayContent
+    ): WorkdayResponse
 
     @PATCH("/api/v1/workdays/{date}")
     suspend fun patchClockOut(
         @Path("date") date: String,
         @Body request: ClockOutRequest,
-    ): WorkdayContent
+    ): WorkdayResponse
 
     @GET("/api/v1/workdays")
     suspend fun getWorkdays(

@@ -162,16 +162,23 @@ class BeforeWorkViewModel @AssistedInject constructor(
         val now = LocalTime.now()
         val state = _uiState.value
 
+        val registeredStartMinutes = state.startHour * 60 + state.startMinute
+        val registeredEndMinutes = state.endHour * 60 + state.endMinute
+        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
+        val endTime = now.plusMinutes(workDurationMinutes.toLong())
+
         updateWorkTimeApi(
             startHour = now.hour,
             startMinute = now.minute,
-            endHour = state.endHour,
-            endMinute = state.endMinute,
+            endHour = endTime.hour,
+            endMinute = endTime.minute,
         )
 
         navigateToWorking(
             startHour = now.hour,
             startMinute = now.minute,
+            endHour = endTime.hour,
+            endMinute = endTime.minute,
         )
     }
 

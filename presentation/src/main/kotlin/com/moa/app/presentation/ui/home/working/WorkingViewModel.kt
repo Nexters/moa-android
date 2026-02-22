@@ -332,6 +332,8 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun onClickCompleteWork() {
+        val state = _uiState.value
+        updateClockOutTimeApi(state.endHour, state.endMinute)
         _uiState.update { it.copy(showWorkCompletionOverlay = false) }
         navigateToAfterWork()
     }
@@ -434,8 +436,11 @@ class WorkingViewModel @AssistedInject constructor(
         val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
 
         suspend {
-            workdayRepository.updateClockOutTime(today, clockOutTime)
             homeRepository.saveActualClockOut(clockOutTime)
+        }.execute(scope = viewModelScope) {}
+
+        suspend {
+            workdayRepository.updateClockOutTime(today, clockOutTime)
         }.execute(scope = viewModelScope) {}
     }
 }
