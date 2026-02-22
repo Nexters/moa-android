@@ -40,10 +40,9 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import com.moa.app.core.extensions.toHourMinuteOrNull
 import com.moa.app.core.model.widget.Widget
-import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.presentation.R
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.designsystem.theme.Gray20
 import com.moa.app.presentation.designsystem.theme.Gray70
 import com.moa.app.presentation.designsystem.theme.MoaTheme
@@ -65,6 +64,7 @@ class MoaWidget : GlanceAppWidget() {
             )
             val homeRepository = entryPoint.getHomeRepository()
             val calculateSalaryUseCase = entryPoint.getCalculateAccumulatedSalaryUseCase()
+            val determineHomeNavigation = entryPoint.getDetermineHomeNavigationUseCase()
 
             suspend fun getWidgetUiState() {
                 uiState = MoaWidgetUiState.Loading
@@ -72,64 +72,39 @@ class MoaWidget : GlanceAppWidget() {
                     val homeResponse = homeRepository.getHome()
                     val now = LocalTime.now()
                     val currentTimeStr = String.format("%02d:%02d", now.hour, now.minute)
+                    val homeNavigation = determineHomeNavigation(homeResponse, now)
 
-                    val clockIn = homeResponse.clockInTime?.toHourMinuteOrNull()
-                    val clockOut = homeResponse.clockOutTime?.toHourMinuteOrNull()
-                    val startHour = clockIn?.first ?: 9
-                    val startMinute = clockIn?.second ?: 0
-                    val endHour = clockOut?.first ?: 18
-                    val endMinute = clockOut?.second ?: 0
-
-                    val clockInTime = LocalTime.of(startHour, startMinute)
-                    val clockOutTime = LocalTime.of(endHour, endMinute)
-
-                    val isOvernightShift = clockOutTime < clockInTime
-                    val isBeforeWork: Boolean
-                    val isAfterWork: Boolean
-
-                    if (isOvernightShift) {
-                        isBeforeWork = now >= clockOutTime && now < clockInTime
-                        isAfterWork = false
-                    } else {
-                        isBeforeWork = now < clockInTime
-                        isAfterWork = now >= clockOutTime
-                    }
-
-                    val isDuringWork = !isBeforeWork && !isAfterWork
-
-                    val widget = when {
-                        homeResponse.type == HomeType.NONE || !isDuringWork -> {
-                            val monthlySalary = homeResponse.workedEarnings
+                    val widget = when (homeNavigation) {
+                        is HomeNavigation.BeforeWork,
+                        is HomeNavigation.AfterWork -> {
                             Widget.Finish(
-                                monthlySalary = formatCurrency(monthlySalary)
+                                monthlySalary = formatCurrency(homeResponse.workedEarnings)
                             )
                         }
-                        homeResponse.type == HomeType.VACATION -> {
+                        is HomeNavigation.Working -> {
                             val todaySalary = calculateSalaryUseCase(
-                                startHour = startHour,
-                                startMinute = startMinute,
-                                endHour = endHour,
-                                endMinute = endMinute,
-                                dailyPay = homeResponse.dailyPay,
+                                startHour = homeNavigation.startHour,
+                                startMinute = homeNavigation.startMinute,
+                                endHour = homeNavigation.endHour,
+                                endMinute = homeNavigation.endMinute,
+                                dailyPay = homeNavigation.dailyPay,
                                 currentTime = now,
                             )
-                            Widget.Vacation(
-                                daySalary = formatCurrency(todaySalary),
-                                time = currentTimeStr,
-                            )
+                            if (homeNavigation.isOnVacation) {
+                                Widget.Vacation(
+                                    daySalary = formatCurrency(todaySalary),
+                                    time = currentTimeStr,
+                                )
+                            } else {
+                                Widget.Working(
+                                    daySalary = formatCurrency(todaySalary),
+                                    time = currentTimeStr,
+                                )
+                            }
                         }
                         else -> {
-                            val todaySalary = calculateSalaryUseCase(
-                                startHour = startHour,
-                                startMinute = startMinute,
-                                endHour = endHour,
-                                endMinute = endMinute,
-                                dailyPay = homeResponse.dailyPay,
-                                currentTime = now,
-                            )
-                            Widget.Working(
-                                daySalary = formatCurrency(todaySalary),
-                                time = currentTimeStr,
+                            Widget.Finish(
+                                monthlySalary = formatCurrency(homeResponse.workedEarnings)
                             )
                         }
                     }

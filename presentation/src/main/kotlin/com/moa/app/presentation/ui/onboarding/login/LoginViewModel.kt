@@ -4,8 +4,6 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.app.data.remote.model.response.HomeResponse
-import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.data.repository.AuthRepository
 import com.moa.app.data.repository.HomeRepository
 import com.moa.app.data.repository.OnboardingRepository
@@ -18,10 +16,10 @@ import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.usecase.DetermineHomeNavigationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +29,7 @@ class LoginViewModel @Inject constructor(
     private val onboardingRepository: OnboardingRepository,
     private val homeRepository: HomeRepository,
     private val tokenRepository: TokenRepository,
+    private val determineHomeNavigation: DetermineHomeNavigationUseCase,
 ) : ViewModel() {
 
     fun clickKakao(activity: Activity) {
@@ -166,72 +165,10 @@ class LoginViewModel @Inject constructor(
     private suspend fun navigateToHome() {
         try {
             val response = homeRepository.getHome()
-            val homeNavigation = response.toHomeNavigation()
+            val homeNavigation = determineHomeNavigation(response)
             navigate(RootNavigation.Home(homeNavigation))
         } catch (e: Exception) {
             navigate(RootNavigation.Home(HomeNavigation.BeforeWork()))
-        }
-    }
-
-    private fun HomeResponse.toHomeNavigation(): HomeNavigation {
-        val clockIn = clockInTime?.let { parseTime(it) }
-        val clockOut = clockOutTime?.let { parseTime(it) }
-
-        val startHour = clockIn?.first ?: 9
-        val startMinute = clockIn?.second ?: 0
-        val endHour = clockOut?.first ?: 18
-        val endMinute = clockOut?.second ?: 0
-
-        val isWorkDay = type != HomeType.NONE
-        val isOnVacation = type == HomeType.VACATION
-
-        val now = LocalTime.now()
-        val clockInLocalTime = LocalTime.of(startHour, startMinute)
-        val clockOutLocalTime = LocalTime.of(endHour, endMinute)
-
-        val isOvernightShift = clockOutLocalTime < clockInLocalTime
-
-        val isBeforeWork: Boolean
-        val isAfterWork: Boolean
-
-        if (isOvernightShift) {
-            isBeforeWork = now >= clockOutLocalTime && now < clockInLocalTime
-            isAfterWork = false
-        } else {
-            isBeforeWork = now < clockInLocalTime
-            isAfterWork = now >= clockOutLocalTime
-        }
-
-        return when {
-            isBeforeWork -> HomeNavigation.BeforeWork()
-            isAfterWork -> HomeNavigation.AfterWork(
-                todayEarnedSalary = dailyPay,
-                startHour = startHour,
-                startMinute = startMinute,
-                endHour = endHour,
-                endMinute = endMinute,
-                isOnVacation = isOnVacation,
-            )
-            else -> HomeNavigation.Working(
-                startHour = startHour,
-                startMinute = startMinute,
-                endHour = endHour,
-                endMinute = endMinute,
-                dailyPay = dailyPay,
-                isOnVacation = isOnVacation,
-                isWorkDay = isWorkDay,
-            )
-        }
-    }
-
-    private fun parseTime(time: String): Pair<Int, Int>? {
-        return try {
-            val parts = time.split(":")
-            if (parts.size >= 2) {
-                Pair(parts[0].toInt(), parts[1].toInt())
-            } else null
-        } catch (e: Exception) {
-            null
         }
     }
 }
