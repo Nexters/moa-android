@@ -50,14 +50,14 @@ fun <T : Any> MoaNavDisplay(
                 slideInHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     initialOffsetX = { -it }
                 ),
                 slideOutHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     targetOffsetX = { it }
                 )
