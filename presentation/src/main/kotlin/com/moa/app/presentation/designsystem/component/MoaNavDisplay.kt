@@ -1,6 +1,7 @@
 package com.moa.app.presentation.designsystem.component
 
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -31,14 +32,14 @@ fun <T : Any> MoaNavDisplay(
                 slideInHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     initialOffsetX = { it }
                 ),
                 slideOutHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     targetOffsetX = { -it }
                 )
@@ -49,14 +50,14 @@ fun <T : Any> MoaNavDisplay(
                 slideInHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     initialOffsetX = { -it }
                 ),
                 slideOutHorizontally(
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutLinearInEasing
+                        easing = EaseIn
                     ),
                     targetOffsetX = { it }
                 )

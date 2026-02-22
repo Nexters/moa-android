@@ -3,6 +3,7 @@ package com.moa.app.presentation.ui.onboarding.salary
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -105,84 +107,92 @@ private fun SalaryScreen(
         containerColor = MoaTheme.colors.bgPrimary,
         contentWindowInsets = WindowInsets.safeDrawing,
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = MoaTheme.spacing.spacing20),
         ) {
-            Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-
-            Text(
-                text = "얼마씩 받고 있나요?",
-                color = MoaTheme.colors.textHighEmphasis,
-                style = MoaTheme.typography.t1_700,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-            Text(
-                text = "입력한 정보를 바탕으로 실시간 급여가 계산되며,\n급여 정보는 누구에게도 공개되지 않아요.",
-                color = MoaTheme.colors.textMediumEmphasis,
-                style = MoaTheme.typography.b2_400,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-            Text(
-                text = "급여 유형",
-                color = MoaTheme.colors.textMediumEmphasis,
-                style = MoaTheme.typography.b2_400,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-            SalaryTypeSelector(
-                selectedType = uiState.selectedSalaryType,
-                onIntent = onIntent,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-
-            Text(
-                text = "금액",
-                color = MoaTheme.colors.textMediumEmphasis,
-                style = MoaTheme.typography.b2_400,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-            MoaFilledTextField(
+            Column(
                 modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth(),
-                state = uiState.salaryTextField,
-                placeholder = "0",
-                trailingText = "원",
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                inputTransformation = CurrencyInputTransformation(),
-                outputTransformation = CurrencyOutputTransformation(),
-            )
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = MoaTheme.spacing.spacing20),
+            ) {
+                Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+                Text(
+                    text = "얼마씩 받고 있나요?",
+                    color = MoaTheme.colors.textHighEmphasis,
+                    style = MoaTheme.typography.t1_700,
+                )
 
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                text = uiState.salaryTextField.text.toString().makePriceString(),
-                color = MoaTheme.colors.textGreen,
-                style = MoaTheme.typography.b2_500,
-            )
+                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
-            Spacer(Modifier.weight(1f))
+                Text(
+                    text = "입력한 정보를 바탕으로 실시간 급여가 계산되며,\n급여 정보는 누구에게도 공개되지 않아요.",
+                    color = MoaTheme.colors.textMediumEmphasis,
+                    style = MoaTheme.typography.b2_400,
+                )
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+                Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
+                Text(
+                    text = "급여 유형",
+                    color = MoaTheme.colors.textMediumEmphasis,
+                    style = MoaTheme.typography.b2_400,
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+                SalaryTypeSelector(
+                    selectedType = uiState.selectedSalaryType,
+                    onIntent = onIntent,
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+
+                Text(
+                    text = "금액",
+                    color = MoaTheme.colors.textMediumEmphasis,
+                    style = MoaTheme.typography.b2_400,
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+                MoaFilledTextField(
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .fillMaxWidth(),
+                    state = uiState.salaryTextField,
+                    placeholder = "0",
+                    trailingText = "원",
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    inputTransformation = CurrencyInputTransformation(),
+                    outputTransformation = CurrencyOutputTransformation(),
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End,
+                    text = uiState.salaryTextField.text.toString().makePriceString(),
+                    color = MoaTheme.colors.textGreen,
+                    style = MoaTheme.typography.b2_500,
+                )
+
+                Spacer(Modifier.height(96.dp))
+            }
 
             MoaPrimaryButton(
                 modifier = Modifier
+                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing24)
+                    .padding(
+                        start = MoaTheme.spacing.spacing20,
+                        end = MoaTheme.spacing.spacing20,
+                        bottom = MoaTheme.spacing.spacing24,
+                    )
                     .height(64.dp),
                 enabled = uiState.salaryTextField.text.isNotBlank(),
                 onClick = {
