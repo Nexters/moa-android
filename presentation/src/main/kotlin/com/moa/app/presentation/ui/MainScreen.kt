@@ -82,13 +82,7 @@ fun MainScreen(
 
                         is OnboardingNavigation -> Unit
 
-                        is SettingNavigation.Back -> {
-                            if (backStack.size > 1) {
-                                backStack.removeAt(backStack.lastIndex)
-                            }
-                        }
-
-                        is SettingNavigation -> backStack.add(it.destination)
+                        is SettingNavigation -> Unit
 
                         is HomeNavigation -> Unit
 
