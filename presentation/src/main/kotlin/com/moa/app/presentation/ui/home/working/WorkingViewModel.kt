@@ -1,7 +1,11 @@
 package com.moa.app.presentation.ui.home.working
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.HomeRepository
+import com.moa.app.data.repository.WorkdayRepository
+import com.moa.app.domain.usecase.CalculateAccumulatedSalaryUseCase
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
@@ -19,17 +23,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 private const val TOOLTIP_COUNT = 3
 private const val TOOLTIP_ROTATION_INTERVAL_MS = 5000L
-private const val SALARY_PER_SECOND = 1L
 
 @HiltViewModel(assistedFactory = WorkingViewModel.Factory::class)
 class WorkingViewModel @AssistedInject constructor(
     @Assisted private val args: HomeNavigation.Working,
     private val moaSideEffectBus: MoaSideEffectBus,
     val widgetUpdateManager: WidgetUpdateManager,
+    private val workdayRepository: WorkdayRepository,
+    private val homeRepository: HomeRepository,
+    private val calculateAccumulatedSalaryUseCase: CalculateAccumulatedSalaryUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -63,9 +71,23 @@ class WorkingViewModel @AssistedInject constructor(
         )
         uiState = _uiState.asStateFlow()
 
+        loadHomeData()
         initializeClockInTime()
         startTimer()
         startTooltipRotation()
+    }
+
+    private fun loadHomeData() {
+        viewModelScope.launch {
+            try {
+                val homeResponse = homeRepository.getHome()
+                _uiState.update { state ->
+                    state.copy(workedEarnings = homeResponse.workedEarnings)
+                }
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to load home data", e)
+            }
+        }
     }
 
     fun onIntent(intent: WorkingIntent) {
@@ -90,7 +112,7 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun initializeClockInTime() {
-        clockInTime = LocalTime.now()
+        clockInTime = LocalTime.of(args.startHour, args.startMinute)
         updateElapsedTime()
     }
 
@@ -127,7 +149,14 @@ class WorkingViewModel @AssistedInject constructor(
         }
 
         _uiState.update { state ->
-            val newTodaySalary = elapsedSeconds.toLong() * SALARY_PER_SECOND
+            val newTodaySalary = calculateAccumulatedSalaryUseCase.calculateSalaryForWorkedTime(
+                workedSeconds = elapsedSeconds,
+                startHour = state.startHour,
+                startMinute = state.startMinute,
+                endHour = state.endHour,
+                endMinute = state.endMinute,
+                dailyPay = args.dailyPay,
+            )
             val endTime = LocalTime.of(state.endHour, state.endMinute)
             val remainingSeconds =
                 java.time.Duration.between(now, endTime).seconds.toInt().coerceAtLeast(0)
@@ -210,6 +239,7 @@ class WorkingViewModel @AssistedInject constructor(
 
     private fun onSelectEndWork() {
         val now = LocalTime.now()
+        val state = _uiState.value
         _uiState.update {
             it.copy(
                 showScheduleAdjustBottomSheet = false,
@@ -218,6 +248,7 @@ class WorkingViewModel @AssistedInject constructor(
                 endMinute = now.minute,
             )
         }
+        updateClockOutTimeApi(now.hour, now.minute)
     }
 
     private fun navigateToAfterWork() {
@@ -238,6 +269,14 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
+    private fun navigateToBeforeWork() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(HomeNavigation.BeforeWork())
+            )
+        }
+    }
+
     private fun onSelectAdjustTime() {
         _uiState.update { state ->
             state.copy(
@@ -248,7 +287,25 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun onUpdateWorkTime(intent: WorkingIntent.UpdateWorkTime) {
-        clockInTime = LocalTime.of(intent.startHour, intent.startMinute)
+        val now = LocalTime.now()
+        val newStartTime = LocalTime.of(intent.startHour, intent.startMinute)
+        val newEndTime = LocalTime.of(intent.endHour, intent.endMinute)
+
+        updateWorkTimeApi(intent.startHour, intent.startMinute, intent.endHour, intent.endMinute)
+
+        if (now < newStartTime) {
+            _uiState.update { it.copy(showTimeBottomSheet = false) }
+            navigateToBeforeWork()
+            return
+        }
+
+        if (now >= newEndTime) {
+            _uiState.update { it.copy(showTimeBottomSheet = false) }
+            navigateToAfterWork()
+            return
+        }
+
+        clockInTime = newStartTime
 
         _uiState.update { state ->
             state.copy(
@@ -285,8 +342,18 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun onClickTodayVacation() {
-        _uiState.update { state ->
-            state.copy(
+        val state = _uiState.value
+
+        updateWorkTimeWithType(
+            startHour = state.startHour,
+            startMinute = state.startMinute,
+            endHour = state.endHour,
+            endMinute = state.endMinute,
+            type = "VACATION",
+        )
+
+        _uiState.update {
+            it.copy(
                 showWorkTimeEditBottomSheet = false,
                 showWorkCompletionOverlay = false,
                 isOnVacation = true,
@@ -296,26 +363,94 @@ class WorkingViewModel @AssistedInject constructor(
         navigateToAfterWork()
     }
 
+    private fun updateWorkTimeWithType(
+        startHour: Int,
+        startMinute: Int,
+        endHour: Int,
+        endMinute: Int,
+        type: String,
+    ) {
+        viewModelScope.launch {
+            val clockInTime = String.format("%02d:%02d", startHour, startMinute)
+            val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+
+            try {
+                homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to save adjusted work time locally", e)
+            }
+
+            try {
+                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                Log.d(WORKDAY_TAG, "[Working] Updating work time with type (PUT): $today, type=$type, $clockInTime ~ $clockOutTime")
+                workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to update work time with type API", e)
+            }
+        }
+    }
+
     private fun onConfirmMoreWork(intent: WorkingIntent.ConfirmMoreWork) {
         hasNavigatedToAfterWork = false
-        _uiState.update { state ->
-            state.copy(
+        _uiState.update {
+            it.copy(
                 showMoreWorkBottomSheet = false,
                 showWorkCompletionOverlay = false,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
             )
         }
+        updateClockOutTimeApi(intent.endHour, intent.endMinute)
     }
 
     private fun onConfirmWorkTimeEdit(intent: WorkingIntent.ConfirmWorkTimeEdit) {
-        _uiState.update { state ->
-            state.copy(
+        _uiState.update {
+            it.copy(
                 showWorkTimeEditBottomSheet = false,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
             )
         }
+        updateClockOutTimeApi(intent.endHour, intent.endMinute)
         navigateToAfterWork()
+    }
+
+    private fun updateWorkTimeApi(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int) {
+        viewModelScope.launch {
+            val clockInTime = String.format("%02d:%02d", startHour, startMinute)
+            val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+
+            try {
+                homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to save adjusted work time locally", e)
+            }
+
+            try {
+                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                Log.d(WORKDAY_TAG, "[Working] Updating work time (PUT): $today, $clockInTime ~ $clockOutTime")
+                workdayRepository.updateWorkTime(today, clockInTime, clockOutTime)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to update work time API", e)
+            }
+        }
+    }
+
+    private fun updateClockOutTimeApi(endHour: Int, endMinute: Int) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+                Log.d(WORKDAY_TAG, "[Working] Updating clock out time (PATCH): $today, $clockOutTime")
+                workdayRepository.updateClockOutTime(today, clockOutTime)
+                homeRepository.saveActualClockOut(clockOutTime)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[Working] Failed to update clock out time", e)
+            }
+        }
+    }
+
+    companion object {
+        private const val WORKDAY_TAG = "WorkdayApi"
     }
 }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 
 @Stable
 data class WorkingUiState(
-    val monthSalary: String = "123,203,000",
+    val workedEarnings: Long = 0L,
     val todaySalary: Long = 0L,
     val elapsedHours: Int = 0,
     val elapsedMinutes: Int = 0,
@@ -65,6 +65,12 @@ data class WorkingUiState(
 
     val todaySalaryDisplay: String
         get() = formatCurrency(todaySalary)
+
+    val monthlyAccumulatedSalary: Long
+        get() = workedEarnings + todaySalary
+
+    val monthSalary: String
+        get() = formatCurrency(monthlyAccumulatedSalary)
 
     private fun formatCurrency(amount: Long): String {
         return String.format("%,d", amount)
