@@ -34,6 +34,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
+    implementation(project(":domain"))
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
