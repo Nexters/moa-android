@@ -6,10 +6,11 @@ import java.util.Locale
 
 data class BeforeWorkUiState(
     val today: LocalDate = LocalDate.now(),
-    val location: String = "모아주식회사",
-    val accumulatedSalary: String = "2,150,000",
+    val location: String? = null,
+    val workedEarnings: Long = 0L,
+    val standardSalary: Long = 0L,
+    val dailyPay: Long = 0L,
     val todayEarnedSalary: Long? = null,
-    val todaySalary: String = "150,000원",
     val startHour: Int = 9,
     val startMinute: Int = 0,
     val endHour: Int = 18,
@@ -17,6 +18,12 @@ data class BeforeWorkUiState(
     val showTimeBottomSheet: Boolean = false,
     val isWorkDay: Boolean = true,
 ) {
+    val accumulatedSalary: String
+        get() = String.format("%,d", workedEarnings)
+
+    val todaySalary: String
+        get() = "${String.format("%,d", dailyPay)}원"
+
     val todayEarnedSalaryDisplay: String?
         get() = todayEarnedSalary?.let { "+${String.format("%,d", it)}" }
 
@@ -31,4 +38,10 @@ data class BeforeWorkUiState(
 
     val autoClockInTime: String
         get() = "${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}"
+
+    val additionalSalary: Long?
+        get() = if (workedEarnings > standardSalary) workedEarnings - standardSalary else null
+
+    val additionalSalaryDisplay: String?
+        get() = additionalSalary?.let { String.format("+%,d원", it) }
 }
