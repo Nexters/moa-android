@@ -82,6 +82,7 @@ private fun ScheduleFormScreen(
             modifier = Modifier.padding(innerPadding),
             title = stringResource(if (uiState.isEditMode) R.string.schedule_form_title_edit else R.string.schedule_form_title_add),
             date = uiState.date,
+            isDateSelected = uiState.isDateSelected,
             scheduleType = uiState.scheduleType,
             time = uiState.time,
             onDateClick = { onIntent(ScheduleFormIntent.ShowDateBottomSheet(true)) },
@@ -101,6 +102,7 @@ private fun ScheduleFormScreenAddPreview() {
             uiState = ScheduleFormUiState(
                 isEditMode = false,
                 date = LocalDateModel(2026, 1, 20),
+                isDateSelected = false,
                 scheduleType = ScheduleInputType.WORK,
                 time = Time(9, 0, 18, 0),
             ),
@@ -117,6 +119,7 @@ private fun ScheduleFormScreenEditPreview() {
             uiState = ScheduleFormUiState(
                 isEditMode = true,
                 date = LocalDateModel(2026, 1, 20),
+                isDateSelected = true,
                 scheduleType = ScheduleInputType.VACATION,
                 time = Time(9, 0, 18, 0),
             ),

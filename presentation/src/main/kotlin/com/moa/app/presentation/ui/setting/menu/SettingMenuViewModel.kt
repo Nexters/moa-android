@@ -4,10 +4,12 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.setting.SettingMenu
+import com.moa.app.data.repository.AuthRepository
 import com.moa.app.data.repository.SettingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
+import com.moa.app.presentation.manager.FcmTokenManager
 import com.moa.app.presentation.model.MoaDialogProperties
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
@@ -29,6 +31,7 @@ class SettingMenuViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val settingRepository: SettingRepository,
     private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
@@ -42,7 +45,7 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickWorkInfo -> workInfo()
             SettingMenuIntent.ClickNotificationSetting -> notificationSetting()
             SettingMenuIntent.ClickTerms -> terms()
-            SettingMenuIntent.ClickLogout -> logout()
+            SettingMenuIntent.ClickLogout -> logoutDialog()
             SettingMenuIntent.ClickWithdraw -> withdraw()
         }
     }
@@ -103,26 +106,29 @@ class SettingMenuViewModel @Inject constructor(
         }
     }
 
-    private fun logout() {
+    private fun logoutDialog() {
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 MoaSideEffect.Dialog(
                     MoaDialogProperties.Confirm(
                         title = "로그아웃 하시겠어요?",
                         message = "로그아웃하면 로그인 화면으로 이동해요.",
-                        onPositive = { clearToken() },
+                        onPositive = { logout() },
                     )
                 )
             )
         }
     }
 
-    private fun clearToken() {
+    private fun logout() {
         suspend {
+            val fcmTokenDeferred = FcmTokenManager.getFcmToken()
+            authRepository.logout(fcmTokenDeferred)
             tokenRepository.clearToken()
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
+            onRetry = { logout() }
         ) {
             viewModelScope.launch {
                 moaSideEffectBus.emit(

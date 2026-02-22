@@ -5,7 +5,6 @@ import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.core.model.setting.NotificationSetting
 import com.moa.app.core.model.setting.SettingMenu
 import com.moa.app.core.model.setting.SettingTerm
-import com.moa.app.core.model.setting.WithdrawalReason
 import com.moa.app.core.model.setting.WorkInfo
 import kotlinx.collections.immutable.ImmutableList
 
@@ -20,5 +19,4 @@ interface SettingRepository {
     suspend fun patchWorkPolicy(workPolicy: WorkPolicy)
     suspend fun getNotificationSettings(): ImmutableList<NotificationSetting>
     suspend fun patchNotificationSetting(notificationSetting: NotificationSetting.Content)
-    suspend fun withDraw(reasons: ImmutableList<WithdrawalReason>)
 }

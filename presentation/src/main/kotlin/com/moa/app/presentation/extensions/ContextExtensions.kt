@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 
 fun Context.sendEmail(appVersion: String) {
-    val email = "moa.mymoney@gmail.com"
+    val email = "moa.salary@gmail.com"
     val subject = "[문의] 모아 서비스에 문의드립니다."
     val body = """
         문의 유형: (버그 신고 / 제휴·광고 / 계정·결제 / 신고 / 기능 제안 / 기타)

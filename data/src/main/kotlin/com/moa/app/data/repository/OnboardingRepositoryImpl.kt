@@ -5,33 +5,18 @@ import com.moa.app.core.model.onboarding.Payroll
 import com.moa.app.core.model.onboarding.Term
 import com.moa.app.core.model.onboarding.WorkPolicy
 import com.moa.app.data.remote.api.OnboardingService
-import com.moa.app.data.remote.api.TokenService
 import com.moa.app.data.remote.mapper.toData
 import com.moa.app.data.remote.mapper.toDomain
 import com.moa.app.data.remote.mapper.toOnboardingTermDomain
 import com.moa.app.data.remote.model.request.NicknameRequest
-import com.moa.app.data.remote.model.request.TokenRequest
 import kotlinx.collections.immutable.ImmutableList
 import javax.inject.Inject
 
 class OnboardingRepositoryImpl @Inject constructor(
-    private val tokenService: TokenService,
     private val onboardingService: OnboardingService,
 ) : OnboardingRepository {
     override suspend fun getOnboardingStatus(): OnboardingStatus {
         return onboardingService.getStatus().toDomain()
-    }
-
-    override suspend fun postToken(
-        idToken: String,
-        fcmDeviceToken: String,
-    ): String {
-        return tokenService.postToken(
-            TokenRequest(
-                idToken = idToken,
-                fcmDeviceToken = fcmDeviceToken,
-            )
-        ).accessToken
     }
 
     override suspend fun patchNickname(nickName: String) {

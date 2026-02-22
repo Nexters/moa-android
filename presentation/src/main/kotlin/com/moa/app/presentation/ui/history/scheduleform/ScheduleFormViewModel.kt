@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.core.model.history.LocalDateModel
 import com.moa.app.core.model.history.Schedule
 import com.moa.app.core.model.history.ScheduleType
+import com.moa.app.core.model.history.WorkdayType
 import com.moa.app.core.model.onboarding.Time
+import com.moa.app.data.repository.SettingRepository
+import com.moa.app.data.repository.WorkdayRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.RootNavigation
@@ -28,7 +31,8 @@ enum class ScheduleInputType {
 data class ScheduleFormUiState(
     val isEditMode: Boolean = false,
     val scheduleId: Long = 0,
-    val date: LocalDateModel = LocalDateModel(2026, 1, 1),
+    val date: LocalDateModel = LocalDateModel.today(),
+    val isDateSelected: Boolean = false,
     val scheduleType: ScheduleInputType = ScheduleInputType.WORK,
     val time: Time = Time(9, 0, 18, 0),
     val showDateBottomSheet: Boolean = false,
@@ -51,6 +55,8 @@ class ScheduleFormViewModel @AssistedInject constructor(
     @Assisted private val initialDate: LocalDateModel,
     @Assisted private val schedule: Schedule?,
     private val moaSideEffectBus: MoaSideEffectBus,
+    private val workdayRepository: WorkdayRepository,
+    private val settingRepository: SettingRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -59,6 +65,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
                 isEditMode = true,
                 scheduleId = schedule.id,
                 date = schedule.date,
+                isDateSelected = true,
                 scheduleType = when (schedule.type) {
                     ScheduleType.VACATION -> ScheduleInputType.VACATION
                     else -> ScheduleInputType.WORK
@@ -68,11 +75,34 @@ class ScheduleFormViewModel @AssistedInject constructor(
         } else {
             ScheduleFormUiState(
                 isEditMode = false,
-                date = initialDate,
+                date = LocalDateModel.today(),
+                isDateSelected = false,
             )
         }
     )
     val uiState = _uiState.asStateFlow()
+
+    init {
+        loadDefaultWorkTime()
+    }
+
+    private fun loadDefaultWorkTime() {
+        viewModelScope.launch {
+            try {
+                val workInfo = settingRepository.getWorkInfo()
+                val defaultTime = workInfo.workPolicy.time
+                _uiState.update { state ->
+                    if (state.time == Time(9, 0, 18, 0)) {
+                        state.copy(time = defaultTime)
+                    } else {
+                        state
+                    }
+                }
+            } catch (_: Exception) {
+                // Use default time
+            }
+        }
+    }
 
     fun onIntent(intent: ScheduleFormIntent) {
         when (intent) {
@@ -98,7 +128,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
     }
 
     private fun setDate(date: LocalDateModel) {
-        _uiState.update { it.copy(date = date, showDateBottomSheet = false) }
+        _uiState.update { it.copy(date = date, isDateSelected = true, showDateBottomSheet = false) }
     }
 
     private fun setTime(time: Time) {
@@ -121,12 +151,35 @@ class ScheduleFormViewModel @AssistedInject constructor(
 
     private fun confirm() {
         viewModelScope.launch {
-            if (_uiState.value.isEditMode) {
-                // TODO: update API
-            } else {
-                // TODO: create API
+            val state = _uiState.value
+            if (!state.isDateSelected) return@launch
+            val selectedDate = state.date
+            val date = "%04d-%02d-%02d".format(selectedDate.year, selectedDate.month, selectedDate.day)
+            val workdayType = when (state.scheduleType) {
+                ScheduleInputType.WORK -> WorkdayType.WORK
+                ScheduleInputType.VACATION -> WorkdayType.VACATION
             }
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
+            val clockInTime = if (state.scheduleType == ScheduleInputType.WORK) {
+                "%02d:%02d".format(state.time.startHour, state.time.startMinute)
+            } else null
+            val clockOutTime = if (state.scheduleType == ScheduleInputType.WORK) {
+                "%02d:%02d".format(state.time.endHour, state.time.endMinute)
+            } else null
+
+            try {
+                moaSideEffectBus.emit(MoaSideEffect.Loading(true))
+                workdayRepository.updateWorkday(
+                    date = date,
+                    type = workdayType,
+                    clockInTime = clockInTime,
+                    clockOutTime = clockOutTime,
+                )
+                moaSideEffectBus.emit(MoaSideEffect.Loading(false))
+                moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
+            } catch (e: Exception) {
+                moaSideEffectBus.emit(MoaSideEffect.Loading(false))
+                moaSideEffectBus.emit(MoaSideEffect.Failure(e) { confirm() })
+            }
         }
     }
 

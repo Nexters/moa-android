@@ -123,6 +123,7 @@
     <string name="schedule_form_title_edit">일정을 수정해주세요</string>
     <string name="schedule_form_work_time_title">근무 시간을 알려주세요</string>
     <string name="schedule_form_select_date">날짜를 선택해주세요</string>
+    <string name="schedule_form_select_date_placeholder">날짜 선택</string>
     <string name="schedule_form_schedule_type_question">어떤 일정인가요?</string>
     <string name="schedule_form_type_vacation">휴가</string>
     <string name="schedule_form_type_work">근무</string>

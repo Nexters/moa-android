@@ -29,7 +29,7 @@ class ContentOnlyConverterFactory(
 
             contentElement?.let {
                 json.decodeFromJsonElement(serializer, contentElement)
-            }
+            } ?: Unit
         }
     }
 }
