@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui.home.afterwork
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.HomeRepository
@@ -74,7 +73,7 @@ class AfterWorkViewModel @AssistedInject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "[AfterWork] Failed to load home data", e)
+                // ignore
             }
         }
     }
@@ -166,16 +165,10 @@ class AfterWorkViewModel @AssistedInject constructor(
             try {
                 val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                 val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
-                Log.d(WORKDAY_TAG, "[AfterWork] Updating clock out time (PATCH): $today, $clockOutTime")
                 workdayRepository.updateClockOutTime(today, clockOutTime)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[AfterWork] Failed to update clock out time", e)
+                // ignore
             }
         }
-    }
-
-    companion object {
-        private const val TAG = "HomeNavigation"
-        private const val WORKDAY_TAG = "WorkdayApi"
     }
 }

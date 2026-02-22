@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui.home.beforework
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.remote.model.response.HomeType
@@ -49,22 +48,17 @@ class BeforeWorkViewModel @AssistedInject constructor(
     private var hasAutoClockInTriggered = false
 
     init {
-        Log.d(TAG, "[BeforeWork] ViewModel created")
         loadHomeData()
     }
 
     private fun loadHomeData() {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "[BeforeWork] Loading home data...")
                 val homeResponse = homeRepository.getHome()
-                Log.d(TAG, "[BeforeWork] API response: type=${homeResponse.type}, clockIn=${homeResponse.clockInTime}, clockOut=${homeResponse.clockOutTime}")
 
                 val clockInTime = homeResponse.clockInTime?.let { parseTime(it) }
                 val clockOutTime = homeResponse.clockOutTime?.let { parseTime(it) }
                 val isWorkDay = homeResponse.type != HomeType.NONE
-
-                Log.d(TAG, "[BeforeWork] Parsed times: clockIn=$clockInTime, clockOut=$clockOutTime, isWorkDay=$isWorkDay")
 
                 _uiState.update { state ->
                     state.copy(
@@ -81,13 +75,9 @@ class BeforeWorkViewModel @AssistedInject constructor(
                 }
 
                 if (isWorkDay && !hasAutoClockInTriggered) {
-                    Log.d(TAG, "[BeforeWork] Starting auto clock-in checker")
                     startAutoClockInChecker()
-                } else {
-                    Log.d(TAG, "[BeforeWork] Skipping auto clock-in: isWorkDay=$isWorkDay, hasAutoClockInTriggered=$hasAutoClockInTriggered")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "[BeforeWork] Failed to load home data", e)
                 moaSideEffectBus.emit(MoaSideEffect.Failure(e) { loadHomeData() })
             }
         }
@@ -134,25 +124,20 @@ class BeforeWorkViewModel @AssistedInject constructor(
 
         val isOvernightShift = clockOutTime < clockInTime
 
-        Log.d(TAG, "[BeforeWork] Time check: current=$currentTime, clockIn=$clockInTime, clockOut=$clockOutTime, isOvernightShift=$isOvernightShift")
-
         if (isOvernightShift) {
             val isWorking = currentTime >= clockInTime || currentTime < clockOutTime
             if (isWorking) {
-                Log.d(TAG, "[BeforeWork] Overnight shift: navigating to Working")
                 hasAutoClockInTriggered = true
                 navigateToWorking()
             }
         } else {
             if (currentTime >= clockOutTime) {
-                Log.d(TAG, "[BeforeWork] Auto navigation: current=$currentTime >= clockOut=$clockOutTime, navigating to AfterWork")
                 hasAutoClockInTriggered = true
                 navigateToAfterWork()
                 return
             }
 
             if (currentTime >= clockInTime) {
-                Log.d(TAG, "[BeforeWork] Auto navigation: current=$currentTime >= clockIn=$clockInTime, navigating to Working")
                 hasAutoClockInTriggered = true
                 navigateToWorking()
             }
@@ -213,15 +198,14 @@ class BeforeWorkViewModel @AssistedInject constructor(
             try {
                 homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
             } catch (e: Exception) {
-                Log.e(TAG, "[BeforeWork] Failed to save adjusted work time locally", e)
+                // ignore
             }
 
             try {
                 val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                Log.d(TAG, "[BeforeWork] Updating work time (PUT): $today, type=$type, $clockInTime ~ $clockOutTime")
                 workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
             } catch (e: Exception) {
-                Log.e(TAG, "[BeforeWork] Failed to update work time API", e)
+                // ignore
             }
         }
     }
@@ -313,9 +297,5 @@ class BeforeWorkViewModel @AssistedInject constructor(
             endHour = endTime.hour,
             endMinute = endTime.minute,
         )
-    }
-
-    companion object {
-        private const val TAG = "HomeNavigation"
     }
 }

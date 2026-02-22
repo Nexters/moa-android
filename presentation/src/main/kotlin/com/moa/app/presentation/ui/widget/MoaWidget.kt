@@ -82,11 +82,22 @@ class MoaWidget : GlanceAppWidget() {
                     val clockInTime = LocalTime.of(startHour, startMinute)
                     val clockOutTime = LocalTime.of(endHour, endMinute)
 
-                    val isBeforeWork = now < clockInTime
-                    val isAfterWork = now >= clockOutTime
+                    val isOvernightShift = clockOutTime < clockInTime
+                    val isBeforeWork: Boolean
+                    val isAfterWork: Boolean
+
+                    if (isOvernightShift) {
+                        isBeforeWork = now >= clockOutTime && now < clockInTime
+                        isAfterWork = false
+                    } else {
+                        isBeforeWork = now < clockInTime
+                        isAfterWork = now >= clockOutTime
+                    }
+
+                    val isDuringWork = !isBeforeWork && !isAfterWork
 
                     val widget = when {
-                        homeResponse.type == HomeType.NONE || isBeforeWork || isAfterWork -> {
+                        homeResponse.type == HomeType.NONE || !isDuringWork -> {
                             val monthlySalary = homeResponse.workedEarnings
                             Widget.Finish(
                                 monthlySalary = formatCurrency(monthlySalary)

@@ -1,6 +1,5 @@
 package com.moa.app.presentation.ui.home.working
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.HomeRepository
@@ -85,7 +84,7 @@ class WorkingViewModel @AssistedInject constructor(
                     state.copy(workedEarnings = homeResponse.workedEarnings)
                 }
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to load home data", e)
+                // ignore
             }
         }
     }
@@ -228,8 +227,18 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun onSelectVacation() {
-        _uiState.update { state ->
-            state.copy(
+        val state = _uiState.value
+
+        updateWorkTimeWithType(
+            startHour = state.startHour,
+            startMinute = state.startMinute,
+            endHour = state.endHour,
+            endMinute = state.endMinute,
+            type = "VACATION",
+        )
+
+        _uiState.update {
+            it.copy(
                 showScheduleAdjustBottomSheet = false,
                 isOnVacation = true,
                 workStatus = WorkStatus.VACATION,
@@ -377,15 +386,14 @@ class WorkingViewModel @AssistedInject constructor(
             try {
                 homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to save adjusted work time locally", e)
+                // ignore
             }
 
             try {
                 val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                Log.d(WORKDAY_TAG, "[Working] Updating work time with type (PUT): $today, type=$type, $clockInTime ~ $clockOutTime")
                 workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to update work time with type API", e)
+                // ignore
             }
         }
     }
@@ -423,15 +431,14 @@ class WorkingViewModel @AssistedInject constructor(
             try {
                 homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to save adjusted work time locally", e)
+                // ignore
             }
 
             try {
                 val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                Log.d(WORKDAY_TAG, "[Working] Updating work time (PUT): $today, $clockInTime ~ $clockOutTime")
                 workdayRepository.updateWorkTime(today, clockInTime, clockOutTime)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to update work time API", e)
+                // ignore
             }
         }
     }
@@ -441,16 +448,11 @@ class WorkingViewModel @AssistedInject constructor(
             try {
                 val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                 val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
-                Log.d(WORKDAY_TAG, "[Working] Updating clock out time (PATCH): $today, $clockOutTime")
                 workdayRepository.updateClockOutTime(today, clockOutTime)
                 homeRepository.saveActualClockOut(clockOutTime)
             } catch (e: Exception) {
-                Log.e(WORKDAY_TAG, "[Working] Failed to update clock out time", e)
+                // ignore
             }
         }
-    }
-
-    companion object {
-        private const val WORKDAY_TAG = "WorkdayApi"
     }
 }

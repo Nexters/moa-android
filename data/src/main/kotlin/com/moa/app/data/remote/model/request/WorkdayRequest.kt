@@ -1,4 +1,4 @@
-package com.moa.app.data.remote.dto.request
+package com.moa.app.data.remote.model.request
 
 import kotlinx.serialization.Serializable
 

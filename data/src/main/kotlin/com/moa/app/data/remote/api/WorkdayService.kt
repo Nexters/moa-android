@@ -1,11 +1,11 @@
 package com.moa.app.data.remote.api
 
-import com.moa.app.data.remote.dto.request.ClockOutRequest
-import com.moa.app.data.remote.dto.request.WorkdayRequest
-import com.moa.app.data.remote.dto.response.EarningsResponse
-import com.moa.app.data.remote.dto.response.WorkdayContent
-import com.moa.app.data.remote.dto.response.WorkdayDetailResponse
-import com.moa.app.data.remote.dto.response.WorkdayListItem
+import com.moa.app.data.remote.model.request.ClockOutRequest
+import com.moa.app.data.remote.model.request.WorkdayRequest
+import com.moa.app.data.remote.model.response.EarningsResponse
+import com.moa.app.data.remote.model.response.WorkdayContent
+import com.moa.app.data.remote.model.response.WorkdayDetailResponse
+import com.moa.app.data.remote.model.response.WorkdayListItem
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
