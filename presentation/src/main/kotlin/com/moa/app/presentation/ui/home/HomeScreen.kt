@@ -1,12 +1,16 @@
 package com.moa.app.presentation.ui.home
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -20,9 +24,22 @@ import com.moa.app.presentation.ui.home.afterwork.AfterWorkScreen
 import com.moa.app.presentation.ui.home.beforework.BeforeWorkScreen
 import com.moa.app.presentation.ui.home.working.WorkingScreen
 
+private const val TAG = "HomeNavigation"
+
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
-    val backStack = rememberNavBackStack(HomeNavigation.BeforeWork())
+    val initialNavigation by viewModel.initialNavigation.collectAsStateWithLifecycle()
+
+    Log.d(TAG, "[HomeScreen] Composing with initialNavigation: $initialNavigation")
+
+    if (initialNavigation == null) {
+        Log.d(TAG, "[HomeScreen] Initial navigation is null, showing loading...")
+        Box(modifier = Modifier.fillMaxSize())
+        return
+    }
+
+    Log.d(TAG, "[HomeScreen] Creating backStack with: $initialNavigation")
+    val backStack = rememberNavBackStack(initialNavigation!!)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
@@ -30,12 +47,17 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
                         HomeNavigation.Back -> {
-                            if (backStack.size > 1) {
-                                backStack.removeAt(backStack.lastIndex)
-                            }
+                            // 뒤로가기 비활성화 - 시간 기반 네비게이션만 허용
                         }
 
-                        is HomeNavigation -> backStack.add(it.destination)
+                        is HomeNavigation -> {
+                            // 스택 초기화 후 새 화면으로 이동 (뒤로가기 방지)
+                            while (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                            backStack.removeAt(0)
+                            backStack.add(it.destination)
+                        }
 
                         else -> Unit
                     }
