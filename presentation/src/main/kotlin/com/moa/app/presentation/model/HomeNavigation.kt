@@ -17,24 +17,7 @@ sealed interface HomeNavigation : RootNavigation {
         val dailyPay: Long = 0L,
         val isOnVacation: Boolean = false,
         val isWorkDay: Boolean = true,
-    ) : HomeNavigation {
-        /**
-         * 초당 급여를 계산합니다.
-         * 하루 근무시간(초) = (퇴근시간 - 출근시간)
-         * 초당 급여 = 일급 / 하루 근무시간(초)
-         */
-        fun calculateSalaryPerSecond(): Double {
-            val startTotalSeconds = startHour * 3600 + startMinute * 60
-            val endTotalSeconds = endHour * 3600 + endMinute * 60
-            val totalWorkSeconds = endTotalSeconds - startTotalSeconds
-
-            return if (totalWorkSeconds > 0 && dailyPay > 0) {
-                dailyPay.toDouble() / totalWorkSeconds
-            } else {
-                0.0
-            }
-        }
-    }
+    ) : HomeNavigation
 
     @Serializable
     data class AfterWork(
