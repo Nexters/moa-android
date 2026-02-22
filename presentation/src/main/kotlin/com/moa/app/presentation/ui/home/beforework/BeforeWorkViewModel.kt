@@ -121,7 +121,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             val isWorking = currentTime >= clockInTime || currentTime < clockOutTime
             if (isWorking) {
                 hasAutoClockInTriggered = true
-                navigateToWorking()
+                navigateToWorking(isOnVacation = state.isOnVacation)
             }
         } else {
             if (currentTime >= clockOutTime) {
@@ -132,7 +132,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
 
             if (currentTime >= clockInTime) {
                 hasAutoClockInTriggered = true
-                navigateToWorking()
+                navigateToWorking(isOnVacation = state.isOnVacation)
             }
         }
     }

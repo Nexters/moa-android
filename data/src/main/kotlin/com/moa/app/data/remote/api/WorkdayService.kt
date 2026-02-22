@@ -18,7 +18,7 @@ interface WorkdayService {
     suspend fun updateWorkday(
         @Path("date") date: String,
         @Body request: WorkdayRequest,
-    ): WorkdayResponse
+    )
 
     @PATCH("/api/v1/workdays/{date}")
     suspend fun patchClockOut(
