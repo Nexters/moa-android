@@ -1,10 +1,14 @@
 package com.moa.app.presentation.ui.home.afterwork
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.data.repository.HomeRepository
+import com.moa.app.data.repository.WorkdayRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
+import com.moa.app.presentation.model.RootNavigation
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkIntent
 import com.moa.app.presentation.ui.home.afterwork.model.AfterWorkUiState
 import com.moa.app.presentation.ui.widget.util.WidgetUpdateManager
@@ -19,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 private const val DATE_CHECK_INTERVAL_MS = 60_000L
 
@@ -27,6 +32,8 @@ class AfterWorkViewModel @AssistedInject constructor(
     @Assisted private val args: HomeNavigation.AfterWork,
     private val moaSideEffectBus: MoaSideEffectBus,
     val widgetUpdateManager: WidgetUpdateManager,
+    private val workdayRepository: WorkdayRepository,
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -50,7 +57,26 @@ class AfterWorkViewModel @AssistedInject constructor(
     val uiState: StateFlow<AfterWorkUiState> = _uiState.asStateFlow()
 
     init {
+        loadHomeData()
         startDateChecker()
+    }
+
+    private fun loadHomeData() {
+        viewModelScope.launch {
+            try {
+                val homeResponse = homeRepository.getHome()
+                _uiState.update { state ->
+                    state.copy(
+                        location = homeResponse.workplace,
+                        workedEarnings = homeResponse.workedEarnings,
+                        standardSalary = homeResponse.standardSalary,
+                        dailyPay = homeResponse.dailyPay,
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "[AfterWork] Failed to load home data", e)
+            }
+        }
     }
 
     private fun startDateChecker() {
@@ -98,7 +124,9 @@ class AfterWorkViewModel @AssistedInject constructor(
     }
 
     private fun onClickCheckWorkHistory() {
-        navigateToBeforeWork()
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History))
+        }
     }
 
     private fun onClickMoreWork() {
@@ -116,8 +144,10 @@ class AfterWorkViewModel @AssistedInject constructor(
     private fun onConfirmMoreWork(intent: AfterWorkIntent.ConfirmMoreWork) {
         _uiState.update { it.copy(showMoreWorkBottomSheet = false) }
 
+        val state = _uiState.value
+        updateClockOutTimeApi(intent.endHour, intent.endMinute)
+
         viewModelScope.launch {
-            val state = _uiState.value
             moaSideEffectBus.emit(
                 MoaSideEffect.Navigate(
                     HomeNavigation.Working(
@@ -129,5 +159,23 @@ class AfterWorkViewModel @AssistedInject constructor(
                 )
             )
         }
+    }
+
+    private fun updateClockOutTimeApi(endHour: Int, endMinute: Int) {
+        viewModelScope.launch {
+            try {
+                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+                Log.d(WORKDAY_TAG, "[AfterWork] Updating clock out time (PATCH): $today, $clockOutTime")
+                workdayRepository.updateClockOutTime(today, clockOutTime)
+            } catch (e: Exception) {
+                Log.e(WORKDAY_TAG, "[AfterWork] Failed to update clock out time", e)
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "HomeNavigation"
+        private const val WORKDAY_TAG = "WorkdayApi"
     }
 }
