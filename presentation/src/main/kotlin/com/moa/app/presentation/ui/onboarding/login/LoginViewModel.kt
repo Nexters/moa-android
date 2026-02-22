@@ -5,15 +5,18 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.AuthRepository
+import com.moa.app.data.repository.HomeRepository
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
 import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.manager.FcmTokenManager
 import com.moa.app.presentation.manager.KakaoLoginManager
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.usecase.DetermineHomeNavigationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -24,7 +27,9 @@ class LoginViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val authRepository: AuthRepository,
     private val onboardingRepository: OnboardingRepository,
+    private val homeRepository: HomeRepository,
     private val tokenRepository: TokenRepository,
+    private val determineHomeNavigation: DetermineHomeNavigationUseCase,
 ) : ViewModel() {
 
     fun clickKakao(activity: Activity) {
@@ -86,7 +91,7 @@ class LoginViewModel @Inject constructor(
                 onboardingRepository.getOnboardingStatus()
             }.onSuccess { onboardingStatus ->
                 if (onboardingStatus.hasRequiredTermsAgreed) {
-                    navigate(RootNavigation.Home)
+                    navigateToHome()
                     return@launch
                 }
 
@@ -154,6 +159,16 @@ class LoginViewModel @Inject constructor(
     private fun toast() {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
+        }
+    }
+
+    private suspend fun navigateToHome() {
+        try {
+            val response = homeRepository.getHome()
+            val homeNavigation = determineHomeNavigation(response)
+            navigate(RootNavigation.Home(homeNavigation))
+        } catch (e: Exception) {
+            navigate(RootNavigation.Home(HomeNavigation.BeforeWork()))
         }
     }
 }

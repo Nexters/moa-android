@@ -252,6 +252,7 @@ private fun WorkingScreen(
                 composition = composition,
                 progress = { progress },
                 modifier = Modifier.fillMaxSize(),
+                alignment = Alignment.TopStart,
             )
         }
 

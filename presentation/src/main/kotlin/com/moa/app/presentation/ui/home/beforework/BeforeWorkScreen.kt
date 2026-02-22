@@ -24,7 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -115,6 +118,7 @@ private fun WorkDayContent(
             month = uiState.month,
             accumulatedSalary = uiState.accumulatedSalary,
             todayEarnedSalary = uiState.todayEarnedSalaryDisplay,
+            additionalSalaryDisplay = uiState.additionalSalaryDisplay,
             isWorkDay = true,
         )
 
@@ -186,10 +190,11 @@ private fun DayOffContent(
             month = uiState.month,
             accumulatedSalary = uiState.accumulatedSalary,
             todayEarnedSalary = uiState.todayEarnedSalaryDisplay,
+            additionalSalaryDisplay = uiState.additionalSalaryDisplay,
             isWorkDay = false,
         )
 
-        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+        Spacer(Modifier.height(MoaTheme.spacing.spacing36))
 
         DayOffInfoCard()
 
@@ -257,6 +262,7 @@ private fun AccumulatedSalarySection(
     month: Int,
     accumulatedSalary: String,
     todayEarnedSalary: String?,
+    additionalSalaryDisplay: String?,
     isWorkDay: Boolean = true,
 ) {
     val coinImage = if (isWorkDay) {
@@ -328,6 +334,28 @@ private fun AccumulatedSalarySection(
                     )
                 }
             }
+        }
+
+        if (additionalSalaryDisplay != null) {
+            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+            Text(
+                text = buildAnnotatedString {
+                    append("기본 월급보다 ")
+                    withStyle(
+                        SpanStyle(
+                            color = MoaTheme.colors.textHighEmphasis,
+                            fontSize = MoaTheme.typography.b1_400.fontSize,
+                            fontWeight = MoaTheme.typography.b1_400.fontWeight,
+                        )
+                    ) {
+                        append(additionalSalaryDisplay)
+                    }
+                    append(" 더 일했어요")
+                },
+                style = MoaTheme.typography.b2_400,
+                color = MoaTheme.colors.textMediumEmphasis,
+            )
         }
     }
 }

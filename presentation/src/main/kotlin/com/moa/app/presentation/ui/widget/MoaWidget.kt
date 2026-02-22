@@ -42,11 +42,13 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.moa.app.core.model.widget.Widget
 import com.moa.app.presentation.R
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.designsystem.theme.Gray20
 import com.moa.app.presentation.designsystem.theme.Gray70
 import com.moa.app.presentation.designsystem.theme.MoaTheme
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 class MoaWidget : GlanceAppWidget() {
 
@@ -60,12 +62,52 @@ class MoaWidget : GlanceAppWidget() {
                 context.applicationContext,
                 MoaWidgetEntryPoint::class.java
             )
-            val repository = entryPoint.getWidgetRepository()
+            val homeRepository = entryPoint.getHomeRepository()
+            val calculateSalaryUseCase = entryPoint.getCalculateAccumulatedSalaryUseCase()
+            val determineHomeNavigation = entryPoint.getDetermineHomeNavigationUseCase()
 
             suspend fun getWidgetUiState() {
                 uiState = MoaWidgetUiState.Loading
                 try {
-                    val widget = repository.getWidget()
+                    val homeResponse = homeRepository.getHome()
+                    val now = LocalTime.now()
+                    val currentTimeStr = String.format("%02d:%02d", now.hour, now.minute)
+                    val homeNavigation = determineHomeNavigation(homeResponse, now)
+
+                    val widget = when (homeNavigation) {
+                        is HomeNavigation.BeforeWork,
+                        is HomeNavigation.AfterWork -> {
+                            Widget.Finish(
+                                monthlySalary = formatCurrency(homeResponse.workedEarnings)
+                            )
+                        }
+                        is HomeNavigation.Working -> {
+                            val todaySalary = calculateSalaryUseCase(
+                                startHour = homeNavigation.startHour,
+                                startMinute = homeNavigation.startMinute,
+                                endHour = homeNavigation.endHour,
+                                endMinute = homeNavigation.endMinute,
+                                dailyPay = homeNavigation.dailyPay,
+                                currentTime = now,
+                            )
+                            if (homeNavigation.isOnVacation) {
+                                Widget.Vacation(
+                                    daySalary = formatCurrency(todaySalary),
+                                    time = currentTimeStr,
+                                )
+                            } else {
+                                Widget.Working(
+                                    daySalary = formatCurrency(todaySalary),
+                                    time = currentTimeStr,
+                                )
+                            }
+                        }
+                        else -> {
+                            Widget.Finish(
+                                monthlySalary = formatCurrency(homeResponse.workedEarnings)
+                            )
+                        }
+                    }
                     uiState = MoaWidgetUiState.Success(widget)
                 } catch (e: Exception) {
                     uiState = MoaWidgetUiState.Error(e.message ?: "알 수 없는 에러")
@@ -87,6 +129,10 @@ class MoaWidget : GlanceAppWidget() {
                 )
             }
         }
+    }
+
+    private fun formatCurrency(amount: Long): String {
+        return String.format("%,d", amount)
     }
 }
 

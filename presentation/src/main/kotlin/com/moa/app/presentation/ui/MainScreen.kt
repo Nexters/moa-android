@@ -187,8 +187,8 @@ private fun MainNavHost(
                 OnboardingScreen(key.startDestination)
             }
 
-            entry<RootNavigation.Home> {
-                HomeScreen()
+            entry<RootNavigation.Home> { key ->
+                HomeScreen(startDestination = key.startDestination)
             }
 
             entry<RootNavigation.History> {

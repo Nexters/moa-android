@@ -21,8 +21,11 @@ import com.moa.app.presentation.ui.home.beforework.BeforeWorkScreen
 import com.moa.app.presentation.ui.home.working.WorkingScreen
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
-    val backStack = rememberNavBackStack(HomeNavigation.BeforeWork())
+fun HomeScreen(
+    startDestination: HomeNavigation,
+    viewModel: HomeViewModel = hiltViewModel(),
+) {
+    val backStack = rememberNavBackStack(startDestination)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
@@ -30,12 +33,17 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
                         HomeNavigation.Back -> {
-                            if (backStack.size > 1) {
-                                backStack.removeAt(backStack.lastIndex)
-                            }
+                            // 뒤로가기 비활성화 - 시간 기반 네비게이션만 허용
                         }
 
-                        is HomeNavigation -> backStack.add(it.destination)
+                        is HomeNavigation -> {
+                            // 스택 초기화 후 새 화면으로 이동 (뒤로가기 방지)
+                            while (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                            backStack.removeAt(0)
+                            backStack.add(it.destination)
+                        }
 
                         else -> Unit
                     }

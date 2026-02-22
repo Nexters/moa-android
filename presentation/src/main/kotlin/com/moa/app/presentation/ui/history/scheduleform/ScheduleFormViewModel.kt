@@ -159,12 +159,8 @@ class ScheduleFormViewModel @AssistedInject constructor(
                 ScheduleInputType.WORK -> WorkdayType.WORK
                 ScheduleInputType.VACATION -> WorkdayType.VACATION
             }
-            val clockInTime = if (state.scheduleType == ScheduleInputType.WORK) {
-                "%02d:%02d".format(state.time.startHour, state.time.startMinute)
-            } else null
-            val clockOutTime = if (state.scheduleType == ScheduleInputType.WORK) {
-                "%02d:%02d".format(state.time.endHour, state.time.endMinute)
-            } else null
+            val clockInTime = "%02d:%02d".format(state.time.startHour, state.time.startMinute)
+            val clockOutTime = "%02d:%02d".format(state.time.endHour, state.time.endMinute)
 
             try {
                 moaSideEffectBus.emit(MoaSideEffect.Loading(true))

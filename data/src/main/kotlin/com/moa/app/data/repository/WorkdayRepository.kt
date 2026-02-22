@@ -7,9 +7,31 @@ import com.moa.app.core.model.history.WorkdayType
 import kotlinx.collections.immutable.ImmutableList
 
 interface WorkdayRepository {
-    suspend fun getWorkdays(year: Int, month: Int): ImmutableList<Workday>
+    suspend fun updateWorkTime(
+        date: String,
+        clockInTime: String,
+        clockOutTime: String,
+        type: String = "WORK",
+    )
 
-    suspend fun getWorkdayDetail(date: String): WorkdayDetail
+    suspend fun updateClockOutTime(
+        date: String,
+        clockOutTime: String,
+    )
+
+    suspend fun getWorkdays(
+        year: Int,
+        month: Int,
+    ): ImmutableList<Workday>
+
+    suspend fun getWorkdayDetail(
+        date: String,
+    ): WorkdayDetail
+
+    suspend fun getEarnings(
+        year: Int,
+        month: Int,
+    ): MonthlyWorkSummary
 
     suspend fun updateWorkday(
         date: String,
@@ -17,6 +39,4 @@ interface WorkdayRepository {
         clockInTime: String?,
         clockOutTime: String?,
     )
-
-    suspend fun getEarnings(year: Int, month: Int): MonthlyWorkSummary
 }

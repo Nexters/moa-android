@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -275,16 +276,23 @@ class HistoryViewModel @Inject constructor(
 
             val isWorkDayFromApi = workday?.type == WorkdayType.WORK
 
-            val hasWorkScheduled = if (hasVacation) {
-                false
-            } else {
-                daySchedules.any { it.type == ScheduleType.WORK_SCHEDULED } || ((isFutureDate || isToday) && isWorkDayFromApi)
-            }
+            val (hasWorkScheduled, hasWorkCompleted) = if (hasVacation) {
+                false to false
+            } else if (isToday && isWorkDayFromApi) {
+                val currentTime = LocalTime.now()
+                val defaultWorkTime = _uiState.value.defaultWorkTime
+                val clockInTime = LocalTime.of(defaultWorkTime.startHour, defaultWorkTime.startMinute)
+                val clockOutTime = LocalTime.of(defaultWorkTime.endHour, defaultWorkTime.endMinute)
 
-            val hasWorkCompleted = if (hasVacation) {
-                false
+                when {
+                    currentTime < clockInTime -> true to false
+                    currentTime >= clockOutTime -> false to true
+                    else -> false to false
+                }
             } else {
-                daySchedules.any { it.type == ScheduleType.WORK_COMPLETED } || (isPastDate && isWorkDayFromApi)
+                val scheduled = daySchedules.any { it.type == ScheduleType.WORK_SCHEDULED } || (isFutureDate && isWorkDayFromApi)
+                val completed = daySchedules.any { it.type == ScheduleType.WORK_COMPLETED } || (isPastDate && isWorkDayFromApi)
+                scheduled to completed
             }
 
             val calendarDay = CalendarDay(
@@ -314,8 +322,16 @@ class HistoryViewModel @Inject constructor(
 
         val workday = state.workdays.find { it.date == dateString }
         val detailType = workdayDetail?.type
-        val isWorkDayFromApi = detailType == WorkdayType.WORK || workday?.type == WorkdayType.WORK
-        val hasVacationFromApi = detailType == WorkdayType.VACATION || workday?.type == WorkdayType.VACATION
+        val isWorkDayFromApi = if (detailType != null) {
+            detailType == WorkdayType.WORK
+        } else {
+            workday?.type == WorkdayType.WORK
+        }
+        val hasVacationFromApi = if (detailType != null) {
+            detailType == WorkdayType.VACATION
+        } else {
+            workday?.type == WorkdayType.VACATION
+        }
 
         val workTime = if (workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
             parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
@@ -356,12 +372,17 @@ class HistoryViewModel @Inject constructor(
         }
 
         val autoVacationSchedule = if (hasVacationFromApi && !hasExistingVacation) {
+            val vacationTime = if (workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
+                parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
+            } else {
+                defaultWorkTime
+            }
             listOf(
                 Schedule(
                     id = -3,
                     date = selectedDate,
                     type = ScheduleType.VACATION,
-                    time = workTime,
+                    time = vacationTime,
                 )
             )
         } else {

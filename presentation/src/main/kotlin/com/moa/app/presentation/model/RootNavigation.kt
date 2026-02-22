@@ -16,7 +16,10 @@ sealed interface RootNavigation : NavKey {
     ) : RootNavigation
 
     @Serializable
-    data object Home : RootNavigation
+    @JvmInline
+    value class Home(
+        val startDestination: HomeNavigation = HomeNavigation.BeforeWork()
+    ) : RootNavigation
 
     @Serializable
     data object History : RootNavigation

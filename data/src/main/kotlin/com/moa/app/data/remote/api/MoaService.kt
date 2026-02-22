@@ -1,5 +1,6 @@
 package com.moa.app.data.remote.api
 
+import com.moa.app.data.remote.model.response.HomeResponse
 import com.moa.app.data.remote.model.response.MemberResponse
 import com.moa.app.data.remote.model.response.PayrollResponse
 import com.moa.app.data.remote.model.response.ProfileResponse
@@ -9,6 +10,9 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface MoaService {
+    @GET("/api/v1/home")
+    suspend fun getHome(): HomeResponse
+
     @GET("/api/v1/version")
     suspend fun getVersion(@Query("osType") osType: String = "ANDROID"): VersionResponse
 

@@ -14,6 +14,7 @@ sealed interface HomeNavigation : RootNavigation {
         val startMinute: Int,
         val endHour: Int,
         val endMinute: Int,
+        val dailyPay: Long = 0L,
         val isOnVacation: Boolean = false,
         val isWorkDay: Boolean = true,
     ) : HomeNavigation

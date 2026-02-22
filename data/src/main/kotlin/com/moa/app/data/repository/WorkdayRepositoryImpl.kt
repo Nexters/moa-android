@@ -5,7 +5,8 @@ import com.moa.app.core.model.history.Workday
 import com.moa.app.core.model.history.WorkdayDetail
 import com.moa.app.core.model.history.WorkdayType
 import com.moa.app.data.remote.api.WorkdayService
-import com.moa.app.data.remote.model.request.UpdateWorkdayRequest
+import com.moa.app.data.remote.model.request.ClockOutRequest
+import com.moa.app.data.remote.model.request.WorkdayRequest
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import javax.inject.Inject
@@ -14,22 +15,63 @@ class WorkdayRepositoryImpl @Inject constructor(
     private val workdayService: WorkdayService,
 ) : WorkdayRepository {
 
-    override suspend fun getWorkdays(year: Int, month: Int): ImmutableList<Workday> {
-        return workdayService.getWorkdays(year, month).map { item ->
+    override suspend fun updateWorkTime(
+        date: String,
+        clockInTime: String,
+        clockOutTime: String,
+        type: String,
+    ) {
+        val request = WorkdayRequest(
+            type = type,
+            clockInTime = clockInTime,
+            clockOutTime = clockOutTime,
+        )
+        workdayService.updateWorkday(date, request)
+    }
+
+    override suspend fun updateClockOutTime(
+        date: String,
+        clockOutTime: String,
+    ) {
+        val request = ClockOutRequest(clockOutTime = clockOutTime)
+        workdayService.patchClockOut(date, request)
+    }
+
+    override suspend fun getWorkdays(
+        year: Int,
+        month: Int,
+    ): ImmutableList<Workday> {
+        val response = workdayService.getWorkdays(year, month)
+        return response.map { item ->
             Workday(
                 date = item.date,
-                type = WorkdayType.valueOf(item.type),
+                type = parseWorkdayType(item.type),
             )
         }.toImmutableList()
     }
 
-    override suspend fun getWorkdayDetail(date: String): WorkdayDetail {
-        val content = workdayService.getWorkday(date)
+    override suspend fun getWorkdayDetail(
+        date: String,
+    ): WorkdayDetail {
+        val response = workdayService.getWorkdayDetail(date)
         return WorkdayDetail(
-            date = content.date,
-            type = WorkdayType.valueOf(content.type),
-            clockInTime = content.clockInTime,
-            clockOutTime = content.clockOutTime,
+            date = response.date,
+            type = parseWorkdayType(response.type),
+            clockInTime = response.clockInTime,
+            clockOutTime = response.clockOutTime,
+        )
+    }
+
+    override suspend fun getEarnings(
+        year: Int,
+        month: Int,
+    ): MonthlyWorkSummary {
+        val response = workdayService.getEarnings(year, month)
+        return MonthlyWorkSummary(
+            workedMinutes = response.workedMinutes,
+            standardMinutes = response.standardMinutes,
+            workedEarnings = response.workedEarnings,
+            standardSalary = response.standardSalary,
         )
     }
 
@@ -39,23 +81,25 @@ class WorkdayRepositoryImpl @Inject constructor(
         clockInTime: String?,
         clockOutTime: String?,
     ) {
-        workdayService.putWorkday(
-            date = date,
-            request = UpdateWorkdayRequest(
-                type = type.name,
-                clockInTime = clockInTime,
-                clockOutTime = clockOutTime,
-            ),
+        val typeString = when (type) {
+            WorkdayType.WORK -> "WORK"
+            WorkdayType.VACATION -> "VACATION"
+            WorkdayType.NONE -> "NONE"
+        }
+
+        val request = WorkdayRequest(
+            type = typeString,
+            clockInTime = clockInTime ?: "09:00",
+            clockOutTime = clockOutTime ?: "18:00",
         )
+        workdayService.updateWorkday(date, request)
     }
 
-    override suspend fun getEarnings(year: Int, month: Int): MonthlyWorkSummary {
-        val response = workdayService.getEarnings(year, month)
-        return MonthlyWorkSummary(
-            workedMinutes = response.workedMinutes,
-            standardMinutes = response.standardMinutes,
-            workedEarnings = response.workedEarnings,
-            standardSalary = response.standardSalary,
-        )
+    private fun parseWorkdayType(type: String): WorkdayType {
+        return when (type.uppercase()) {
+            "WORK" -> WorkdayType.WORK
+            "VACATION" -> WorkdayType.VACATION
+            else -> WorkdayType.NONE
+        }
     }
 }

@@ -3,12 +3,15 @@ package com.moa.app.presentation.ui.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.app.data.local.PreferencesDataStore
+import com.moa.app.data.repository.HomeRepository
 import com.moa.app.data.repository.OnboardingRepository
 import com.moa.app.data.repository.TokenRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.OnboardingNavigation
 import com.moa.app.presentation.model.RootNavigation
+import com.moa.app.presentation.usecase.DetermineHomeNavigationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,7 +21,9 @@ class SplashViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val tokenRepository: TokenRepository,
     private val onboardingRepository: OnboardingRepository,
+    private val homeRepository: HomeRepository,
     private val preferencesDataStore: PreferencesDataStore,
+    private val determineHomeNavigation: DetermineHomeNavigationUseCase,
 ) : ViewModel() {
     fun getOnboardingStatus() {
         viewModelScope.launch {
@@ -37,7 +42,7 @@ class SplashViewModel @Inject constructor(
                 }
 
                 if (onboardingStatus.hasRequiredTermsAgreed) {
-                    navigate(RootNavigation.Home)
+                    navigateToHome()
                     return@launch
                 }
 
@@ -99,6 +104,16 @@ class SplashViewModel @Inject constructor(
     private fun navigate(destination: RootNavigation) {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
+        }
+    }
+
+    private suspend fun navigateToHome() {
+        try {
+            val response = homeRepository.getHome()
+            val homeNavigation = determineHomeNavigation(response)
+            navigate(RootNavigation.Home(homeNavigation))
+        } catch (e: Exception) {
+            navigate(RootNavigation.Home(HomeNavigation.BeforeWork()))
         }
     }
 }

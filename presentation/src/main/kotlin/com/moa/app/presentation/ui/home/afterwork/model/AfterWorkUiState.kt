@@ -8,10 +8,12 @@ import java.util.Locale
 @Stable
 data class AfterWorkUiState(
     val today: LocalDate = LocalDate.now(),
-    val location: String = "모아주식회사",
-    val month: Int = 1,
-    val todaySalary: Long = 132000L,
-    val accumulatedSalary: String = "123,123,000",
+    val location: String? = null,
+    val month: Int = LocalDate.now().monthValue,
+    val todaySalary: Long = 0L,
+    val workedEarnings: Long = 0L,
+    val standardSalary: Long = 0L,
+    val dailyPay: Long = 0L,
     val startHour: Int = 9,
     val startMinute: Int = 0,
     val endHour: Int = 18,
@@ -20,6 +22,17 @@ data class AfterWorkUiState(
     val showMoreWorkBottomSheet: Boolean = false,
     val showConfetti: Boolean = true,
 ) {
+    val monthlyAccumulatedSalary: Long
+        get() = workedEarnings + todaySalary
+
+    val accumulatedSalary: String
+        get() = formatCurrency(monthlyAccumulatedSalary)
+
+    val additionalSalary: Long?
+        get() = if (monthlyAccumulatedSalary > standardSalary) monthlyAccumulatedSalary - standardSalary else null
+
+    val additionalSalaryDisplay: String?
+        get() = additionalSalary?.let { String.format("+%,d원", it) }
     val dateDisplay: String
         get() = today.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN))
 
