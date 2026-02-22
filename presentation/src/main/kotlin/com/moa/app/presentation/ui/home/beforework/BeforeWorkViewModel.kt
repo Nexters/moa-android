@@ -64,6 +64,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             val clockInTime = homeResponse.clockInTime?.toHourMinuteOrNull()
             val clockOutTime = homeResponse.clockOutTime?.toHourMinuteOrNull()
             val isWorkDay = homeResponse.type != HomeType.NONE
+            val isOnVacation = homeResponse.type == HomeType.VACATION
 
             _uiState.update { state ->
                 state.copy(
@@ -76,6 +77,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
                     endHour = clockOutTime?.first ?: state.endHour,
                     endMinute = clockOutTime?.second ?: state.endMinute,
                     isWorkDay = isWorkDay,
+                    isOnVacation = isOnVacation,
                 )
             }
 

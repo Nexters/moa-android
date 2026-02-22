@@ -17,6 +17,7 @@ data class BeforeWorkUiState(
     val endMinute: Int = 0,
     val showTimeBottomSheet: Boolean = false,
     val isWorkDay: Boolean = true,
+    val isOnVacation: Boolean = false,
 ) {
     val accumulatedSalary: String
         get() = String.format("%,d", workedEarnings)
@@ -34,7 +35,11 @@ data class BeforeWorkUiState(
         get() = today.monthValue
 
     val workTimeDisplay: String
-        get() = "${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')} - ${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}"
+        get() = if (isOnVacation) {
+            "휴가"
+        } else {
+            "${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')} - ${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}"
+        }
 
     val autoClockInTime: String
         get() = "${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}"
