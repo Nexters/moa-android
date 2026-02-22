@@ -22,7 +22,7 @@ import com.moa.app.presentation.designsystem.theme.MoaTheme
 @Composable
 fun MoaDateLocationBar(
     date: String,
-    location: String,
+    location: String?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -52,22 +52,24 @@ fun MoaDateLocationBar(
             color = MoaTheme.colors.textHighEmphasis,
         )
 
-        Spacer(Modifier.width(MoaTheme.spacing.spacing12))
+        if (!location.isNullOrEmpty()) {
+            Spacer(Modifier.width(MoaTheme.spacing.spacing12))
 
-        Icon(
-            modifier = Modifier.size(16.dp),
-            painter = painterResource(R.drawable.icon_location),
-            contentDescription = stringResource(R.string.date_location_bar_location_icon_description),
-            tint = MoaTheme.colors.textHighEmphasis,
-        )
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(R.drawable.icon_location),
+                contentDescription = stringResource(R.string.date_location_bar_location_icon_description),
+                tint = MoaTheme.colors.textHighEmphasis,
+            )
 
-        Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.width(4.dp))
 
-        Text(
-            text = location,
-            style = MoaTheme.typography.b2_500,
-            color = MoaTheme.colors.textHighEmphasis,
-        )
+            Text(
+                text = location,
+                style = MoaTheme.typography.b2_500,
+                color = MoaTheme.colors.textHighEmphasis,
+            )
+        }
     }
 }
 
