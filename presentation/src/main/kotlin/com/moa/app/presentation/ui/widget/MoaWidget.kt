@@ -40,6 +40,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import com.moa.app.core.extensions.toHourMinuteOrNull
 import com.moa.app.core.model.widget.Widget
 import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.presentation.R
@@ -72,8 +73,8 @@ class MoaWidget : GlanceAppWidget() {
                     val now = LocalTime.now()
                     val currentTimeStr = String.format("%02d:%02d", now.hour, now.minute)
 
-                    val clockIn = homeResponse.clockInTime?.let { parseTime(it) }
-                    val clockOut = homeResponse.clockOutTime?.let { parseTime(it) }
+                    val clockIn = homeResponse.clockInTime?.toHourMinuteOrNull()
+                    val clockOut = homeResponse.clockOutTime?.toHourMinuteOrNull()
                     val startHour = clockIn?.first ?: 9
                     val startMinute = clockIn?.second ?: 0
                     val endHour = clockOut?.first ?: 18
@@ -152,17 +153,6 @@ class MoaWidget : GlanceAppWidget() {
                     }
                 )
             }
-        }
-    }
-
-    private fun parseTime(time: String): Pair<Int, Int>? {
-        return try {
-            val parts = time.split(":")
-            if (parts.size >= 2) {
-                Pair(parts[0].toInt(), parts[1].toInt())
-            } else null
-        } catch (e: Exception) {
-            null
         }
     }
 

@@ -2,6 +2,7 @@ package com.moa.app.presentation.ui.onboarding.widgetguide
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.extensions.toHourMinuteOrNull
 import com.moa.app.data.remote.model.response.HomeResponse
 import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.data.repository.HomeRepository
@@ -50,8 +51,8 @@ class WidgetGuideViewModel @Inject constructor(
     }
 
     private fun HomeResponse.toHomeNavigation(): HomeNavigation {
-        val clockIn = clockInTime?.let { parseTime(it) }
-        val clockOut = clockOutTime?.let { parseTime(it) }
+        val clockIn = clockInTime?.toHourMinuteOrNull()
+        val clockOut = clockOutTime?.toHourMinuteOrNull()
 
         val startHour = clockIn?.first ?: 9
         val startMinute = clockIn?.second ?: 0
@@ -97,17 +98,6 @@ class WidgetGuideViewModel @Inject constructor(
                 isOnVacation = isOnVacation,
                 isWorkDay = isWorkDay,
             )
-        }
-    }
-
-    private fun parseTime(time: String): Pair<Int, Int>? {
-        return try {
-            val parts = time.split(":")
-            if (parts.size >= 2) {
-                Pair(parts[0].toInt(), parts[1].toInt())
-            } else null
-        } catch (e: Exception) {
-            null
         }
     }
 }

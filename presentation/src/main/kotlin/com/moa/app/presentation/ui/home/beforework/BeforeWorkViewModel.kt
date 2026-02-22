@@ -2,10 +2,12 @@ package com.moa.app.presentation.ui.home.beforework
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.app.core.extensions.toHourMinuteOrNull
 import com.moa.app.data.remote.model.response.HomeType
 import com.moa.app.data.repository.HomeRepository
 import com.moa.app.data.repository.WorkdayRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.ui.home.beforework.model.BeforeWorkIntent
@@ -52,45 +54,34 @@ class BeforeWorkViewModel @AssistedInject constructor(
     }
 
     private fun loadHomeData() {
-        viewModelScope.launch {
-            try {
-                val homeResponse = homeRepository.getHome()
+        suspend {
+            homeRepository.getHome()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { loadHomeData() },
+        ) { homeResponse ->
+            val clockInTime = homeResponse.clockInTime?.toHourMinuteOrNull()
+            val clockOutTime = homeResponse.clockOutTime?.toHourMinuteOrNull()
+            val isWorkDay = homeResponse.type != HomeType.NONE
 
-                val clockInTime = homeResponse.clockInTime?.let { parseTime(it) }
-                val clockOutTime = homeResponse.clockOutTime?.let { parseTime(it) }
-                val isWorkDay = homeResponse.type != HomeType.NONE
-
-                _uiState.update { state ->
-                    state.copy(
-                        location = homeResponse.workplace,
-                        workedEarnings = homeResponse.workedEarnings,
-                        standardSalary = homeResponse.standardSalary,
-                        dailyPay = homeResponse.dailyPay,
-                        startHour = clockInTime?.first ?: state.startHour,
-                        startMinute = clockInTime?.second ?: state.startMinute,
-                        endHour = clockOutTime?.first ?: state.endHour,
-                        endMinute = clockOutTime?.second ?: state.endMinute,
-                        isWorkDay = isWorkDay,
-                    )
-                }
-
-                if (isWorkDay && !hasAutoClockInTriggered) {
-                    startAutoClockInChecker()
-                }
-            } catch (e: Exception) {
-                moaSideEffectBus.emit(MoaSideEffect.Failure(e) { loadHomeData() })
+            _uiState.update { state ->
+                state.copy(
+                    location = homeResponse.workplace,
+                    workedEarnings = homeResponse.workedEarnings,
+                    standardSalary = homeResponse.standardSalary,
+                    dailyPay = homeResponse.dailyPay,
+                    startHour = clockInTime?.first ?: state.startHour,
+                    startMinute = clockInTime?.second ?: state.startMinute,
+                    endHour = clockOutTime?.first ?: state.endHour,
+                    endMinute = clockOutTime?.second ?: state.endMinute,
+                    isWorkDay = isWorkDay,
+                )
             }
-        }
-    }
 
-    private fun parseTime(time: String): Pair<Int, Int>? {
-        return try {
-            val parts = time.split(":")
-            if (parts.size >= 2) {
-                Pair(parts[0].toInt(), parts[1].toInt())
-            } else null
-        } catch (e: Exception) {
-            null
+            if (isWorkDay && !hasAutoClockInTriggered) {
+                startAutoClockInChecker()
+            }
         }
     }
 
@@ -191,23 +182,17 @@ class BeforeWorkViewModel @AssistedInject constructor(
         endMinute: Int,
         type: String = "WORK",
     ) {
-        viewModelScope.launch {
-            val clockInTime = String.format("%02d:%02d", startHour, startMinute)
-            val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+        val clockInTime = String.format("%02d:%02d", startHour, startMinute)
+        val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
 
-            try {
-                homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
-            } catch (e: Exception) {
-                // ignore
-            }
+        suspend {
+            homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
+        }.execute(scope = viewModelScope) {}
 
-            try {
-                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
+        suspend {
+            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
+        }.execute(scope = viewModelScope) {}
     }
 
     private fun navigateToWorking(

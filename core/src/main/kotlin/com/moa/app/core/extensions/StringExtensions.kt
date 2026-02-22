@@ -45,6 +45,17 @@ fun String.toHourMinute(): Pair<Int, Int> {
     return Pair(hour, minute)
 }
 
+fun String.toHourMinuteOrNull(): Pair<Int, Int>? {
+    return try {
+        val parts = this.split(":")
+        if (parts.size >= 2) {
+            Pair(parts[0].toInt(), parts[1].toInt())
+        } else null
+    } catch (e: Exception) {
+        null
+    }
+}
+
 fun Char.isKoreanEnglishOrDigit(): Boolean {
     return this in 'a'..'z' ||
             this in 'A'..'Z' ||

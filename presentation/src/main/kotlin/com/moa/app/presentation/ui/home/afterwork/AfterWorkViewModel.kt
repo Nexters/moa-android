@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.app.data.repository.HomeRepository
 import com.moa.app.data.repository.WorkdayRepository
 import com.moa.app.presentation.bus.MoaSideEffectBus
+import com.moa.app.presentation.extensions.execute
 import com.moa.app.presentation.model.HomeNavigation
 import com.moa.app.presentation.model.MoaSideEffect
 import com.moa.app.presentation.model.RootNavigation
@@ -61,19 +62,16 @@ class AfterWorkViewModel @AssistedInject constructor(
     }
 
     private fun loadHomeData() {
-        viewModelScope.launch {
-            try {
-                val homeResponse = homeRepository.getHome()
-                _uiState.update { state ->
-                    state.copy(
-                        location = homeResponse.workplace,
-                        workedEarnings = homeResponse.workedEarnings,
-                        standardSalary = homeResponse.standardSalary,
-                        dailyPay = homeResponse.dailyPay,
-                    )
-                }
-            } catch (e: Exception) {
-                // ignore
+        suspend {
+            homeRepository.getHome()
+        }.execute(scope = viewModelScope) { homeResponse ->
+            _uiState.update { state ->
+                state.copy(
+                    location = homeResponse.workplace,
+                    workedEarnings = homeResponse.workedEarnings,
+                    standardSalary = homeResponse.standardSalary,
+                    dailyPay = homeResponse.dailyPay,
+                )
             }
         }
     }
@@ -161,14 +159,10 @@ class AfterWorkViewModel @AssistedInject constructor(
     }
 
     private fun updateClockOutTimeApi(endHour: Int, endMinute: Int) {
-        viewModelScope.launch {
-            try {
-                val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
-                workdayRepository.updateClockOutTime(today, clockOutTime)
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
+        suspend {
+            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val clockOutTime = String.format("%02d:%02d", endHour, endMinute)
+            workdayRepository.updateClockOutTime(today, clockOutTime)
+        }.execute(scope = viewModelScope) {}
     }
 }
