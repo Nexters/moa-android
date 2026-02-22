@@ -17,11 +17,11 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.moa.app"
+    namespace = "com.moa.salary.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.moa.app"
+        applicationId = "com.moa.salary.app"
         minSdk = 26
         targetSdk = 36
         versionCode = property("APP_VERSION_CODE").toString().toInt()

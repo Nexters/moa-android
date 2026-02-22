@@ -17,7 +17,7 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.moa.app.data"
+    namespace = "com.moa.salary.app.data"
     compileSdk = 36
 
     defaultConfig {

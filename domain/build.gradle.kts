@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.moa.app.domain"
+    namespace = "com.moa.salary.app.domain"
     compileSdk = 36
 
     defaultConfig {
