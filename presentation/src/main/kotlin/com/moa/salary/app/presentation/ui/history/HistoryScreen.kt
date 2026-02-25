@@ -28,9 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,21 +37,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
+import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
 import com.moa.salary.app.core.model.history.LocalDateModel
 import com.moa.salary.app.core.model.history.MonthlyWorkSummary
 import com.moa.salary.app.core.model.history.Schedule
 import com.moa.salary.app.core.model.history.ScheduleType
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
-import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
-import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.designsystem.component.CalendarHeader
 import com.moa.salary.app.presentation.designsystem.component.Day
+import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
+import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -314,10 +315,10 @@ private fun MonthNavigator(
 
 @Composable
 private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
-    val workedTimeText = formatMinutesToTime(summary.workedMinutes)
-    val standardTimeText = formatMinutesToTime(summary.standardMinutes)
+    val workedTimeText = summary.workedMinutes.convertMinutesToRoundedHours().toString()
+    val standardTimeText = "${summary.standardMinutes.convertMinutesToRoundedHours()}시간"
 
-    val workedSalaryText = "${summary.workedEarnings / 10000}만원"
+    val workedSalaryText = "${summary.workedEarnings / 10000}"
     val standardSalaryText = "${summary.standardSalary / 10000}만원"
 
     Column(
@@ -381,17 +382,6 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
     }
 }
 
-private fun formatMinutesToTime(totalMinutes: Int): String {
-    val remainingMins = totalMinutes % 60
-    val baseHours = totalMinutes / 60
-
-    return when {
-        remainingMins >= 45 -> "${baseHours + 1}시간"
-        remainingMins >= 15 -> "${baseHours}시간 30분"
-        else -> "${baseHours}시간"
-    }
-}
-
 @Composable
 private fun ScheduleItem(
     schedule: Schedule,
@@ -416,7 +406,10 @@ private fun ScheduleItem(
                     ScheduleType.WORK_SCHEDULED -> stringResource(R.string.history_schedule_work_scheduled)
                     ScheduleType.WORK_COMPLETED -> stringResource(R.string.history_schedule_work_completed)
                     ScheduleType.VACATION -> stringResource(R.string.history_schedule_vacation)
-                    ScheduleType.PAYDAY -> stringResource(R.string.history_schedule_payday, schedule.date.day)
+                    ScheduleType.PAYDAY -> stringResource(
+                        R.string.history_schedule_payday,
+                        schedule.date.day
+                    )
                 },
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textLowEmphasis,
@@ -428,6 +421,7 @@ private fun ScheduleItem(
                 text = when (schedule.type) {
                     ScheduleType.WORK_SCHEDULED,
                     ScheduleType.WORK_COMPLETED -> schedule.time?.getFormattedTimeRange() ?: ""
+
                     ScheduleType.VACATION -> schedule.time?.getFormattedTimeRange() ?: ""
                     ScheduleType.PAYDAY -> "+ ${formatCurrency(schedule.amount ?: 0)}원"
                 },
