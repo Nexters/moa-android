@@ -241,6 +241,7 @@ private fun MoaTimeBottomSheetTimeContent(
                         endHour
                     },
                     onItemSelected = onSelectedHour,
+                    itemToString = { "${it}시" },
                 )
 
                 MoaWheelPicker(
@@ -252,6 +253,7 @@ private fun MoaTimeBottomSheetTimeContent(
                         endMinute
                     },
                     onItemSelected = onSelectedMinute,
+                    itemToString = { "${it}분" }
                 )
             }
         }
