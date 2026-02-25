@@ -101,6 +101,90 @@ private fun HistoryScreen(
     selectedDateSchedules: ImmutableList<Schedule>,
     onIntent: (HistoryIntent) -> Unit,
 ) {
+    Scaffold(
+        topBar = {
+            MoaTopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { onIntent(HistoryIntent.ClickBack) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_24_arrow_left),
+                            contentDescription = stringResource(R.string.history_back_description),
+                            tint = MoaTheme.colors.textHighEmphasis,
+                        )
+                    }
+                },
+                containerColor = MoaTheme.colors.containerPrimary,
+            )
+        },
+        containerColor = MoaTheme.colors.bgPrimary,
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
+            item {
+                HistoryCalendar(
+                    uiState = uiState,
+                    onIntent = onIntent,
+                )
+            }
+
+            item {
+                Spacer(Modifier.height(MoaTheme.spacing.spacing28))
+
+                Text(
+                    modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing16),
+                    text = "${uiState.selectedDate.year}.${uiState.selectedDate.month}.${uiState.selectedDate.day}",
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textLowEmphasis,
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing20))
+            }
+
+            items(selectedDateSchedules) { schedule ->
+                ScheduleItem(
+                    schedule = schedule,
+                    onClick = { onIntent(HistoryIntent.ClickSchedule(schedule)) },
+                )
+
+                Spacer(Modifier.height(MoaTheme.spacing.spacing12))
+            }
+
+            if (selectedDateSchedules.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = MoaTheme.spacing.spacing32,
+                                horizontal = MoaTheme.spacing.spacing16,
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.history_no_schedule),
+                            style = MoaTheme.typography.b1_500,
+                            color = MoaTheme.colors.textLowEmphasis,
+                        )
+                    }
+                }
+            }
+
+            item {
+                Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryCalendar(
+    uiState: HistoryUiState,
+    onIntent: (HistoryIntent) -> Unit,
+
+    ) {
     val currentMonth = YearMonth.of(uiState.currentYear, uiState.currentMonth)
     val startMonth = currentMonth.minusMonths(100)
     val endMonth = currentMonth.plusMonths(100)
@@ -122,140 +206,67 @@ private fun HistoryScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            MoaTopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { onIntent(HistoryIntent.ClickBack) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_24_arrow_left),
-                            contentDescription = stringResource(R.string.history_back_description),
-                            tint = MoaTheme.colors.textHighEmphasis,
-                        )
-                    }
-                },
-            )
-        },
-        containerColor = MoaTheme.colors.bgPrimary,
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(horizontal = MoaTheme.spacing.spacing16),
-        ) {
-            item {
-                MonthNavigator(
-                    month = uiState.currentMonth,
-                    onPreviousClick = {
-                        coroutineScope.launch {
-                            calendarState.animateScrollToMonth(currentMonth.minusMonths(1))
-                        }
-                    },
-                    onNextClick = {
-                        coroutineScope.launch {
-                            calendarState.animateScrollToMonth(currentMonth.plusMonths(1))
-                        }
-                    },
-                    onAddClick = { onIntent(HistoryIntent.ClickAddSchedule) },
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(MoaTheme.spacing.spacing16))
-            }
-
-            item {
-                WorkSummaryCard(summary = uiState.monthlyWorkSummary)
-            }
-
-            item {
-                Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-            }
-
-            item {
-                CalendarHeader(daysOfWeek = daysOfWeek)
-            }
-
-            item {
-                HorizontalCalendar(
-                    state = calendarState,
-                    dayContent = { day ->
-                        val calendarDay = uiState.calendarDays.find {
-                            it.date?.year == day.date.year &&
-                                    it.date.month == day.date.monthValue &&
-                                    it.date.day == day.date.dayOfMonth
-                        }
-                        Day(
-                            day = day,
-                            calendarDay = calendarDay,
-                            isSelected = uiState.selectedDate.year == day.date.year &&
-                                    uiState.selectedDate.month == day.date.monthValue &&
-                                    uiState.selectedDate.day == day.date.dayOfMonth,
-                            onClick = {
-                                if (day.position == DayPosition.MonthDate) {
-                                    onIntent(
-                                        HistoryIntent.ClickDate(
-                                            LocalDateModel(
-                                                day.date.year,
-                                                day.date.monthValue,
-                                                day.date.dayOfMonth,
-                                            )
-                                        )
-                                    )
-                                }
-                            },
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(MoaTheme.spacing.spacing28))
-            }
-
-            item {
-                Text(
-                    text = "${uiState.selectedDate.year}.${uiState.selectedDate.month}.${uiState.selectedDate.day}",
-                    style = MoaTheme.typography.b1_500,
-                    color = MoaTheme.colors.textLowEmphasis,
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-            }
-
-            items(selectedDateSchedules) { schedule ->
-                ScheduleItem(
-                    schedule = schedule,
-                    onClick = { onIntent(HistoryIntent.ClickSchedule(schedule)) },
-                )
-                Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-            }
-
-            if (selectedDateSchedules.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = MoaTheme.spacing.spacing32),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.history_no_schedule),
-                            style = MoaTheme.typography.b1_500,
-                            color = MoaTheme.colors.textLowEmphasis,
-                        )
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
+            .background(MoaTheme.colors.containerPrimary)
+            .padding(horizontal = MoaTheme.spacing.spacing16)
+    ) {
+        MonthNavigator(
+            month = uiState.currentMonth,
+            onPreviousClick = {
+                coroutineScope.launch {
+                    calendarState.animateScrollToMonth(currentMonth.minusMonths(1))
                 }
-            }
+            },
+            onNextClick = {
+                coroutineScope.launch {
+                    calendarState.animateScrollToMonth(currentMonth.plusMonths(1))
+                }
+            },
+            onAddClick = { onIntent(HistoryIntent.ClickAddSchedule) },
+        )
 
-            item {
-                Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-            }
-        }
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+        WorkSummaryCard(summary = uiState.monthlyWorkSummary)
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
+        CalendarHeader(daysOfWeek = daysOfWeek)
+
+        HorizontalCalendar(
+            modifier = Modifier.fillMaxWidth(),
+            state = calendarState,
+            dayContent = { day ->
+                val calendarDay = uiState.calendarDays.find {
+                    it.date?.year == day.date.year &&
+                            it.date.month == day.date.monthValue &&
+                            it.date.day == day.date.dayOfMonth
+                }
+                Day(
+                    day = day,
+                    calendarDay = calendarDay,
+                    isSelected = uiState.selectedDate.year == day.date.year &&
+                            uiState.selectedDate.month == day.date.monthValue &&
+                            uiState.selectedDate.day == day.date.dayOfMonth,
+                    onClick = {
+                        if (day.position == DayPosition.MonthDate) {
+                            onIntent(
+                                HistoryIntent.ClickDate(
+                                    LocalDateModel(
+                                        day.date.year,
+                                        day.date.monthValue,
+                                        day.date.dayOfMonth,
+                                    )
+                                )
+                            )
+                        }
+                    },
+                )
+            },
+        )
     }
 }
 
@@ -390,6 +401,7 @@ private fun ScheduleItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing16)
             .clip(RoundedCornerShape(MoaTheme.radius.radius12))
             .background(MoaTheme.colors.containerSecondary)
             .clickable(onClick = onClick)
