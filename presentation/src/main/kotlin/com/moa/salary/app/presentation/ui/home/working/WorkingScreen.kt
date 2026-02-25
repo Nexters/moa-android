@@ -467,7 +467,7 @@ private fun WorkingStatusSection(
             ) {
                 Text(
                     text = stringResource(R.string.working_adjust_schedule),
-                    style = MoaTheme.typography.b2_500,
+                    style = MoaTheme.typography.b1_600,
                 )
             }
         }
