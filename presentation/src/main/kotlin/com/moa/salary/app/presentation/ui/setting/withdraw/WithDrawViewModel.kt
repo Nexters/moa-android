@@ -50,6 +50,7 @@ class WithDrawViewModel @Inject constructor(
         if (selectedReasons.contains(reason)) {
             updateReasons.remove(reason)
         } else {
+            updateReasons.clear()
             updateReasons.add(reason)
         }
 

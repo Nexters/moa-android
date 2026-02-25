@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moa.salary.app.core.model.onboarding.Term
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
-import com.moa.salary.app.core.model.onboarding.Term
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -56,11 +56,7 @@ fun MoaTermBottomSheet(
 
                 if (term is Term.All) {
                     HorizontalDivider(
-                        modifier = Modifier
-                            .padding(
-                                top = MoaTheme.spacing.spacing16,
-                                bottom = MoaTheme.spacing.spacing4,
-                            ),
+                        modifier = Modifier.padding(vertical = MoaTheme.spacing.spacing4),
                         color = MoaTheme.colors.dividerSecondary
                     )
                 }

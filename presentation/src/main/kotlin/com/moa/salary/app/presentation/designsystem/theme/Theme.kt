@@ -57,7 +57,7 @@ fun MoaTheme(
         textBlue = Blue,
         textError = Color(0xFFFF4037),
         textErrorLight = Color(0xFFFFDBDA),
-        dividerPrimary = Gray80,
+        dividerPrimary = Color(0x1FFFFFFF),
         dividerSecondary = Gray70,
         dimPrimary = Color(0x99000000),
         dimSecondary = Color(0x66000000),

@@ -2,6 +2,7 @@ package com.moa.salary.app.presentation.ui.setting.notification
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,6 +37,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaSwitch
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.extensions.openNotificationSettings
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -105,13 +108,14 @@ private fun NotificationSettingScreen(
 
 @Composable
 private fun NotificationSettingHeaderContent() {
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = Color(0x1FFF4037),
-                shape = RoundedCornerShape(MoaTheme.radius.radius12)
-            )
+            .clip(shape = RoundedCornerShape(MoaTheme.radius.radius12))
+            .background(color = Color(0x1FFF4037))
+            .clickable { context.openNotificationSettings() }
             .padding(
                 horizontal = MoaTheme.spacing.spacing16,
                 vertical = 14.dp
@@ -173,9 +177,13 @@ private fun NotificationSettingContent(
                         },
                         trailingContent = {
                             MoaSwitch(
-                                checked =if(isNotificationEnabled) notificationSetting.checked else false,
+                                checked = if (isNotificationEnabled) notificationSetting.checked else false,
                                 onCheckedChange = {
-                                    onIntent(NotificationSettingIntent.ToggleNotification(notificationSetting ))
+                                    onIntent(
+                                        NotificationSettingIntent.ToggleNotification(
+                                            notificationSetting
+                                        )
+                                    )
                                 },
                                 enabled = isNotificationEnabled,
                             )
