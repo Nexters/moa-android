@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.dp
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 
-enum class ScheduleAdjustOption {
-    VACATION,
-    END_WORK,
-    ADJUST_TIME,
+enum class ScheduleAdjustOption(val strRes: Int) {
+    VACATION(R.string.schedule_adjust_option_vacation),
+    END_WORK(R.string.schedule_adjust_option_end_work),
+    ADJUST_TIME(R.string.schedule_adjust_option_adjust_time),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,48 +50,32 @@ fun MoaScheduleAdjustBottomSheet(
                 .padding(horizontal = MoaTheme.spacing.spacing20)
                 .padding(bottom = MoaTheme.spacing.spacing24),
         ) {
-            // 제목
             Text(
                 text = stringResource(R.string.schedule_adjust_title),
                 style = MoaTheme.typography.t1_700,
                 color = MoaTheme.colors.textHighEmphasis,
             )
 
+            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+            ScheduleAdjustOption.entries.forEachIndexed { index, option ->
+                ScheduleOptionItem(
+                    text = stringResource(option.strRes),
+                    isSelected = selectedOption == option,
+                    onClick = { selectedOption = option },
+                )
+
+                if (index != ScheduleAdjustOption.entries.lastIndex) {
+                    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+                }
+            }
+
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-            // 옵션 1: 오늘 휴가예요
-            ScheduleOptionItem(
-                text = stringResource(R.string.schedule_adjust_option_vacation),
-                isSelected = selectedOption == ScheduleAdjustOption.VACATION,
-                onClick = { selectedOption = ScheduleAdjustOption.VACATION },
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-
-            // 옵션 2: 오늘 근무를 마칠 거예요
-            ScheduleOptionItem(
-                text = stringResource(R.string.schedule_adjust_option_end_work),
-                isSelected = selectedOption == ScheduleAdjustOption.END_WORK,
-                onClick = { selectedOption = ScheduleAdjustOption.END_WORK },
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-
-            // 옵션 3: 근무 시간 조정이 필요해요
-            ScheduleOptionItem(
-                text = stringResource(R.string.schedule_adjust_option_adjust_time),
-                isSelected = selectedOption == ScheduleAdjustOption.ADJUST_TIME,
-                onClick = { selectedOption = ScheduleAdjustOption.ADJUST_TIME },
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-
-            // 하단 버튼
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing12),
             ) {
-                // 취소 버튼
                 MoaTertiaryButton(
                     modifier = Modifier
                         .weight(1f)
@@ -104,7 +88,6 @@ fun MoaScheduleAdjustBottomSheet(
                     )
                 }
 
-                // 확인 버튼
                 MoaPrimaryButton(
                     modifier = Modifier
                         .weight(1f)
