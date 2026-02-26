@@ -3,6 +3,7 @@ package com.moa.salary.app.data.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,6 +19,25 @@ class PreferencesDataStore @Inject constructor(
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
         name = DATASTORE_NAME
     )
+
+    suspend fun getBoolean(key: String): Boolean? {
+        return try {
+            val preferences = context.dataStore.data.first()
+            preferences[booleanPreferencesKey(key)]
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    suspend fun putBoolean(key: String, value: Boolean) {
+        try {
+            context.dataStore.edit { preferences ->
+                preferences[booleanPreferencesKey(key)] = value
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to save preference", e)
+        }
+    }
 
     suspend fun getString(key: String): String? {
         return try {
@@ -117,6 +137,14 @@ class PreferencesDataStore @Inject constructor(
         return getString(KEY_PAYDAY_DAY)?.toIntOrNull()
     }
 
+    suspend fun getShownNotificationBottomSheet(): Boolean {
+        return getBoolean(KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET) ?: false
+    }
+
+    suspend fun putShownNotificationBottomSheet(value: Boolean) {
+        putBoolean(KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET, value)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_ACTUAL_CLOCK_OUT_DATE = "actual_clock_out_date"
@@ -125,5 +153,6 @@ class PreferencesDataStore @Inject constructor(
         private const val KEY_ADJUSTED_CLOCK_IN_TIME = "adjusted_clock_in_time"
         private const val KEY_ADJUSTED_CLOCK_OUT_TIME = "adjusted_clock_out_time"
         private const val KEY_PAYDAY_DAY = "payday_day"
+        private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
     }
 }

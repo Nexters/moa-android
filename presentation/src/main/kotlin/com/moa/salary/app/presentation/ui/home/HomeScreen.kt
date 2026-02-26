@@ -1,5 +1,9 @@
 package com.moa.salary.app.presentation.ui.home
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -13,6 +17,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.moa.salary.app.presentation.designsystem.component.MoaHomeTopBar
 import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
+import com.moa.salary.app.presentation.designsystem.component.MoaNotificationBottomSheet
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
@@ -26,8 +31,18 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val backStack = rememberNavBackStack(startDestination)
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            viewModel.onIntent(HomeIntent.GetShownNotificatioNBottomSheet)
+        }
+    )
 
     LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(POST_NOTIFICATIONS)
+        }
+
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
@@ -37,11 +52,7 @@ fun HomeScreen(
                         }
 
                         is HomeNavigation -> {
-                            // 스택 초기화 후 새 화면으로 이동 (뒤로가기 방지)
-                            while (backStack.size > 1) {
-                                backStack.removeAt(backStack.lastIndex)
-                            }
-                            backStack.removeAt(0)
+                            backStack.clear()
                             backStack.add(it.destination)
                         }
 
@@ -68,6 +79,14 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
             backStack = backStack,
+        )
+    }
+
+    if (!viewModel.shownNotificationBottomSheet.value) {
+        MoaNotificationBottomSheet(
+            onDismissRequest = {
+                viewModel.onIntent(HomeIntent.SetShownNotificationBottomSheet)
+            }
         )
     }
 }
@@ -99,4 +118,6 @@ private fun HomeNavHost(
 sealed interface HomeIntent {
     data object NavigateToHistory : HomeIntent
     data object NavigateToSetting : HomeIntent
+    data object GetShownNotificatioNBottomSheet : HomeIntent
+    data object SetShownNotificationBottomSheet : HomeIntent
 }

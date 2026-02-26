@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -236,14 +235,6 @@ private fun InfoCard(
                 text = workTimeOrVacation,
                 style = MoaTheme.typography.t3_700,
                 color = MoaTheme.colors.textHighEmphasis,
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            Icon(
-                painter = painterResource(R.drawable.ic_24_chevron_right),
-                contentDescription = null,
-                tint = MoaTheme.colors.textLowEmphasis,
             )
         }
     }
