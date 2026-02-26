@@ -68,14 +68,31 @@ class WorkingViewModel @AssistedInject constructor(
                 currentSecond = now.second,
                 isOnVacation = args.isOnVacation,
                 workStatus = if (args.isOnVacation) WorkStatus.VACATION else WorkStatus.WORKING,
+                showWorkCompletionOverlay = args.showWorkCompletionOverlay,
+                todaySalary = if (args.showWorkCompletionOverlay) args.dailyPay else 0L,
             )
         )
         uiState = _uiState.asStateFlow()
+
+        if (args.showWorkCompletionOverlay) {
+            hasNavigatedToAfterWork = true
+        }
 
         loadHomeData()
         initializeClockInTime()
         startTimer()
         startTooltipRotation()
+        observeRefreshHome()
+    }
+
+    private fun observeRefreshHome() {
+        viewModelScope.launch {
+            moaSideEffectBus.sideEffects.collect { effect ->
+                if (effect is MoaSideEffect.RefreshHome) {
+                    loadHomeData()
+                }
+            }
+        }
     }
 
     private fun loadHomeData() {
