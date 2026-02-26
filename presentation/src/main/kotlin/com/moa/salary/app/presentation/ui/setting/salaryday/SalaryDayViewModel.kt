@@ -66,6 +66,9 @@ class SalaryDayViewModel @AssistedInject constructor(
             _uiState.value = _uiState.value.copy(
                 salaryDay = day,
             )
+            viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
+            }
         }
     }
 

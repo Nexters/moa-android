@@ -158,6 +158,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
             moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
         }
     }
@@ -219,7 +220,8 @@ class HistoryViewModel @Inject constructor(
     private fun editSchedule(schedule: Schedule) {
         viewModelScope.launch {
             val destination = if (schedule.type == ScheduleType.PAYDAY) {
-                SettingNavigation.WorkInfo
+                val paydayDay = _uiState.value.paydayDay ?: return@launch
+                SettingNavigation.SalaryDay(paydayDay)
             } else {
                 RootNavigation.ScheduleForm(date = schedule.date, schedule = schedule)
             }
@@ -360,7 +362,15 @@ class HistoryViewModel @Inject constructor(
         val hasExistingVacation = existingSchedules.any { it.type == ScheduleType.VACATION }
 
         val autoWorkSchedule = if (!hasVacation && !hasExistingWorkSchedule && isWorkDayFromApi) {
-            val scheduleType = if (localDate.isBefore(today)) {
+            val isToday = localDate.isEqual(today)
+            val isPastWorkEndTime = if (isToday) {
+                val currentTime = LocalTime.now()
+                val workEndTime = LocalTime.of(workTime.endHour, workTime.endMinute)
+                currentTime >= workEndTime
+            } else {
+                false
+            }
+            val scheduleType = if (localDate.isBefore(today) || isPastWorkEndTime) {
                 ScheduleType.WORK_COMPLETED
             } else {
                 ScheduleType.WORK_SCHEDULED
@@ -398,12 +408,15 @@ class HistoryViewModel @Inject constructor(
         }
 
         val paydayDay = _uiState.value.paydayDay
+        val monthlyWorkSummary = state.monthlyWorkSummary
+        val paydayAmount = maxOf(monthlyWorkSummary.workedEarnings, monthlyWorkSummary.standardSalary)
         val paydaySchedule = if (paydayDay == selectedDate.day) {
             listOf(
                 Schedule(
                     id = -2,
                     date = selectedDate,
                     type = ScheduleType.PAYDAY,
+                    amount = paydayAmount,
                 )
             )
         } else {

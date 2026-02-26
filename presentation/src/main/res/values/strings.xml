@@ -2,7 +2,7 @@
 <resources>
     <!-- BeforeWorkScreen -->
     <string name="before_work_time_bottom_sheet_title">예상 출퇴근 시간을 알려주세요</string>
-    <string name="before_work_early_clock_in">일찍 출근하기</string>
+    <string name="before_work_early_clock_in">지금 출근하기</string>
     <string name="before_work_vacation_today">오늘 휴가예요</string>
     <string name="before_work_date_icon_description">날짜</string>
     <string name="before_work_location_icon_description">위치</string>
@@ -38,18 +38,18 @@
 
     <!-- WorkingScreen - Purchasable Tooltip by Amount -->
     <string name="working_tooltip_purchasable_default">열심히 일해서 월급을 모아봐요</string>
-    <string name="working_tooltip_purchasable_10000">커피와 조각 케이크를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_20000">치킨 한 마리 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_30000">영화 2인 예매를 할 수 있어요</string>
-    <string name="working_tooltip_purchasable_50000">로지텍 무선 마우스를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_100000">나이키 운동화 한 켤레를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_200000">노스페이스 백팩을 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_250000">갤럭시 워치 FE를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_300000">에어팟 3세대를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_350000">아이패드 9세대를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_400000">다이슨 무선 청소기를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_450000">닌텐도 스위치를 살 수 있어요</string>
-    <string name="working_tooltip_purchasable_500000">플레이스테이션 5를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_10000">지금까지 번 돈으로 커피와 조각 케이크를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_20000">지금까지 번 돈으로 치킨 한 마리 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_30000">지금까지 번 돈으로 영화 2인 예매를 할 수 있어요</string>
+    <string name="working_tooltip_purchasable_50000">지금까지 번 돈으로 로지텍 무선 마우스를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_100000">지금까지 번 돈으로 나이키 운동화 한 켤레를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_200000">지금까지 번 돈으로 노스페이스 백팩을 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_250000">지금까지 번 돈으로 갤럭시 워치 FE를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_300000">지금까지 번 돈으로 에어팟 3세대를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_350000">지금까지 번 돈으로 아이패드 9세대를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_400000">지금까지 번 돈으로 다이슨 무선 청소기를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_450000">지금까지 번 돈으로 닌텐도 스위치를 살 수 있어요</string>
+    <string name="working_tooltip_purchasable_500000">지금까지 번 돈으로 플레이스테이션 5를 살 수 있어요</string>
 
     <!-- WorkingScreen - Work Completion Overlay -->
     <string name="working_completion_accumulated_salary_label">누적 월급</string>
@@ -112,7 +112,7 @@
     <string name="history_schedule_payday">월급날 · 매달 %1$d일</string>
     <string name="history_schedule_all_day">종일</string>
     <string name="history_schedule_detail_description">상세</string>
-    <string name="history_no_schedule">일정이 없습니다</string>
+    <string name="history_no_schedule">등록된 일정이 없어요</string>
 
     <!-- HistoryCalendar -->
     <string name="history_calendar_payday">월급</string>

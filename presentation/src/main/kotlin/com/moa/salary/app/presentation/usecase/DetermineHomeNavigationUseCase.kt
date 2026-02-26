@@ -41,13 +41,15 @@ class DetermineHomeNavigationUseCase @Inject constructor() {
 
         return when {
             isBeforeWork -> HomeNavigation.BeforeWork()
-            isAfterWork -> HomeNavigation.AfterWork(
-                todayEarnedSalary = response.dailyPay,
+            isAfterWork -> HomeNavigation.Working(
                 startHour = startHour,
                 startMinute = startMinute,
                 endHour = endHour,
                 endMinute = endMinute,
+                dailyPay = response.dailyPay,
                 isOnVacation = isOnVacation,
+                isWorkDay = isWorkDay,
+                showWorkCompletionOverlay = true,
             )
             else -> HomeNavigation.Working(
                 startHour = startHour,

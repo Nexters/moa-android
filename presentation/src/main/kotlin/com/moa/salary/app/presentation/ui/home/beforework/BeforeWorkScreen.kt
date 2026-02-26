@@ -312,28 +312,6 @@ private fun AccumulatedSalarySection(
                 style = MoaTheme.typography.t2_700,
                 color = MoaTheme.colors.textHighEmphasis,
             )
-
-            if (todayEarnedSalary != null) {
-                Spacer(Modifier.width(MoaTheme.spacing.spacing8))
-
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = MoaTheme.colors.textBlue,
-                            shape = RoundedCornerShape(MoaTheme.radius.radius999),
-                        )
-                        .padding(
-                            horizontal = MoaTheme.spacing.spacing8,
-                            vertical = MoaTheme.spacing.spacing4,
-                        ),
-                ) {
-                    Text(
-                        text = todayEarnedSalary,
-                        style = MoaTheme.typography.b2_500,
-                        color = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-            }
         }
 
         if (additionalSalaryDisplay != null) {

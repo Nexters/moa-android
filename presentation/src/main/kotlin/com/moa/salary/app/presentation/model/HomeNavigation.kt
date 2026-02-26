@@ -18,6 +18,7 @@ sealed interface HomeNavigation : RootNavigation {
         val dailyPay: Long = 0L,
         val isOnVacation: Boolean = false,
         val isWorkDay: Boolean = true,
+        val showWorkCompletionOverlay: Boolean = false,
     ) : HomeNavigation
 
     @Serializable

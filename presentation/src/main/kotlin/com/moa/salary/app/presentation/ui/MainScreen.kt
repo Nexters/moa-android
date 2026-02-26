@@ -84,6 +84,16 @@ fun MainScreen(
 
                         is OnboardingNavigation -> Unit
 
+                        SettingNavigation.Back -> {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                        }
+
+                        SettingNavigation.WorkInfo -> backStack.add(it.destination)
+                        is SettingNavigation.SalaryDay -> backStack.add(it.destination)
+                        is SettingNavigation.CompanyName -> backStack.add(it.destination)
+
                         is SettingNavigation -> Unit
 
                         is HomeNavigation -> Unit
@@ -136,6 +146,8 @@ fun MainScreen(
                         }
                     }
                 }
+
+                is MoaSideEffect.RefreshHome -> Unit
             }
         }
     }
