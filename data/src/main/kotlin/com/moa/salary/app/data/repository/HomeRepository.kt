@@ -8,4 +8,6 @@ interface HomeRepository {
     suspend fun clearActualClockOut()
     suspend fun saveAdjustedWorkTime(clockInTime: String, clockOutTime: String)
     suspend fun clearAdjustedWorkTime()
+    suspend fun getShownNotificationBottomSheet(): Boolean
+    suspend fun putShownNotificationBottomSheet(value: Boolean)
 }

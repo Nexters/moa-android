@@ -42,4 +42,12 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun clearAdjustedWorkTime() {
         preferencesDataStore.clearAdjustedWorkTime()
     }
+
+    override suspend fun getShownNotificationBottomSheet(): Boolean {
+        return preferencesDataStore.getShownNotificationBottomSheet()
+    }
+
+    override suspend fun putShownNotificationBottomSheet(value: Boolean) {
+        preferencesDataStore.putShownNotificationBottomSheet(value)
+    }
 }
