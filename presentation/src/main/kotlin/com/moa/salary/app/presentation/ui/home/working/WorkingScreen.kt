@@ -366,7 +366,7 @@ private fun RollingDigitsText(
                 ) { digit ->
                     Text(
                         text = digit.toString(),
-                        style = MoaTheme.typography.h1_700,
+                        style = MoaTheme.typography.h1_700.copy(fontFeatureSettings = "tnum"),
                         color = MoaTheme.colors.textHighEmphasis,
                     )
                 }
