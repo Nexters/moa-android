@@ -60,6 +60,17 @@ class AfterWorkViewModel @AssistedInject constructor(
     init {
         loadHomeData()
         startDateChecker()
+        observeRefreshHome()
+    }
+
+    private fun observeRefreshHome() {
+        viewModelScope.launch {
+            moaSideEffectBus.sideEffects.collect { effect ->
+                if (effect is MoaSideEffect.RefreshHome) {
+                    loadHomeData()
+                }
+            }
+        }
     }
 
     private fun loadHomeData() {

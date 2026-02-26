@@ -17,4 +17,6 @@ sealed interface MoaSideEffect {
         val exception: Throwable,
         val onRetry: () -> Unit,
     ) : MoaSideEffect
+
+    data object RefreshHome : MoaSideEffect
 }

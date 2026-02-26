@@ -197,6 +197,7 @@ class WorkScheduleViewModel @AssistedInject constructor(
             onRetry = { nextIfIsNotOnboarding() },
         ) {
             viewModelScope.launch {
+                moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
             }
         }
