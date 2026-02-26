@@ -61,8 +61,9 @@ data class WorkingUiState(
         get() {
             if (showWorkCompletionOverlay) return 0.7f
 
-            val totalSeconds = elapsedSeconds
-            val fractionInCycle = totalSeconds / 60f
+            val totalSecondsInCycle = (elapsedMinutes % 30) * 60 + elapsedSeconds
+            val cycleSeconds = 30 * 60f
+            val fractionInCycle = totalSecondsInCycle / cycleSeconds
             val minHeight = 0.3f
             val maxHeight = 0.7f
             return minHeight + (maxHeight - minHeight) * fractionInCycle
