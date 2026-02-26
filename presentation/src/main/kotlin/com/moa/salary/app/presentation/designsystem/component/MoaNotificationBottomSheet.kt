@@ -10,23 +10,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
-import com.moa.salary.app.presentation.extensions.openNotificationSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoaNotificationBottomSheet(
+    onAllowClick: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     MoaBottomSheet(
         onDismissRequest = onDismissRequest,
     ) {
         MoaNotificationBottomSheetContent(
+            onAllowClick = onAllowClick,
             onDismissRequest = onDismissRequest,
         )
     }
@@ -34,10 +34,9 @@ fun MoaNotificationBottomSheet(
 
 @Composable
 private fun MoaNotificationBottomSheetContent(
+    onAllowClick: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,10 +61,7 @@ private fun MoaNotificationBottomSheetContent(
         Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
         MoaPrimaryButton(
-            onClick = {
-                onDismissRequest()
-                context.openNotificationSettings()
-            },
+            onClick = onAllowClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp),
@@ -99,7 +95,8 @@ private fun MoaNotificationBottomSheetContent(
 private fun MoaNotificationBottomSheetPreview() {
     MoaTheme {
         MoaNotificationBottomSheetContent(
-            onDismissRequest = {}
+            onAllowClick = {},
+            onDismissRequest = {},
         )
     }
 }

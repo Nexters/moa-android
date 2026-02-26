@@ -47,6 +47,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun setShownNotificationBottomSheet() {
+        shownNotificationBottomSheet.value = true
         viewModelScope.launch {
             homeRepository.putShownNotificationBottomSheet(true)
         }

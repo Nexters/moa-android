@@ -33,15 +33,11 @@ fun HomeScreen(
     val backStack = rememberNavBackStack(startDestination)
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            viewModel.onIntent(HomeIntent.GetShownNotificatioNBottomSheet)
-        }
+        onResult = { _ -> }
     )
 
     LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(POST_NOTIFICATIONS)
-        }
+        viewModel.onIntent(HomeIntent.GetShownNotificatioNBottomSheet)
 
         viewModel.moaSideEffects.collect {
             when (it) {
@@ -84,6 +80,12 @@ fun HomeScreen(
 
     if (!viewModel.shownNotificationBottomSheet.value) {
         MoaNotificationBottomSheet(
+            onAllowClick = {
+                viewModel.onIntent(HomeIntent.SetShownNotificationBottomSheet)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionLauncher.launch(POST_NOTIFICATIONS)
+                }
+            },
             onDismissRequest = {
                 viewModel.onIntent(HomeIntent.SetShownNotificationBottomSheet)
             }
