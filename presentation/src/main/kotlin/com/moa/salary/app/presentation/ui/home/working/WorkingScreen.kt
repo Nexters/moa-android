@@ -186,7 +186,7 @@ private fun WorkingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     if (!uiState.showWorkCompletionOverlay) {
-                        RollingTooltipBanner(
+                        TooltipBanner(
                             monthSalary = uiState.monthSalary,
                             todaySalary = uiState.todaySalary,
                             remainingHours = uiState.remainingHours,
@@ -260,7 +260,7 @@ private fun WorkingScreen(
 }
 
 @Composable
-private fun RollingTooltipBanner(
+private fun TooltipBanner(
     monthSalary: String,
     todaySalary: Long,
     remainingHours: Int,
@@ -295,21 +295,16 @@ private fun RollingTooltipBanner(
 
     val displayIndex = if (isOnVacation) 0 else currentIndex % tooltipMessages.size
 
-    MoaTooltipBanner {
-        AnimatedContent(
-            targetState = displayIndex,
-            transitionSpec = {
-                (slideInVertically { height -> height } + fadeIn())
-                    .togetherWith(slideOutVertically { height -> -height } + fadeOut())
-            },
-            label = "tooltipAnimation",
-        ) { index ->
-            Text(
-                text = tooltipMessages.getOrElse(index) { tooltipMessages.first() },
-                style = MoaTheme.typography.b2_500,
-                color = MoaTheme.colors.textHighEmphasis,
-            )
-        }
+    AnimatedContent(
+        targetState = displayIndex,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(durationMillis = 500, delayMillis = 500)) togetherWith
+                    fadeOut(animationSpec = tween(durationMillis = 500))
+        },
+        label = "tooltipBannerAnimation",
+    ) { targetIndex ->
+        val message = tooltipMessages.getOrElse(targetIndex) { tooltipMessages.first() }
+        MoaTooltipBanner(text = message)
     }
 }
 
