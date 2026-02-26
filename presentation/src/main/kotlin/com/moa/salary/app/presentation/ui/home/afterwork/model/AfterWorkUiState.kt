@@ -23,11 +23,8 @@ data class AfterWorkUiState(
     val showMoreWorkBottomSheet: Boolean = false,
     val showConfetti: Boolean = true,
 ) {
-    val monthlyAccumulatedSalary: Long
-        get() = workedEarnings + todaySalary
-
     val accumulatedSalary: String
-        get() = formatCurrency(monthlyAccumulatedSalary)
+        get() = formatCurrency(workedEarnings)
 
     val dateDisplay: String
         get() = today.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN))

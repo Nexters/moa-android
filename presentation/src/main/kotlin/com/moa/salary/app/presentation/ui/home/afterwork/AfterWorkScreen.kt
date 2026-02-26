@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -63,57 +62,29 @@ private fun AfterWorkScreen(
     uiState: AfterWorkUiState,
     onIntent: (AfterWorkIntent) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = MoaTheme.spacing.spacing20),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
-
-        MoaDateLocationBar(
-            date = uiState.dateDisplay,
-            location = uiState.location,
-        )
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-        Box(
-            modifier = Modifier.size(80.dp),
-            contentAlignment = Alignment.Center,
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = MoaTheme.spacing.spacing20),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+            MoaDateLocationBar(
+                date = uiState.dateDisplay,
+                location = uiState.location,
+            )
+
+            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
             Image(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.size(80.dp),
                 painter = painterResource(R.drawable.ic_full_coin),
                 contentDescription = stringResource(R.string.after_work_coin_description),
             )
 
-            if (uiState.showConfetti) {
-                val composition by rememberLottieComposition(
-                    LottieCompositionSpec.RawRes(R.raw.confeti)
-                )
-                val progress by animateLottieCompositionAsState(
-                    composition = composition,
-                    iterations = 1,
-                )
-
-                LaunchedEffect(progress) {
-                    if (progress == 1f) {
-                        onIntent(AfterWorkIntent.DismissConfetti)
-                    }
-                }
-
-                LottieAnimation(
-                    composition = composition,
-                    progress = { progress },
-                    modifier = Modifier
-                        .wrapContentSize(unbounded = true)
-                        .size(200.dp),
-                )
-            }
-        }
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
         Text(
             text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
@@ -167,7 +138,31 @@ private fun AfterWorkScreen(
             )
         }
 
-        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+        }
+
+        if (uiState.showConfetti) {
+            val composition by rememberLottieComposition(
+                LottieCompositionSpec.RawRes(R.raw.confeti)
+            )
+            val progress by animateLottieCompositionAsState(
+                composition = composition,
+                iterations = 1,
+            )
+
+            LaunchedEffect(progress) {
+                if (progress == 1f) {
+                    onIntent(AfterWorkIntent.DismissConfetti)
+                }
+            }
+
+            LottieAnimation(
+                composition = composition,
+                progress = { progress },
+                modifier = Modifier.fillMaxSize(),
+                alignment = Alignment.TopStart,
+            )
+        }
     }
 }
 
