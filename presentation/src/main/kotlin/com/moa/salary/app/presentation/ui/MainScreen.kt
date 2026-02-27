@@ -16,6 +16,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.moa.salary.app.core.exception.ApiErrorException
 import com.moa.salary.app.core.exception.NetworkException
 import com.moa.salary.app.core.exception.ServerException
@@ -142,6 +143,7 @@ fun MainScreen(
                         }
 
                         else -> {
+                            FirebaseCrashlytics.getInstance().recordException(it.exception)
                             Toast.makeText(context, "일시적인 오류가 발생했어요", Toast.LENGTH_LONG).show()
                         }
                     }
