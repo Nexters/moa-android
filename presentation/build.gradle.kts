@@ -82,6 +82,9 @@ dependencies {
     // Calendar
     implementation(libs.calendar.compose)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
