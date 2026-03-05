@@ -169,7 +169,7 @@ private fun WorkingScreen(
         ) {
             val animatedHeightFraction by animateFloatAsState(
                 targetValue = uiState.coinHeightFraction,
-                animationSpec = tween(durationMillis = 2000),
+                animationSpec = tween(durationMillis = 500),
                 label = "coinHeightAnimation",
             )
 
