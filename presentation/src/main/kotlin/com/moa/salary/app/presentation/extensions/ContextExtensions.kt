@@ -3,6 +3,7 @@ package com.moa.salary.app.presentation.extensions
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import androidx.core.net.toUri
 
@@ -39,4 +40,13 @@ fun Context.openNotificationSettings() {
     }
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
+}
+
+fun Context.openPlayStore() {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+        startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+
+    }
 }
