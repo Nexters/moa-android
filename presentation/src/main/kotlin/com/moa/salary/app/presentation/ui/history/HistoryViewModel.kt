@@ -325,7 +325,7 @@ class HistoryViewModel @Inject constructor(
         }
 
         val workTime =
-            if (workdayDetail?.startHour !=null && workdayDetail?.startMinute != null && workdayDetail?.endHour!=null && workdayDetail?.endMinute != null) {
+            if (workdayDetail?.startHour !=null && workdayDetail.startMinute != null && workdayDetail.endHour!=null && workdayDetail.endMinute != null) {
                 Time(
                     workdayDetail.startHour!!,
                     workdayDetail.startMinute!!,
@@ -379,7 +379,7 @@ class HistoryViewModel @Inject constructor(
 
         val autoVacationSchedule = if (hasVacationFromApi && !hasExistingVacation) {
             val vacationTime =
-                if (workdayDetail?.startHour !=null && workdayDetail?.startMinute != null && workdayDetail?.endHour!=null && workdayDetail?.endMinute != null) {
+                if (workdayDetail?.startHour !=null && workdayDetail.startMinute != null && workdayDetail.endHour!=null && workdayDetail.endMinute != null) {
                     Time(
                         workdayDetail.startHour!!,
                         workdayDetail.startMinute!!,
