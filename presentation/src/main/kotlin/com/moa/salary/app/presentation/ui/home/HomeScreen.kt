@@ -37,16 +37,12 @@ fun HomeScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(HomeIntent.GetShownNotificatioNBottomSheet)
+        viewModel.onIntent(HomeIntent.GetShownNotificationBottomSheet)
 
         viewModel.moaSideEffects.collect {
             when (it) {
                 is MoaSideEffect.Navigate -> {
                     when (it.destination) {
-                        HomeNavigation.Back -> {
-                            // 뒤로가기 비활성화 - 시간 기반 네비게이션만 허용
-                        }
-
                         is HomeNavigation -> {
                             backStack.clear()
                             backStack.add(it.destination)
@@ -120,6 +116,6 @@ private fun HomeNavHost(
 sealed interface HomeIntent {
     data object NavigateToHistory : HomeIntent
     data object NavigateToSetting : HomeIntent
-    data object GetShownNotificatioNBottomSheet : HomeIntent
+    data object GetShownNotificationBottomSheet : HomeIntent
     data object SetShownNotificationBottomSheet : HomeIntent
 }

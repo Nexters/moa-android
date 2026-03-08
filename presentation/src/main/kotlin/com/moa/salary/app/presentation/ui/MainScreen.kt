@@ -35,9 +35,6 @@ import com.moa.salary.app.presentation.ui.history.scheduleform.ScheduleFormScree
 import com.moa.salary.app.presentation.ui.home.HomeScreen
 import com.moa.salary.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.salary.app.presentation.ui.setting.SettingScreen
-import com.moa.salary.app.presentation.ui.setting.companyname.CompanyNameScreen
-import com.moa.salary.app.presentation.ui.setting.salaryday.SalaryDayScreen
-import com.moa.salary.app.presentation.ui.setting.workinfo.WorkInfoScreen
 import com.moa.salary.app.presentation.ui.splash.SplashScreen
 import com.moa.salary.app.presentation.ui.webview.WebViewScreen
 
@@ -66,6 +63,11 @@ fun MainScreen(
                             }
                         }
 
+                        is RootNavigation.Splash -> {
+                            backStack.clear()
+                            backStack.add(it.destination)
+                        }
+
                         is RootNavigation.Onboarding -> {
                             val startDestination = it.destination.startDestination
                             val shouldClear = when (startDestination) {
@@ -83,23 +85,27 @@ fun MainScreen(
                             backStack.add(it.destination)
                         }
 
-                        is OnboardingNavigation -> Unit
-
-                        SettingNavigation.Back -> {
-                            if (backStack.size > 1) {
-                                backStack.removeAt(backStack.lastIndex)
-                            }
+                        is RootNavigation.History -> {
+                            backStack.add(it.destination)
                         }
 
-                        SettingNavigation.WorkInfo -> backStack.add(it.destination)
-                        is SettingNavigation.SalaryDay -> backStack.add(it.destination)
-                        is SettingNavigation.CompanyName -> backStack.add(it.destination)
+                        is RootNavigation.ScheduleForm -> {
+                            backStack.add(it.destination)
+                        }
+
+                        is RootNavigation.Setting -> {
+                            backStack.add(it.destination)
+                        }
+
+                        is RootNavigation.Webview -> {
+                            backStack.add(it.destination)
+                        }
+
+                        is OnboardingNavigation -> Unit
 
                         is SettingNavigation -> Unit
 
                         is HomeNavigation -> Unit
-
-                        else -> backStack.add(it.destination)
                     }
                 }
 
@@ -136,9 +142,7 @@ fun MainScreen(
                         }
 
                         is ApiErrorException -> {
-                            val code = it.exception.code
                             val message = it.exception.message
-                            // TODO 필요하다면 code에 따른 처리
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
 
@@ -148,8 +152,6 @@ fun MainScreen(
                         }
                     }
                 }
-
-                is MoaSideEffect.RefreshHome -> Unit
             }
         }
     }
@@ -214,23 +216,14 @@ private fun MainNavHost(
             }
 
             entry<RootNavigation.ScheduleForm> { key ->
-                ScheduleFormScreen(initialDate = key.date, schedule = key.schedule)
+                ScheduleFormScreen(
+                    initialDate = key.date,
+                    schedule = key.schedule
+                )
             }
 
             entry<RootNavigation.Setting> {
                 SettingScreen()
-            }
-
-            entry<SettingNavigation.WorkInfo> {
-                WorkInfoScreen()
-            }
-
-            entry<SettingNavigation.SalaryDay> { key ->
-                SalaryDayScreen(day = key.day)
-            }
-
-            entry<SettingNavigation.CompanyName> { key ->
-                CompanyNameScreen(companyName = key.companyName)
             }
 
             entry<RootNavigation.Webview> { key ->

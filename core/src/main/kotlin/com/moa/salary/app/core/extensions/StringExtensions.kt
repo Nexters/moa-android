@@ -1,6 +1,6 @@
 package com.moa.salary.app.core.extensions
 
-import com.moa.salary.app.core.util.PayrollConstants
+import com.moa.salary.app.core.util.Constants
 import java.util.Locale
 
 fun makeTimeString(hour: Int, minute: Int): String {
@@ -18,12 +18,12 @@ fun formatCurrency(amount : Long) : String {
 fun String.makePriceString(): String {
     val value = this.toDoubleOrNull() ?: return ""
 
-    if (value < PayrollConstants.MAN) {
+    if (value < Constants.MAN) {
         return ""
     }
 
-    if (value < PayrollConstants.EOK) {
-        val divided = value / PayrollConstants.MAN
+    if (value < Constants.EOK) {
+        val divided = value / Constants.MAN
         var formatted = String.format(Locale.getDefault(), "%.1f", divided)
         if (formatted.endsWith(".0")) {
             formatted = formatted.substring(0, formatted.length - 2)
@@ -31,8 +31,8 @@ fun String.makePriceString(): String {
         return "${formatted}만원"
     } else {
         val valueAsLong = value.toLong()
-        val eokPart = valueAsLong / PayrollConstants.EOK
-        val manPart = (valueAsLong % PayrollConstants.EOK) / PayrollConstants.MAN
+        val eokPart = valueAsLong / Constants.EOK
+        val manPart = (valueAsLong % Constants.EOK) / Constants.MAN
 
         return buildString {
             append("${eokPart}억")

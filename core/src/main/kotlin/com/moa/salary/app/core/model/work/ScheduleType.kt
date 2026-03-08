@@ -1,4 +1,4 @@
-package com.moa.salary.app.core.model.history
+package com.moa.salary.app.core.model.work
 
 import kotlinx.serialization.Serializable
 

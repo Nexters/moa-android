@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.Schedule
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.Schedule
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.DatePickerBottomSheet
@@ -304,6 +304,17 @@ private fun ScheduleTypeButton(
             color = textColor,
         )
     }
+}
+
+sealed interface ScheduleFormIntent {
+    data object ClickBack : ScheduleFormIntent
+    data class SelectScheduleType(val type: ScheduleInputType) : ScheduleFormIntent
+    data class SetDate(val date: LocalDateModel) : ScheduleFormIntent
+    data class SetTime(val time: Time) : ScheduleFormIntent
+    data class ShowDateBottomSheet(val visible: Boolean) : ScheduleFormIntent
+    data class ShowTimeBottomSheet(val visible: Boolean) : ScheduleFormIntent
+    data object ClickCancel : ScheduleFormIntent
+    data object ClickConfirm : ScheduleFormIntent
 }
 
 @Preview

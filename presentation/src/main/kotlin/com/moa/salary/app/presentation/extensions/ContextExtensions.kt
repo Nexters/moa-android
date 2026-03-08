@@ -40,3 +40,12 @@ fun Context.openNotificationSettings() {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
 }
+
+fun Context.openPlayStore() {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+        startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+
+    }
+}

@@ -1,4 +1,4 @@
-package com.moa.salary.app.core.model.history
+package com.moa.salary.app.core.model.work
 
 import androidx.compose.runtime.Stable
 import com.moa.salary.app.core.model.onboarding.Time

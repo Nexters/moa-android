@@ -23,7 +23,6 @@ class SettingViewModel @Inject constructor(
 
     private fun rootBack() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
             moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
         }
     }
