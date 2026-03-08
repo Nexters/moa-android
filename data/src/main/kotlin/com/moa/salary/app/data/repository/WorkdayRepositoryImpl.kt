@@ -1,10 +1,11 @@
 package com.moa.salary.app.data.repository
 
-import com.moa.salary.app.core.model.history.MonthlyWorkSummary
-import com.moa.salary.app.core.model.history.Workday
-import com.moa.salary.app.core.model.history.WorkdayDetail
-import com.moa.salary.app.core.model.history.WorkdayType
+import com.moa.salary.app.core.model.work.MonthlyWorkSummary
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayItem
 import com.moa.salary.app.data.remote.api.WorkdayService
+import com.moa.salary.app.data.remote.mapper.toDomain
+import com.moa.salary.app.data.remote.mapper.toWorkdayType
 import com.moa.salary.app.data.remote.model.request.ClockOutRequest
 import com.moa.salary.app.data.remote.model.request.WorkdayRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -15,91 +16,51 @@ class WorkdayRepositoryImpl @Inject constructor(
     private val workdayService: WorkdayService,
 ) : WorkdayRepository {
 
-    override suspend fun updateWorkTime(
+    override suspend fun updateWorkday(
         date: String,
         clockInTime: String,
         clockOutTime: String,
         type: String,
-    ) {
+    ): Workday {
         val request = WorkdayRequest(
             type = type,
             clockInTime = clockInTime,
             clockOutTime = clockOutTime,
         )
-        workdayService.updateWorkday(date, request)
+        return workdayService.updateWorkday(date, request).toDomain()
     }
 
-    override suspend fun updateClockOutTime(
+    override suspend fun patchClockOUt(
         date: String,
         clockOutTime: String,
-    ) {
+    ): Workday {
         val request = ClockOutRequest(clockOutTime = clockOutTime)
-        workdayService.patchClockOut(date, request)
+        return workdayService.patchClockOut(date, request).toDomain()
     }
 
     override suspend fun getWorkdays(
         year: Int,
         month: Int,
-    ): ImmutableList<Workday> {
+    ): ImmutableList<WorkdayItem> {
         val response = workdayService.getWorkdays(year, month)
         return response.map { item ->
-            Workday(
+            WorkdayItem(
                 date = item.date,
-                type = parseWorkdayType(item.type),
+                type = item.type.toWorkdayType(),
             )
         }.toImmutableList()
     }
 
-    override suspend fun getWorkdayDetail(
+    override suspend fun getWorkday(
         date: String,
-    ): WorkdayDetail {
-        val response = workdayService.getWorkdayDetail(date)
-        return WorkdayDetail(
-            date = response.date,
-            type = parseWorkdayType(response.type),
-            clockInTime = response.clockInTime,
-            clockOutTime = response.clockOutTime,
-        )
+    ): Workday {
+        return workdayService.getWorkday(date).toDomain()
     }
 
     override suspend fun getEarnings(
         year: Int,
         month: Int,
     ): MonthlyWorkSummary {
-        val response = workdayService.getEarnings(year, month)
-        return MonthlyWorkSummary(
-            workedMinutes = response.workedMinutes,
-            standardMinutes = response.standardMinutes,
-            workedEarnings = response.workedEarnings,
-            standardSalary = response.standardSalary,
-        )
-    }
-
-    override suspend fun updateWorkday(
-        date: String,
-        type: WorkdayType,
-        clockInTime: String?,
-        clockOutTime: String?,
-    ) {
-        val typeString = when (type) {
-            WorkdayType.WORK -> "WORK"
-            WorkdayType.VACATION -> "VACATION"
-            WorkdayType.NONE -> "NONE"
-        }
-
-        val request = WorkdayRequest(
-            type = typeString,
-            clockInTime = clockInTime ?: "09:00",
-            clockOutTime = clockOutTime ?: "18:00",
-        )
-        workdayService.updateWorkday(date, request)
-    }
-
-    private fun parseWorkdayType(type: String): WorkdayType {
-        return when (type.uppercase()) {
-            "WORK" -> WorkdayType.WORK
-            "VACATION" -> WorkdayType.VACATION
-            else -> WorkdayType.NONE
-        }
+        return workdayService.getEarnings(year, month).toDomain()
     }
 }

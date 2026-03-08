@@ -2,16 +2,14 @@ package com.moa.salary.app.presentation.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.salary.app.data.local.PreferencesDataStore
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.OnboardingRepository
 import com.moa.salary.app.data.repository.TokenRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
-import com.moa.salary.app.presentation.model.HomeNavigation
+import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
-import com.moa.salary.app.presentation.usecase.DetermineHomeNavigationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,8 +20,6 @@ class SplashViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val onboardingRepository: OnboardingRepository,
     private val homeRepository: HomeRepository,
-    private val preferencesDataStore: PreferencesDataStore,
-    private val determineHomeNavigation: DetermineHomeNavigationUseCase,
 ) : ViewModel() {
     fun getOnboardingStatus() {
         viewModelScope.launch {
@@ -37,12 +33,8 @@ class SplashViewModel @Inject constructor(
             runCatching {
                 onboardingRepository.getOnboardingStatus()
             }.onSuccess { onboardingStatus ->
-                onboardingStatus.profile?.paydayDay?.let { paydayDay ->
-                    preferencesDataStore.setPaydayDay(paydayDay)
-                }
-
                 if (onboardingStatus.hasRequiredTermsAgreed) {
-                    navigateToHome()
+                    getHome()
                     return@launch
                 }
 
@@ -101,19 +93,22 @@ class SplashViewModel @Inject constructor(
         }
     }
 
-    private fun navigate(destination: RootNavigation) {
+    private fun getHome() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
+            runCatching {
+                homeRepository.getHome()
+            }.onSuccess {
+                val homeNavigation = it.determineHomeNavigation()
+                navigate(RootNavigation.Home(homeNavigation))
+            }.onFailure {
+                navigate(RootNavigation.Onboarding())
+            }
         }
     }
 
-    private suspend fun navigateToHome() {
-        try {
-            val response = homeRepository.getHome()
-            val homeNavigation = determineHomeNavigation(response)
-            navigate(RootNavigation.Home(homeNavigation))
-        } catch (_: Exception) {
-            navigate(RootNavigation.Home(HomeNavigation.BeforeWork()))
+    private fun navigate(destination: RootNavigation) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
         }
     }
 }

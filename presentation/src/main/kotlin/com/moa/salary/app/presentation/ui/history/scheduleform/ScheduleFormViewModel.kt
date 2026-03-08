@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.makeDateString
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.Schedule
-import com.moa.salary.app.core.model.history.ScheduleType
-import com.moa.salary.app.core.model.history.WorkdayType
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.Schedule
+import com.moa.salary.app.core.model.work.ScheduleType
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
@@ -168,7 +168,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
                 moaSideEffectBus.emit(MoaSideEffect.Loading(true))
                 workdayRepository.updateWorkday(
                     date = date,
-                    type = workdayType,
+                    type = workdayType.name,
                     clockInTime = clockInTime,
                     clockOutTime = clockOutTime,
                 )

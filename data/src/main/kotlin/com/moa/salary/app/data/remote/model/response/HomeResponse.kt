@@ -8,14 +8,7 @@ data class HomeResponse(
     val workedEarnings: Long,
     val standardSalary: Long,
     val dailyPay: Long,
-    val type: HomeType,
+    val type: String,
     val clockInTime: String?,
     val clockOutTime: String?,
 )
-
-@Serializable
-enum class HomeType {
-    NONE,
-    WORK,
-    VACATION,
-}

@@ -1,6 +1,7 @@
 package com.moa.salary.app.data.remote.mapper
 
 import com.moa.salary.app.core.extensions.toHourMinute
+import com.moa.salary.app.core.extensions.toHourMinuteOrNull
 import com.moa.salary.app.core.model.onboarding.OnboardingStatus
 import com.moa.salary.app.core.model.onboarding.Payroll
 import com.moa.salary.app.core.model.onboarding.Profile
@@ -9,12 +10,21 @@ import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.onboarding.WorkPolicy
 import com.moa.salary.app.core.model.setting.NotificationSetting
 import com.moa.salary.app.core.model.setting.SettingTerm
+import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.MonthlyWorkSummary
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayItem
+import com.moa.salary.app.core.model.work.WorkdayType
+import com.moa.salary.app.data.remote.model.response.EarningsResponse
+import com.moa.salary.app.data.remote.model.response.HomeResponse
 import com.moa.salary.app.data.remote.model.response.NotificationSettingResponse
 import com.moa.salary.app.data.remote.model.response.PayrollResponse
 import com.moa.salary.app.data.remote.model.response.ProfileResponse
 import com.moa.salary.app.data.remote.model.response.StatusResponse
 import com.moa.salary.app.data.remote.model.response.TermResponse
 import com.moa.salary.app.data.remote.model.response.WorkPolicyResponse
+import com.moa.salary.app.data.remote.model.response.WorkdayItemResponse
+import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -110,3 +120,54 @@ fun List<NotificationSettingResponse>.toNotificationSettingDomain(): ImmutableLi
 
     return list.toImmutableList()
 }
+
+fun HomeResponse.toDomain(): Home {
+    val clockIn = clockInTime?.toHourMinuteOrNull()
+    val clockOut = clockOutTime?.toHourMinuteOrNull()
+
+    return Home(
+        workplace = workplace,
+        workedEarnings = workedEarnings,
+        standardSalary = standardSalary,
+        dailyPay = dailyPay,
+        type = type.toWorkdayType(),
+        startHour = clockIn?.first ?: 9,
+        startMinute = clockIn?.second ?: 0,
+        endHour = clockOut?.first ?: 18,
+        endMinute = clockOut?.second ?: 0,
+    )
+}
+
+fun WorkdayResponse.toDomain(): Workday {
+    val clockIn = clockInTime?.toHourMinuteOrNull()
+    val clockOut = clockOutTime?.toHourMinuteOrNull()
+
+    return Workday(
+        date = date,
+        type = type.toWorkdayType(),
+        dailyPay = dailyPay,
+        startHour = clockIn?.first,
+        startMinute = clockIn?.second,
+        endHour = clockOut?.first,
+        endMinute = clockOut?.second,
+    )
+}
+
+fun WorkdayItemResponse.toDomain(): WorkdayItem = WorkdayItem(
+    date = date,
+    type = type.toWorkdayType(),
+)
+
+fun String.toWorkdayType(): WorkdayType = when (this) {
+    "WORK" -> WorkdayType.WORK
+    "VACATION" -> WorkdayType.VACATION
+    else -> WorkdayType.NONE
+}
+
+fun EarningsResponse.toDomain(): MonthlyWorkSummary = MonthlyWorkSummary(
+    workedMinutes = workedMinutes,
+    standardMinutes = standardMinutes,
+    workedEarnings = workedEarnings,
+    standardSalary = standardSalary,
+
+    )

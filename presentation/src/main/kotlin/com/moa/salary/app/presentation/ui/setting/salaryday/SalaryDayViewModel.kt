@@ -57,7 +57,6 @@ class SalaryDayViewModel @AssistedInject constructor(
     private fun setSalaryDay(day: Int) {
         suspend {
             settingRepository.patchPaydayDay(day)
-            preferencesDataStore.setPaydayDay(day)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
@@ -66,9 +65,6 @@ class SalaryDayViewModel @AssistedInject constructor(
             _uiState.value = _uiState.value.copy(
                 salaryDay = day,
             )
-            viewModelScope.launch {
-                moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
-            }
         }
     }
 

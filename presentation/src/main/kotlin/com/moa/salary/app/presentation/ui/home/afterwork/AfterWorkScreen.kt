@@ -30,13 +30,13 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
-import com.moa.salary.app.presentation.ui.home.afterwork.model.AfterWorkIntent
-import com.moa.salary.app.presentation.ui.home.afterwork.model.AfterWorkUiState
 
 @Composable
 fun AfterWorkScreen(
@@ -48,7 +48,7 @@ fun AfterWorkScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.widgetUpdateManager.updateAllWidgets()
+        viewModel.onIntent(AfterWorkIntent.GetHome)
     }
 
     AfterWorkScreen(
@@ -73,7 +73,7 @@ private fun AfterWorkScreen(
 
             MoaDateLocationBar(
                 date = uiState.dateDisplay,
-                location = uiState.location,
+                workplace = uiState.home.workplace,
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing32))
@@ -86,57 +86,57 @@ private fun AfterWorkScreen(
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
-        Text(
-            text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
-            style = MoaTheme.typography.b1_500,
-            color = MoaTheme.colors.textMediumEmphasis,
-        )
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
-
-        Row(
-            verticalAlignment = Alignment.Bottom,
-        ) {
             Text(
-                text = uiState.accumulatedSalary,
-                style = MoaTheme.typography.h1_700,
-                color = MoaTheme.colors.textGreen,
+                text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
+                style = MoaTheme.typography.b1_500,
+                color = MoaTheme.colors.textMediumEmphasis,
             )
 
-            Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-            Text(
-                modifier = Modifier.padding(bottom = 4.dp),
-                text = stringResource(R.string.after_work_currency_won),
-                style = MoaTheme.typography.t2_700,
-                color = MoaTheme.colors.textHighEmphasis,
+            Row(
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                Text(
+                    text = uiState.accumulatedSalary,
+                    style = MoaTheme.typography.h1_700,
+                    color = MoaTheme.colors.textGreen,
+                )
+
+                Spacer(Modifier.width(4.dp))
+
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = stringResource(R.string.after_work_currency_won),
+                    style = MoaTheme.typography.t2_700,
+                    color = MoaTheme.colors.textHighEmphasis,
+                )
+            }
+
+            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
+            InfoCard(
+                todaySalary = uiState.todaySalary,
+                workTimeOrVacation = if (uiState.home.type == WorkdayType.VACATION) {
+                    stringResource(R.string.after_work_vacation)
+                } else {
+                    uiState.workTimeDisplay
+                },
             )
-        }
 
-        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+            Spacer(Modifier.weight(1f))
 
-        InfoCard(
-            todaySalaryWithPlus = uiState.todaySalaryWithPlusDisplay,
-            workTimeOrVacation = if (uiState.isOnVacation) {
-                stringResource(R.string.after_work_vacation)
-            } else {
-                uiState.workTimeDisplay
-            },
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        MoaPrimaryButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
-            onClick = { onIntent(AfterWorkIntent.ClickCheckWorkHistory) },
-        ) {
-            Text(
-                text = stringResource(R.string.after_work_check_work_history),
-                style = MoaTheme.typography.t3_700,
-            )
-        }
+            MoaPrimaryButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+                onClick = { onIntent(AfterWorkIntent.ClickHistory) },
+            ) {
+                Text(
+                    text = stringResource(R.string.after_work_check_work_history),
+                    style = MoaTheme.typography.t3_700,
+                )
+            }
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
         }
@@ -168,7 +168,7 @@ private fun AfterWorkScreen(
 
 @Composable
 private fun InfoCard(
-    todaySalaryWithPlus: String,
+    todaySalary: String,
     workTimeOrVacation: String,
 ) {
     Column(
@@ -197,7 +197,7 @@ private fun InfoCard(
             Spacer(Modifier.width(MoaTheme.spacing.spacing12))
 
             Text(
-                text = todaySalaryWithPlus,
+                text = todaySalary,
                 style = MoaTheme.typography.t3_700,
                 color = MoaTheme.colors.textHighEmphasis,
             )
@@ -235,6 +235,18 @@ private fun InfoCard(
     }
 }
 
+sealed interface AfterWorkIntent {
+    data object GetHome : AfterWorkIntent
+    data object ClickHistory : AfterWorkIntent
+    data object ClickMoreWork : AfterWorkIntent
+    data object DismissMoreWorkBottomSheet : AfterWorkIntent
+    data object DismissConfetti : AfterWorkIntent
+    data class ConfirmMoreWork(
+        val endHour: Int,
+        val endMinute: Int,
+    ) : AfterWorkIntent
+}
+
 @Preview
 @Composable
 private fun AfterWorkScreenPreview() {
@@ -245,7 +257,20 @@ private fun AfterWorkScreenPreview() {
                 .background(MoaTheme.colors.bgPrimary),
         ) {
             AfterWorkScreen(
-                uiState = AfterWorkUiState(showConfetti = false),
+                uiState = AfterWorkUiState(
+                    home = Home(
+                        workplace = "모아주식회사",
+                        workedEarnings = 1000000,
+                        standardSalary = 1000000,
+                        dailyPay = 100000,
+                        type = WorkdayType.WORK,
+                        startHour = 9,
+                        startMinute = 0,
+                        endHour = 18,
+                        endMinute = 0,
+                    ),
+                    showConfetti = false
+                ),
                 onIntent = {},
             )
         }

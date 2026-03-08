@@ -1,18 +1,20 @@
 package com.moa.salary.app.presentation.ui.home.beforework
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.extensions.toHourMinuteOrNull
-import com.moa.salary.app.data.remote.model.response.HomeType
+import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
+import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
-import com.moa.salary.app.presentation.ui.home.beforework.model.BeforeWorkIntent
-import com.moa.salary.app.presentation.ui.home.beforework.model.BeforeWorkUiState
+import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,8 +28,49 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 private const val TIME_CHECK_INTERVAL_MS = 1000L
+
+@Stable
+data class BeforeWorkUiState(
+    val today: LocalDate = LocalDate.now(),
+    val home: Home,
+    val showTimeBottomSheet: Boolean = false,
+) {
+    val accumulatedSalary: String
+        get() = formatCurrency(home.workedEarnings)
+
+    val todaySalary: String
+        get() = "${formatCurrency(home.dailyPay)}원"
+
+    val dateDisplay: String
+        get() = today.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN))
+
+    val month: Int
+        get() = today.monthValue
+
+    val workTimeDisplay: String
+        get() = if (home.type == WorkdayType.VACATION) {
+            "휴가"
+        } else {
+            "${makeTimeString(home.startHour, home.startMinute)} - ${
+                makeTimeString(
+                    home.endHour,
+                    home.endMinute
+                )
+            }"
+        }
+
+    val autoClockInTime: String
+        get() = makeTimeString(home.startHour, home.startMinute)
+
+    val additionalSalary: Long?
+        get() = if (home.workedEarnings > home.standardSalary) home.workedEarnings - home.standardSalary else null
+
+    val additionalSalaryDisplay: String?
+        get() = additionalSalary?.let { String.format(Locale.getDefault(), "+%,d원", it) }
+}
 
 @HiltViewModel(assistedFactory = BeforeWorkViewModel.Factory::class)
 class BeforeWorkViewModel @AssistedInject constructor(
@@ -36,159 +79,70 @@ class BeforeWorkViewModel @AssistedInject constructor(
     private val homeRepository: HomeRepository,
     private val workdayRepository: WorkdayRepository,
 ) : ViewModel() {
-    @AssistedFactory
-    interface Factory {
-        fun create(args: HomeNavigation.BeforeWork): BeforeWorkViewModel
-    }
 
-    private val _uiState = MutableStateFlow(
-        BeforeWorkUiState(
-            todayEarnedSalary = args.todayEarnedSalary,
-        )
-    )
+    private val _uiState = MutableStateFlow(BeforeWorkUiState(home = args.home))
     val uiState: StateFlow<BeforeWorkUiState> = _uiState.asStateFlow()
 
-    private var hasAutoClockInTriggered = false
-
     init {
-        loadHomeData()
-        observeRefreshHome()
-    }
-
-    private fun observeRefreshHome() {
         viewModelScope.launch {
-            moaSideEffectBus.sideEffects.collect { effect ->
-                if (effect is MoaSideEffect.RefreshHome) {
-                    loadHomeData()
-                }
-            }
-        }
-    }
-
-    private fun loadHomeData() {
-        suspend {
-            homeRepository.getHome()
-        }.execute(
-            bus = moaSideEffectBus,
-            scope = viewModelScope,
-            onRetry = { loadHomeData() },
-        ) { homeResponse ->
-            val clockInTime = homeResponse.clockInTime?.toHourMinuteOrNull()
-            val clockOutTime = homeResponse.clockOutTime?.toHourMinuteOrNull()
-            val isWorkDay = homeResponse.type != HomeType.NONE
-            val isOnVacation = homeResponse.type == HomeType.VACATION
-
-            _uiState.update { state ->
-                state.copy(
-                    location = homeResponse.workplace,
-                    workedEarnings = homeResponse.workedEarnings,
-                    standardSalary = homeResponse.standardSalary,
-                    dailyPay = homeResponse.dailyPay,
-                    startHour = clockInTime?.first ?: state.startHour,
-                    startMinute = clockInTime?.second ?: state.startMinute,
-                    endHour = clockOutTime?.first ?: state.endHour,
-                    endMinute = clockOutTime?.second ?: state.endMinute,
-                    isWorkDay = isWorkDay,
-                    isOnVacation = isOnVacation,
-                )
-            }
-
-            if (isWorkDay && !hasAutoClockInTriggered) {
-                startAutoClockInChecker()
+            while (true) {
+                delay(TIME_CHECK_INTERVAL_MS)
+                checkTime()
             }
         }
     }
 
     fun onIntent(intent: BeforeWorkIntent) {
         when (intent) {
-            BeforeWorkIntent.ClickWorkTime -> onClickWorkTime()
-            BeforeWorkIntent.ClickEarlyClockIn -> onClickEarlyClockIn()
-            BeforeWorkIntent.ClickVacation -> onClickVacation()
-            BeforeWorkIntent.ClickClockInOnDayOff -> onClickClockInOnDayOff()
-            BeforeWorkIntent.DismissTimeBottomSheet -> onDismissTimeBottomSheet()
-            is BeforeWorkIntent.UpdateWorkTime -> onUpdateWorkTime(intent)
-        }
-    }
-
-    private fun startAutoClockInChecker() {
-        viewModelScope.launch {
-            while (true) {
-                checkAutoClockIn()
-                delay(TIME_CHECK_INTERVAL_MS)
-            }
-        }
-    }
-
-    private fun checkAutoClockIn() {
-        if (hasAutoClockInTriggered) return
-
-        val currentTime = LocalTime.now()
-        val state = _uiState.value
-        val clockInTime = LocalTime.of(state.startHour, state.startMinute)
-        val clockOutTime = LocalTime.of(state.endHour, state.endMinute)
-
-        val isOvernightShift = clockOutTime < clockInTime
-
-        if (isOvernightShift) {
-            val isWorking = currentTime >= clockInTime || currentTime < clockOutTime
-            if (isWorking) {
-                hasAutoClockInTriggered = true
-                navigateToWorking(isOnVacation = state.isOnVacation)
-            }
-        } else {
-            if (currentTime >= clockOutTime) {
-                hasAutoClockInTriggered = true
-                navigateToAfterWork()
-                return
-            }
-
-            if (currentTime >= clockInTime) {
-                hasAutoClockInTriggered = true
-                navigateToWorking(isOnVacation = state.isOnVacation)
-            }
-        }
-    }
-
-    private fun onClickWorkTime() {
-        _uiState.update { it.copy(showTimeBottomSheet = true) }
-    }
-
-    private fun onDismissTimeBottomSheet() {
-        _uiState.update { it.copy(showTimeBottomSheet = false) }
-    }
-
-    private fun onUpdateWorkTime(intent: BeforeWorkIntent.UpdateWorkTime) {
-        hasAutoClockInTriggered = false
-
-        _uiState.update { state ->
-            state.copy(
+            BeforeWorkIntent.GetHome -> getHome()
+            BeforeWorkIntent.ClickWorkTime -> clockWorkTime()
+            BeforeWorkIntent.ClickEarlyClockIn -> clickEarlyClockIn()
+            BeforeWorkIntent.ClickVacation -> clickVacation()
+            BeforeWorkIntent.ClickClockInOnDayOff -> clickClockInOnDayOff()
+            BeforeWorkIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
+            is BeforeWorkIntent.UpdateWorkTime -> updateWorkday(
                 startHour = intent.startHour,
                 startMinute = intent.startMinute,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
-                showTimeBottomSheet = false,
             )
         }
     }
 
-    private fun onClickEarlyClockIn() {
-        hasAutoClockInTriggered = true
+    private fun getHome() {
+        suspend {
+            homeRepository.getHome()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { getHome() },
+        ) { home ->
+            _uiState.update { state ->
+                state.copy(home = home)
+            }
+
+            checkTime()
+        }
+    }
+
+    private fun clockWorkTime() {
+        _uiState.update { it.copy(showTimeBottomSheet = true) }
+    }
+
+    private fun dismissTimeBottomSheet() {
+        _uiState.update { it.copy(showTimeBottomSheet = false) }
+    }
+
+    private fun clickEarlyClockIn() {
         val now = LocalTime.now()
         val state = _uiState.value
 
-        val registeredStartMinutes = state.startHour * 60 + state.startMinute
-        val registeredEndMinutes = state.endHour * 60 + state.endMinute
+        val registeredStartMinutes = state.home.startHour * 60 + state.home.startMinute
+        val registeredEndMinutes = state.home.endHour * 60 + state.home.endMinute
         val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
         val endTime = now.plusMinutes(workDurationMinutes.toLong())
 
-        updateWorkTimeApi(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
-        )
-
-        navigateToWorking(
+        updateWorkday(
             startHour = now.hour,
             startMinute = now.minute,
             endHour = endTime.hour,
@@ -196,7 +150,37 @@ class BeforeWorkViewModel @AssistedInject constructor(
         )
     }
 
-    private fun updateWorkTimeApi(
+    private fun clickVacation() {
+        val state = _uiState.value
+        val now = LocalTime.now()
+
+        val registeredStartMinutes = state.home.startHour * 60 + state.home.startMinute
+        val registeredEndMinutes = state.home.endHour * 60 + state.home.endMinute
+        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
+        val endTime = now.plusMinutes(workDurationMinutes.toLong())
+
+        updateWorkday(
+            startHour = now.hour,
+            startMinute = now.minute,
+            endHour = endTime.hour,
+            endMinute = endTime.minute,
+            type = "VACATION",
+        )
+    }
+
+    private fun clickClockInOnDayOff() {
+        val now = LocalTime.now()
+        val endTime = now.plusHours(3)
+
+        updateWorkday(
+            startHour = now.hour,
+            startMinute = now.minute,
+            endHour = endTime.hour,
+            endMinute = endTime.minute,
+        )
+    }
+
+    private fun updateWorkday(
         startHour: Int,
         startMinute: Int,
         endHour: Int,
@@ -207,101 +191,55 @@ class BeforeWorkViewModel @AssistedInject constructor(
         val clockOutTime = makeTimeString(endHour, endMinute)
 
         suspend {
-            homeRepository.saveAdjustedWorkTime(clockInTime, clockOutTime)
-        }.execute(scope = viewModelScope) {}
-
-        suspend {
             val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-            workdayRepository.updateWorkTime(today, clockInTime, clockOutTime, type)
-        }.execute(scope = viewModelScope) {}
-    }
-
-    private fun navigateToWorking(
-        startHour: Int? = null,
-        startMinute: Int? = null,
-        endHour: Int? = null,
-        endMinute: Int? = null,
-        isOnVacation: Boolean = false,
-    ) {
-        viewModelScope.launch {
-            val state = _uiState.value
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    HomeNavigation.Working(
-                        startHour = startHour ?: state.startHour,
-                        startMinute = startMinute ?: state.startMinute,
-                        endHour = endHour ?: state.endHour,
-                        endMinute = endMinute ?: state.endMinute,
-                        dailyPay = state.dailyPay,
-                        isOnVacation = isOnVacation,
-                        isWorkDay = state.isWorkDay,
+            workdayRepository.updateWorkday(
+                date = today,
+                clockInTime = clockInTime,
+                clockOutTime = clockOutTime,
+                type = type
+            )
+        }.execute(
+            scope = viewModelScope,
+            bus = moaSideEffectBus,
+            onRetry = { updateWorkday(startHour, startMinute, endHour, endMinute) },
+        ) { workday ->
+            _uiState.update {
+                it.copy(
+                    home = it.home.copy(
+                        dailyPay = workday.dailyPay,
+                        type = workday.type,
+                        startHour = workday.startHour ?: it.home.startHour,
+                        startMinute = workday.startMinute ?: it.home.startMinute,
+                        endHour = workday.endHour ?: it.home.endHour,
+                        endMinute = workday.endMinute ?: it.home.endMinute,
                     )
                 )
-            )
+            }
+
+            checkTime()
         }
     }
 
-    private fun navigateToAfterWork() {
-        viewModelScope.launch {
-            val state = _uiState.value
-            moaSideEffectBus.emit(
-                MoaSideEffect.Navigate(
-                    HomeNavigation.AfterWork(
-                        todayEarnedSalary = state.dailyPay,
-                        startHour = state.startHour,
-                        startMinute = state.startMinute,
-                        endHour = state.endHour,
-                        endMinute = state.endMinute,
-                        isOnVacation = false,
-                    )
-                )
-            )
-        }
-    }
-
-    private fun onClickVacation() {
-        hasAutoClockInTriggered = true
+    private fun checkTime() {
         val state = _uiState.value
-        val now = LocalTime.now()
 
-        val registeredStartMinutes = state.startHour * 60 + state.startMinute
-        val registeredEndMinutes = state.endHour * 60 + state.endMinute
-        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
-        val endTime = now.plusMinutes(workDurationMinutes.toLong())
+        val homeNavigation = state.home.determineHomeNavigation()
 
-        updateWorkTimeApi(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
-            type = "VACATION",
-        )
-
-        navigateToWorking(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
-            isOnVacation = true,
-        )
+        when (homeNavigation) {
+            is HomeNavigation.Working -> navigate(homeNavigation)
+            is HomeNavigation.AfterWork -> navigate(homeNavigation)
+            else -> Unit
+        }
     }
 
-    private fun onClickClockInOnDayOff() {
-        val now = LocalTime.now()
-        val endTime = now.plusHours(3)
+    private fun navigate(navigation: RootNavigation) {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(navigation))
+        }
+    }
 
-        updateWorkTimeApi(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
-        )
-
-        navigateToWorking(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
-        )
+    @AssistedFactory
+    interface Factory {
+        fun create(args: HomeNavigation.BeforeWork): BeforeWorkViewModel
     }
 }

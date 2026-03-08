@@ -1,42 +1,34 @@
 package com.moa.salary.app.data.repository
 
-import com.moa.salary.app.core.model.history.MonthlyWorkSummary
-import com.moa.salary.app.core.model.history.Workday
-import com.moa.salary.app.core.model.history.WorkdayDetail
-import com.moa.salary.app.core.model.history.WorkdayType
+import com.moa.salary.app.core.model.work.MonthlyWorkSummary
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayItem
 import kotlinx.collections.immutable.ImmutableList
 
 interface WorkdayRepository {
-    suspend fun updateWorkTime(
+    suspend fun updateWorkday(
         date: String,
         clockInTime: String,
         clockOutTime: String,
-        type: String = "WORK",
-    )
+        type: String,
+    ): Workday
 
-    suspend fun updateClockOutTime(
+    suspend fun patchClockOUt(
         date: String,
         clockOutTime: String,
-    )
+    ): Workday
 
     suspend fun getWorkdays(
         year: Int,
         month: Int,
-    ): ImmutableList<Workday>
+    ): ImmutableList<WorkdayItem>
 
-    suspend fun getWorkdayDetail(
+    suspend fun getWorkday(
         date: String,
-    ): WorkdayDetail
+    ): Workday
 
     suspend fun getEarnings(
         year: Int,
         month: Int,
     ): MonthlyWorkSummary
-
-    suspend fun updateWorkday(
-        date: String,
-        type: WorkdayType,
-        clockInTime: String?,
-        clockOutTime: String?,
-    )
 }

@@ -45,10 +45,12 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.model.widget.Widget
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Gray20
 import com.moa.salary.app.presentation.designsystem.theme.Gray70
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.ui.MainActivity
 import dagger.hilt.android.EntryPointAccessors
@@ -70,7 +72,6 @@ class MoaWidget : GlanceAppWidget() {
             )
             val homeRepository = entryPoint.getHomeRepository()
             val calculateSalaryUseCase = entryPoint.getCalculateAccumulatedSalaryUseCase()
-            val determineHomeNavigation = entryPoint.getDetermineHomeNavigationUseCase()
 
             suspend fun getWidgetUiState() {
                 uiState = MoaWidgetUiState.Loading
@@ -78,7 +79,7 @@ class MoaWidget : GlanceAppWidget() {
                     val homeResponse = homeRepository.getHome()
                     val now = LocalTime.now()
                     val currentTimeStr = makeTimeString(now.hour, now.minute)
-                    val homeNavigation = determineHomeNavigation(homeResponse, now)
+                    val homeNavigation = homeResponse.determineHomeNavigation()
 
                     val widget = when (homeNavigation) {
                         is HomeNavigation.BeforeWork,
@@ -90,14 +91,14 @@ class MoaWidget : GlanceAppWidget() {
 
                         is HomeNavigation.Working -> {
                             val todaySalary = calculateSalaryUseCase(
-                                startHour = homeNavigation.startHour,
-                                startMinute = homeNavigation.startMinute,
-                                endHour = homeNavigation.endHour,
-                                endMinute = homeNavigation.endMinute,
-                                dailyPay = homeNavigation.dailyPay,
+                                startHour = homeNavigation.home.startHour,
+                                startMinute = homeNavigation.home.startMinute,
+                                endHour = homeNavigation.home.endHour,
+                                endMinute = homeNavigation.home.endMinute,
+                                dailyPay = homeNavigation.home.dailyPay,
                                 currentTime = now,
                             )
-                            if (homeNavigation.isOnVacation) {
+                            if (homeNavigation.home.type == WorkdayType.VACATION) {
                                 Widget.Vacation(
                                     daySalary = formatCurrency(todaySalary),
                                     time = currentTimeStr,
@@ -108,12 +109,6 @@ class MoaWidget : GlanceAppWidget() {
                                     time = currentTimeStr,
                                 )
                             }
-                        }
-
-                        else -> {
-                            Widget.Finish(
-                                monthlySalary = formatCurrency(homeResponse.workedEarnings)
-                            )
                         }
                     }
                     uiState = MoaWidgetUiState.Success(widget)

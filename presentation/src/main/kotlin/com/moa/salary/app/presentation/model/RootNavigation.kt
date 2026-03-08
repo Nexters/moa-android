@@ -1,8 +1,8 @@
 package com.moa.salary.app.presentation.model
 
 import androidx.navigation3.runtime.NavKey
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.Schedule
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.Schedule
 import kotlinx.serialization.Serializable
 
 sealed interface RootNavigation : NavKey {
@@ -18,7 +18,7 @@ sealed interface RootNavigation : NavKey {
     @Serializable
     @JvmInline
     value class Home(
-        val startDestination: HomeNavigation = HomeNavigation.BeforeWork()
+        val startDestination: HomeNavigation
     ) : RootNavigation
 
     @Serializable

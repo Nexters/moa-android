@@ -46,10 +46,10 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.MonthlyWorkSummary
-import com.moa.salary.app.core.model.history.Schedule
-import com.moa.salary.app.core.model.history.ScheduleType
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.MonthlyWorkSummary
+import com.moa.salary.app.core.model.work.Schedule
+import com.moa.salary.app.core.model.work.ScheduleType
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.CalendarHeader
@@ -69,7 +69,7 @@ fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val selectedDateSchedules = remember(
         uiState.selectedDate,
-        uiState.selectedWorkdayDetail,
+        uiState.selectedWorkday,
         uiState.paydayDay,
     ) {
         viewModel.getSchedulesForSelectedDate()

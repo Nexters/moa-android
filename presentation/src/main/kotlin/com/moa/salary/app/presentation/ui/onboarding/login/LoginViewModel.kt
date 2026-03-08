@@ -9,14 +9,13 @@ import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.OnboardingRepository
 import com.moa.salary.app.data.repository.TokenRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
+import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.manager.FcmTokenManager
 import com.moa.salary.app.presentation.manager.KakaoLoginManager
-import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
-import com.moa.salary.app.presentation.usecase.DetermineHomeNavigationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -29,7 +28,6 @@ class LoginViewModel @Inject constructor(
     private val onboardingRepository: OnboardingRepository,
     private val homeRepository: HomeRepository,
     private val tokenRepository: TokenRepository,
-    private val determineHomeNavigation: DetermineHomeNavigationUseCase,
 ) : ViewModel() {
 
     fun clickKakao(activity: Activity) {
@@ -91,7 +89,7 @@ class LoginViewModel @Inject constructor(
                 onboardingRepository.getOnboardingStatus()
             }.onSuccess { onboardingStatus ->
                 if (onboardingStatus.hasRequiredTermsAgreed) {
-                    navigateToHome()
+                    getHome()
                     return@launch
                 }
 
@@ -150,6 +148,19 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    private fun getHome() {
+        viewModelScope.launch {
+            runCatching {
+                homeRepository.getHome()
+            }.onSuccess {
+                val homeNavigation = it.determineHomeNavigation()
+                navigate(RootNavigation.Home(homeNavigation))
+            }.onFailure {
+                toast()
+            }
+        }
+    }
+
     private fun navigate(destination: RootNavigation) {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Navigate(destination))
@@ -159,16 +170,6 @@ class LoginViewModel @Inject constructor(
     private fun toast() {
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
-        }
-    }
-
-    private suspend fun navigateToHome() {
-        try {
-            val response = homeRepository.getHome()
-            val homeNavigation = determineHomeNavigation(response)
-            navigate(RootNavigation.Home(homeNavigation))
-        } catch (_: Exception) {
-            navigate(RootNavigation.Home(HomeNavigation.BeforeWork()))
         }
     }
 }

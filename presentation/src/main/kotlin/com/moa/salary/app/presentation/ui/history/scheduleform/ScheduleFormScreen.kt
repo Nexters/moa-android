@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.Schedule
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.Schedule
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.DatePickerBottomSheet
