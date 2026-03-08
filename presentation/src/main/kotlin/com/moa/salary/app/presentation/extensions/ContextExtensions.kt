@@ -3,7 +3,6 @@ package com.moa.salary.app.presentation.extensions
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.provider.Settings
 import androidx.core.net.toUri
 
