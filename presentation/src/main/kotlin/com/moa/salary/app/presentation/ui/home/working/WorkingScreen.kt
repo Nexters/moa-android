@@ -74,8 +74,8 @@ fun WorkingScreen(
         viewModel.onIntent(WorkingIntent.GetHome)
     }
 
-    LaunchedEffect(uiState.progress) {
-        if (uiState.progress == 1f) {
+    LaunchedEffect(uiState.confettiProgress) {
+        if (uiState.confettiProgress == 1f) {
             viewModel.onIntent(WorkingIntent.ShowConfetti(true))
         }
     }

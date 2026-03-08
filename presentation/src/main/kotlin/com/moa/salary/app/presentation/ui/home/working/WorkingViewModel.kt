@@ -54,7 +54,17 @@ data class WorkingUiState(
     val endTimeDisplay: String
         get() = makeTimeString(home.endHour, home.endMinute)
 
-    val progress: Float
+    val progress : Float
+        get() {
+            if(elapsedTotalSeconds == 0) return 0f
+            val startSeconds = home.startHour * 3600 + home.startMinute * 60
+            val endSeconds = home.endHour * 3600 + home.endMinute * 60
+            val totalSeconds = endSeconds - startSeconds
+
+            return elapsedTotalSeconds / totalSeconds.toFloat()
+        }
+
+    val confettiProgress: Float
         get() {
             if (elapsedTotalSeconds == 0) return 0f
 
@@ -66,7 +76,7 @@ data class WorkingUiState(
         get() {
             val minHeight = 0.3f
             val maxHeight = 0.7f
-            return minHeight + (maxHeight - minHeight) * progress
+            return minHeight + (maxHeight - minHeight) * confettiProgress
         }
 
     val todaySalaryDisplay: String
@@ -286,7 +296,10 @@ class WorkingViewModel @AssistedInject constructor(
                         endMinute = workday.endMinute ?: it.home.endMinute,
                     ),
                     showScheduleAdjustBottomSheet = false,
+                    showTimeBottomSheet = false,
+                    showMoreWorkBottomSheet = false,
                     showWorkTimeEditBottomSheet = false,
+                    showWorkCompletionOverlay = false,
                 )
             }
 
@@ -318,8 +331,10 @@ class WorkingViewModel @AssistedInject constructor(
                         endMinute = workday.endMinute ?: it.home.endMinute,
                     ),
                     showScheduleAdjustBottomSheet = false,
-                    showWorkTimeEditBottomSheet = false,
+                    showTimeBottomSheet = false,
                     showMoreWorkBottomSheet = false,
+                    showWorkTimeEditBottomSheet = false,
+                    showWorkCompletionOverlay = false,
                 )
             }
 
@@ -358,7 +373,7 @@ class WorkingViewModel @AssistedInject constructor(
                 startMinute = state.home.startMinute,
                 endHour = state.home.endHour,
                 endMinute = state.home.endMinute,
-                dailyPay = args.home.dailyPay,
+                dailyPay = state.home.dailyPay,
             )
             val remainingSeconds =
                 Duration.between(now, endTime).seconds.toInt().coerceAtLeast(0)
