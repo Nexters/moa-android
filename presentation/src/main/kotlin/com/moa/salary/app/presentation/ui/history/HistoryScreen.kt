@@ -47,11 +47,11 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
 import com.moa.salary.app.core.extensions.formatCurrency
+import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.LocalDateModel
 import com.moa.salary.app.core.model.work.MonthlyWorkSummary
 import com.moa.salary.app.core.model.work.Schedule
 import com.moa.salary.app.core.model.work.ScheduleType
-import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.CalendarHeader
 import com.moa.salary.app.presentation.designsystem.component.Day
@@ -60,10 +60,8 @@ import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
 import java.time.DayOfWeek
 import java.time.YearMonth
-import java.util.Locale
 
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {

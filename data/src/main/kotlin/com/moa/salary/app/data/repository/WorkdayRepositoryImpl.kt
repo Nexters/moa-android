@@ -5,7 +5,6 @@ import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayItem
 import com.moa.salary.app.data.remote.api.WorkdayService
 import com.moa.salary.app.data.remote.mapper.toDomain
-import com.moa.salary.app.data.remote.mapper.toWorkdayType
 import com.moa.salary.app.data.remote.model.request.ClockOutRequest
 import com.moa.salary.app.data.remote.model.request.WorkdayRequest
 import kotlinx.collections.immutable.ImmutableList
@@ -43,12 +42,7 @@ class WorkdayRepositoryImpl @Inject constructor(
         month: Int,
     ): ImmutableList<WorkdayItem> {
         val response = workdayService.getWorkdays(year, month)
-        return response.map { item ->
-            WorkdayItem(
-                date = item.date,
-                type = item.type.toWorkdayType(),
-            )
-        }.toImmutableList()
+        return response.map { it.toDomain() }.toImmutableList()
     }
 
     override suspend fun getWorkday(
