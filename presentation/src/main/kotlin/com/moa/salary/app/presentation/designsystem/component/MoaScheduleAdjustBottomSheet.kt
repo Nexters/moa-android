@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 
@@ -36,6 +37,7 @@ enum class ScheduleAdjustOption(val strRes: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoaScheduleAdjustBottomSheet(
+    type: WorkdayType,
     onDismissRequest: () -> Unit,
     onConfirm: (ScheduleAdjustOption) -> Unit,
 ) {
@@ -59,6 +61,10 @@ fun MoaScheduleAdjustBottomSheet(
             Spacer(Modifier.height(MoaTheme.spacing.spacing16))
 
             ScheduleAdjustOption.entries.forEachIndexed { index, option ->
+                if (type == WorkdayType.VACATION && option == ScheduleAdjustOption.VACATION) {
+                    return@forEachIndexed
+                }
+
                 ScheduleOptionItem(
                     text = stringResource(option.strRes),
                     isSelected = selectedOption == option,

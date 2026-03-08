@@ -93,6 +93,7 @@ private fun WorkingScreen(
 ) {
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
+            type = uiState.home.type,
             onDismissRequest = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
             onConfirm = { option ->
                 when (option) {
