@@ -23,7 +23,7 @@ class HomeViewModel @Inject constructor(
         when (intent) {
             is HomeIntent.NavigateToHistory -> navigateToHistory()
             is HomeIntent.NavigateToSetting -> navigateToSetting()
-            is HomeIntent.GetShownNotificatioNBottomSheet -> getShownNotificationBottomSheet()
+            is HomeIntent.GetShownNotificationBottomSheet -> getShownNotificationBottomSheet()
             is HomeIntent.SetShownNotificationBottomSheet -> setShownNotificationBottomSheet()
         }
     }

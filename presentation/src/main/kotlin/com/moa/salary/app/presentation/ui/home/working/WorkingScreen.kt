@@ -48,6 +48,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
@@ -58,9 +60,6 @@ import com.moa.salary.app.presentation.designsystem.component.MoaVacationButton
 import com.moa.salary.app.presentation.designsystem.component.ScheduleAdjustOption
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
-import com.moa.salary.app.presentation.ui.home.working.model.WorkStatus
-import com.moa.salary.app.presentation.ui.home.working.model.WorkingIntent
-import com.moa.salary.app.presentation.ui.home.working.model.WorkingUiState
 
 @Composable
 fun WorkingScreen(
@@ -71,8 +70,14 @@ fun WorkingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState.isOnVacation) {
-        viewModel.widgetUpdateManager.updateAllWidgets()
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(WorkingIntent.GetHome)
+    }
+
+    LaunchedEffect(uiState.confettiProgress) {
+        if (uiState.confettiProgress == 1f) {
+            viewModel.onIntent(WorkingIntent.ShowConfetti(true))
+        }
     }
 
     WorkingScreen(
@@ -88,7 +93,8 @@ private fun WorkingScreen(
 ) {
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
-            onDismissRequest = { onIntent(WorkingIntent.DismissScheduleAdjustBottomSheet) },
+            type = uiState.home.type,
+            onDismissRequest = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
             onConfirm = { option ->
                 when (option) {
                     ScheduleAdjustOption.VACATION -> onIntent(WorkingIntent.SelectVacation)
@@ -102,10 +108,10 @@ private fun WorkingScreen(
     if (uiState.showTimeBottomSheet) {
         MoaTimeBottomSheet(
             time = Time(
-                startHour = uiState.startHour,
-                startMinute = uiState.startMinute,
-                endHour = uiState.endHour,
-                endMinute = uiState.endMinute,
+                startHour = uiState.home.startHour,
+                startMinute = uiState.home.startMinute,
+                endHour = uiState.home.endHour,
+                endMinute = uiState.home.endMinute,
             ),
             title = stringResource(R.string.working_time_bottom_sheet_title),
             onPositive = { time ->
@@ -125,29 +131,29 @@ private fun WorkingScreen(
     if (uiState.showMoreWorkBottomSheet) {
         MoaTimeBottomSheet(
             time = Time(
-                startHour = uiState.startHour,
-                startMinute = uiState.startMinute,
-                endHour = uiState.endHour,
-                endMinute = uiState.endMinute,
+                startHour = uiState.home.startHour,
+                startMinute = uiState.home.startMinute,
+                endHour = uiState.home.endHour,
+                endMinute = uiState.home.endMinute,
             ),
             title = stringResource(R.string.working_more_work_title),
             negativeText = stringResource(R.string.schedule_adjust_cancel),
             endTimeOnly = true,
-            onNegative = { onIntent(WorkingIntent.DismissMoreWorkBottomSheet) },
+            onNegative = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
             onPositive = { time ->
                 onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
             },
-            onDismissRequest = { onIntent(WorkingIntent.DismissMoreWorkBottomSheet) },
+            onDismissRequest = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
         )
     }
 
     if (uiState.showWorkTimeEditBottomSheet) {
         MoaTimeBottomSheet(
             time = Time(
-                startHour = uiState.startHour,
-                startMinute = uiState.startMinute,
-                endHour = uiState.endHour,
-                endMinute = uiState.endMinute,
+                startHour = uiState.home.startHour,
+                startMinute = uiState.home.startMinute,
+                endHour = uiState.home.endHour,
+                endMinute = uiState.home.endMinute,
             ),
             title = stringResource(R.string.working_work_time_edit_title),
             negativeText = stringResource(R.string.working_today_vacation),
@@ -156,7 +162,7 @@ private fun WorkingScreen(
             onPositive = { time ->
                 onIntent(WorkingIntent.ConfirmWorkTimeEdit(time.endHour, time.endMinute))
             },
-            onDismissRequest = { onIntent(WorkingIntent.DismissWorkTimeEditBottomSheet) },
+            onDismissRequest = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
         )
     }
 
@@ -187,46 +193,51 @@ private fun WorkingScreen(
                 ) {
                     if (!uiState.showWorkCompletionOverlay) {
                         TooltipBanner(
-                            monthSalary = uiState.monthSalary,
+                            monthSalaryDisplay = uiState.monthSalaryDisplay,
                             todaySalary = uiState.todaySalary,
                             remainingHours = uiState.remainingHours,
                             currentIndex = uiState.currentTooltipIndex,
-                            isOnVacation = uiState.isOnVacation,
+                            type = uiState.home.type,
                         )
 
                         Spacer(Modifier.height(MoaTheme.spacing.spacing20))
                     }
 
                     TodaySalarySection(
-                        todaySalary = uiState.todaySalaryDisplay,
+                        todaySalaryDisplay = uiState.todaySalaryDisplay,
                     )
 
                     Spacer(Modifier.height(22.dp))
 
                     CoinGraph(
                         modifier = Modifier.height(coinGraphHeight),
-                        isOnVacation = uiState.isOnVacation,
+                        type = uiState.home.type,
                     )
                 }
             }
 
             if (uiState.showWorkCompletionOverlay) {
                 WorkCompletionSection(
-                    accumulatedSalary = uiState.monthSalary,
+                    accumulatedSalary = uiState.monthSalaryDisplay,
                     workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
-                    onContinueWorking = { onIntent(WorkingIntent.ClickContinueWorking) },
+                    onContinueWorking = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true)) },
                     onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
-                    onWorkTimeClick = { onIntent(WorkingIntent.ClickWorkTimeEdit) },
+                    onWorkTimeClick = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(true)) },
                 )
             } else {
                 WorkingStatusSection(
-                    workStatus = uiState.workStatus,
                     elapsedTime = uiState.elapsedTimeDisplay,
                     progress = uiState.progress,
                     startTime = uiState.startTimeDisplay,
                     endTime = uiState.endTimeDisplay,
-                    isOnVacation = uiState.isOnVacation,
-                    onAdjustScheduleClick = { onIntent(WorkingIntent.ClickAdjustSchedule) },
+                    type = uiState.home.type,
+                    onAdjustScheduleClick = {
+                        onIntent(
+                            WorkingIntent.ShowScheduleAdjustBottomSheet(
+                                true
+                            )
+                        )
+                    },
                 )
             }
 
@@ -244,7 +255,7 @@ private fun WorkingScreen(
 
             LaunchedEffect(progress) {
                 if (progress == 1f) {
-                    onIntent(WorkingIntent.DismissConfetti)
+                    onIntent(WorkingIntent.ShowConfetti(false))
                 }
             }
 
@@ -261,11 +272,11 @@ private fun WorkingScreen(
 
 @Composable
 private fun TooltipBanner(
-    monthSalary: String,
+    monthSalaryDisplay: String,
     todaySalary: Long,
     remainingHours: Int,
     currentIndex: Int,
-    isOnVacation: Boolean,
+    type: WorkdayType,
 ) {
     val purchasableMessage = when {
         todaySalary >= 500000 -> stringResource(R.string.working_tooltip_purchasable_500000)
@@ -283,17 +294,17 @@ private fun TooltipBanner(
         else -> stringResource(R.string.working_tooltip_purchasable_default)
     }
 
-    val tooltipMessages = if (isOnVacation) {
+    val tooltipMessages = if (type == WorkdayType.VACATION) {
         listOf(stringResource(R.string.working_tooltip_vacation))
     } else {
         listOf(
-            stringResource(R.string.working_tooltip_month_salary, monthSalary),
+            stringResource(R.string.working_tooltip_month_salary, monthSalaryDisplay),
             purchasableMessage,
             stringResource(R.string.working_tooltip_remaining_time, remainingHours),
         )
     }
 
-    val displayIndex = if (isOnVacation) 0 else currentIndex % tooltipMessages.size
+    val displayIndex = if (type == WorkdayType.VACATION) 0 else currentIndex % tooltipMessages.size
 
     AnimatedContent(
         targetState = displayIndex,
@@ -310,7 +321,7 @@ private fun TooltipBanner(
 
 @Composable
 private fun TodaySalarySection(
-    todaySalary: String,
+    todaySalaryDisplay: String,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -327,7 +338,7 @@ private fun TodaySalarySection(
             verticalAlignment = Alignment.Bottom,
         ) {
             RollingDigitsText(
-                text = todaySalary,
+                text = todaySalaryDisplay,
             )
 
             Spacer(Modifier.width(4.dp))
@@ -379,7 +390,7 @@ private fun RollingDigitsText(
 @Composable
 private fun CoinGraph(
     modifier: Modifier = Modifier,
-    isOnVacation: Boolean = false,
+    type: WorkdayType,
 ) {
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth(),
@@ -393,7 +404,7 @@ private fun CoinGraph(
                 .clipToBounds(),
             contentAlignment = Alignment.TopCenter,
         ) {
-            val coinImage = if (isOnVacation) {
+            val coinImage = if (type == WorkdayType.VACATION) {
                 R.drawable.img_blue_coin_progress
             } else {
                 R.drawable.img_coin_progress
@@ -419,8 +430,6 @@ private fun CoinGraph(
                             MoaTheme.colors.bgPrimary,
                         )
                     )
-
-
                 ),
         )
     }
@@ -428,12 +437,11 @@ private fun CoinGraph(
 
 @Composable
 private fun WorkingStatusSection(
-    workStatus: WorkStatus,
     elapsedTime: String,
     progress: Float,
     startTime: String,
     endTime: String,
-    isOnVacation: Boolean,
+    type: WorkdayType,
     onAdjustScheduleClick: () -> Unit,
 ) {
     Column(
@@ -444,7 +452,7 @@ private fun WorkingStatusSection(
             verticalAlignment = Alignment.Bottom,
         ) {
             Column {
-                WorkStatusTag(workStatus = workStatus)
+                WorkdayTypeTag(type = type)
 
                 Spacer(Modifier.height(MoaTheme.spacing.spacing12))
 
@@ -473,38 +481,26 @@ private fun WorkingStatusSection(
             progress = progress,
             startTime = startTime,
             endTime = endTime,
-            isOnVacation = isOnVacation,
+            type = type,
         )
     }
 }
 
 @Composable
-private fun WorkStatusTag(
-    workStatus: WorkStatus,
+private fun WorkdayTypeTag(
+    type: WorkdayType,
 ) {
-    val (text, borderColor, textColor) = when (workStatus) {
-        WorkStatus.WORKING -> Triple(
+    val (text, borderColor, textColor) = when (type) {
+        WorkdayType.WORK -> Triple(
             stringResource(R.string.working_status_working),
             Color(0xFF4ADE80),
             Color(0xFF4ADE80),
         )
 
-        WorkStatus.LUNCH_TIME -> Triple(
-            stringResource(R.string.working_status_lunch),
-            Color(0xFF60A5FA),
-            Color(0xFF60A5FA),
-        )
-
-        WorkStatus.VACATION -> Triple(
+        else -> Triple(
             stringResource(R.string.working_status_vacation),
             Color(0xFF60A5FA),
             Color(0xFF60A5FA),
-        )
-
-        WorkStatus.OVERTIME -> Triple(
-            stringResource(R.string.working_status_overtime),
-            Color(0xFFEF4444),
-            Color(0xFFEF4444),
         )
     }
 
@@ -533,7 +529,7 @@ private fun WorkProgressBar(
     progress: Float,
     startTime: String,
     endTime: String,
-    isOnVacation: Boolean = false,
+    type: WorkdayType,
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -541,7 +537,7 @@ private fun WorkProgressBar(
         label = "progressAnimation",
     )
 
-    val progressColors = if (isOnVacation) {
+    val progressColors = if (type == WorkdayType.VACATION) {
         listOf(Color(0xFF60A5FA), Color(0xFF3B82F6))
     } else {
         listOf(Color(0xFF4ADE80), Color(0xFF22C55E))
@@ -716,6 +712,40 @@ private fun WorkCompletionInfoCard(
     }
 }
 
+sealed interface WorkingIntent {
+    data object GetHome : WorkingIntent
+
+    @JvmInline
+    value class ShowScheduleAdjustBottomSheet(val show: Boolean) : WorkingIntent
+
+    @JvmInline
+    value class ShowWorkTimeEditBottomSheet(val show: Boolean) : WorkingIntent
+
+    @JvmInline
+    value class ShowMoreWorkBottomSheet(val show: Boolean) : WorkingIntent
+
+    @JvmInline
+    value class ShowConfetti(val show: Boolean) : WorkingIntent
+
+    data object DismissTimeBottomSheet : WorkingIntent
+    data object SelectVacation : WorkingIntent
+    data object SelectEndWork : WorkingIntent
+    data object SelectAdjustTime : WorkingIntent
+
+    data class UpdateWorkTime(
+        val startHour: Int,
+        val startMinute: Int,
+        val endHour: Int,
+        val endMinute: Int,
+    ) : WorkingIntent
+
+    data object ClickCompleteWork : WorkingIntent
+
+    data object ClickTodayVacation : WorkingIntent
+    data class ConfirmMoreWork(val endHour: Int, val endMinute: Int) : WorkingIntent
+    data class ConfirmWorkTimeEdit(val endHour: Int, val endMinute: Int) : WorkingIntent
+}
+
 @Preview
 @Composable
 private fun WorkingScreenPreview() {
@@ -726,27 +756,21 @@ private fun WorkingScreenPreview() {
                 .background(MoaTheme.colors.bgPrimary),
         ) {
             WorkingScreen(
-                uiState = WorkingUiState(),
+                uiState = WorkingUiState(
+                    home = Home(
+                        workplace = "모아주식회사",
+                        workedEarnings = 1000000,
+                        standardSalary = 1000000,
+                        dailyPay = 100000,
+                        type = WorkdayType.WORK,
+                        startHour = 9,
+                        startMinute = 0,
+                        endHour = 18,
+                        endMinute = 0,
+                    ),
+                ),
                 onIntent = {},
             )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun WorkStatusTagPreview() {
-    MoaTheme {
-        Row(
-            modifier = Modifier
-                .background(MoaTheme.colors.bgPrimary)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            WorkStatusTag(WorkStatus.WORKING)
-            WorkStatusTag(WorkStatus.LUNCH_TIME)
-            WorkStatusTag(WorkStatus.VACATION)
-            WorkStatusTag(WorkStatus.OVERTIME)
         }
     }
 }

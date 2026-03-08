@@ -22,7 +22,7 @@ import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 @Composable
 fun MoaDateLocationBar(
     date: String,
-    location: String?,
+    workplace: String?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -52,7 +52,7 @@ fun MoaDateLocationBar(
             color = MoaTheme.colors.textHighEmphasis,
         )
 
-        if (!location.isNullOrEmpty()) {
+        if (!workplace.isNullOrEmpty()) {
             Spacer(Modifier.width(MoaTheme.spacing.spacing12))
 
             Icon(
@@ -65,7 +65,7 @@ fun MoaDateLocationBar(
             Spacer(Modifier.width(4.dp))
 
             Text(
-                text = location,
+                text = workplace,
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
@@ -79,7 +79,7 @@ private fun MoaDateLocationBarPreview() {
     MoaTheme {
         MoaDateLocationBar(
             date = "2월 15일 (토)",
-            location = "모아주식회사",
+            workplace = "모아주식회사",
         )
     }
 }

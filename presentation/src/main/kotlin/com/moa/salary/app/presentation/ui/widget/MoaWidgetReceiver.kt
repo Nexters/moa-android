@@ -23,6 +23,6 @@ class MoaWidgetReceiver : GlanceAppWidgetReceiver() {
             context,
             MoaWidgetEntryPoint::class.java
         )
-        entryPoint.getWidgetWorkManager().schedulePeriodicUpdate()
+        entryPoint.getWidgetWorkManager().cancelPeriodicUpdate()
     }
 }

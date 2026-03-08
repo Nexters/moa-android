@@ -3,7 +3,6 @@ package com.moa.salary.app.presentation.ui.setting.salaryday
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.salary.app.data.local.PreferencesDataStore
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
@@ -28,7 +27,6 @@ class SalaryDayViewModel @AssistedInject constructor(
     @Assisted day: Int,
     private val moaSideEffectBus: MoaSideEffectBus,
     private val settingRepository: SettingRepository,
-    private val preferencesDataStore: PreferencesDataStore,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SalaryDayUiState(salaryDay = day))
@@ -57,7 +55,6 @@ class SalaryDayViewModel @AssistedInject constructor(
     private fun setSalaryDay(day: Int) {
         suspend {
             settingRepository.patchPaydayDay(day)
-            preferencesDataStore.setPaydayDay(day)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
@@ -66,9 +63,6 @@ class SalaryDayViewModel @AssistedInject constructor(
             _uiState.value = _uiState.value.copy(
                 salaryDay = day,
             )
-            viewModelScope.launch {
-                moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
-            }
         }
     }
 

@@ -4,18 +4,18 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.makeDateString
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.MonthlyWorkSummary
-import com.moa.salary.app.core.model.history.Schedule
-import com.moa.salary.app.core.model.history.ScheduleType
-import com.moa.salary.app.core.model.history.Workday
-import com.moa.salary.app.core.model.history.WorkdayDetail
-import com.moa.salary.app.core.model.history.WorkdayType
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.MonthlyWorkSummary
+import com.moa.salary.app.core.model.work.Schedule
+import com.moa.salary.app.core.model.work.ScheduleType
+import com.moa.salary.app.core.model.work.WorkdayItem
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.model.onboarding.Time
-import com.moa.salary.app.data.local.PreferencesDataStore
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
+import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.RootNavigation
 import com.moa.salary.app.presentation.model.SettingNavigation
@@ -49,10 +49,10 @@ data class HistoryUiState(
     ),
     val schedules: ImmutableList<Schedule> = persistentListOf(),
     val calendarDays: ImmutableList<CalendarDay> = persistentListOf(),
-    val workdays: ImmutableList<Workday> = persistentListOf(),
+    val workdayItems: ImmutableList<WorkdayItem> = persistentListOf(),
     val paydayDay: Int? = null,
     val defaultWorkTime: Time = Time(9, 0, 18, 0),
-    val selectedWorkdayDetail: WorkdayDetail? = null,
+    val selectedWorkday: Workday? = null,
 )
 
 @Stable
@@ -66,21 +66,10 @@ data class CalendarDay(
     val hasPayday: Boolean = false,
 )
 
-sealed interface HistoryIntent {
-    data object ClickBack : HistoryIntent
-    data object ClickPreviousMonth : HistoryIntent
-    data object ClickNextMonth : HistoryIntent
-    data object ClickAddSchedule : HistoryIntent
-    data class ClickDate(val date: LocalDateModel) : HistoryIntent
-    data class ClickSchedule(val schedule: Schedule) : HistoryIntent
-    data class SetMonth(val year: Int, val month: Int) : HistoryIntent
-}
-
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val workdayRepository: WorkdayRepository,
-    private val preferencesDataStore: PreferencesDataStore,
     private val settingRepository: SettingRepository,
 ) : ViewModel() {
 
@@ -88,7 +77,6 @@ class HistoryViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        loadPaydayDay()
         loadWorkInfo()
         fetchEarnings()
         fetchWorkdays()
@@ -96,28 +84,25 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun refresh() {
-        loadPaydayDay()
         fetchEarnings()
         fetchWorkdays()
         fetchWorkdayDetail(_uiState.value.selectedDate)
     }
 
     private fun loadWorkInfo() {
-        viewModelScope.launch {
-            try {
-                val workInfo = settingRepository.getWorkInfo()
-                _uiState.update { it.copy(defaultWorkTime = workInfo.workPolicy.time) }
-            } catch (_: Exception) {
-                // Use default time
+        suspend {
+            settingRepository.getWorkInfo()
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { loadWorkInfo() },
+        ) { workInfo ->
+            _uiState.update {
+                it.copy(
+                    defaultWorkTime = workInfo.workPolicy.time,
+                    paydayDay = workInfo.paydayDay,
+                )
             }
-        }
-    }
-
-    private fun loadPaydayDay() {
-        viewModelScope.launch {
-            val paydayDay = preferencesDataStore.getPaydayDay()
-            _uiState.update { it.copy(paydayDay = paydayDay) }
-            updateCalendarDays()
         }
     }
 
@@ -126,7 +111,7 @@ class HistoryViewModel @Inject constructor(
             try {
                 val state = _uiState.value
                 val workdays = workdayRepository.getWorkdays(state.currentYear, state.currentMonth)
-                _uiState.update { it.copy(workdays = workdays) }
+                _uiState.update { it.copy(workdayItems = workdays) }
                 updateCalendarDays()
             } catch (_: Exception) {
             }
@@ -158,7 +143,6 @@ class HistoryViewModel @Inject constructor(
 
     private fun back() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.RefreshHome)
             moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Back))
         }
     }
@@ -200,7 +184,7 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun selectDate(date: LocalDateModel) {
-        _uiState.update { it.copy(selectedDate = date, selectedWorkdayDetail = null) }
+        _uiState.update { it.copy(selectedDate = date, selectedWorkday = null) }
         updateCalendarDays()
         fetchWorkdayDetail(date)
     }
@@ -209,10 +193,10 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val dateString = makeDateString(date.year, date.month, date.day)
-                val detail = workdayRepository.getWorkdayDetail(dateString)
-                _uiState.update { it.copy(selectedWorkdayDetail = detail) }
+                val detail = workdayRepository.getWorkday(dateString)
+                _uiState.update { it.copy(selectedWorkday = detail) }
             } catch (_: Exception) {
-                _uiState.update { it.copy(selectedWorkdayDetail = null) }
+                _uiState.update { it.copy(selectedWorkday = null) }
             }
         }
     }
@@ -251,7 +235,7 @@ class HistoryViewModel @Inject constructor(
         val today = LocalDate.now()
         val selectedDate = _uiState.value.selectedDate
         val schedules = _uiState.value.schedules
-        val workdays = _uiState.value.workdays
+        val workdays = _uiState.value.workdayItems
         val paydayDay = _uiState.value.paydayDay
 
         val calendarDays = mutableListOf<CalendarDay>()
@@ -325,9 +309,9 @@ class HistoryViewModel @Inject constructor(
         val today = LocalDate.now()
         val dateString = localDate.toString()
         val defaultWorkTime = state.defaultWorkTime
-        val workdayDetail = state.selectedWorkdayDetail
+        val workdayDetail = state.selectedWorkday
 
-        val workday = state.workdays.find { it.date == dateString }
+        val workday = state.workdayItems.find { it.date == dateString }
         val detailType = workdayDetail?.type
         val isWorkDayFromApi = if (detailType != null) {
             detailType == WorkdayType.WORK
@@ -341,8 +325,13 @@ class HistoryViewModel @Inject constructor(
         }
 
         val workTime =
-            if (workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
-                parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
+            if (workdayDetail?.startHour !=null && workdayDetail.startMinute != null && workdayDetail.endHour!=null && workdayDetail.endMinute != null) {
+                Time(
+                    workdayDetail.startHour!!,
+                    workdayDetail.startMinute!!,
+                    workdayDetail.endHour!!,
+                    workdayDetail.endMinute!!
+                )
             } else {
                 defaultWorkTime
             }
@@ -390,8 +379,13 @@ class HistoryViewModel @Inject constructor(
 
         val autoVacationSchedule = if (hasVacationFromApi && !hasExistingVacation) {
             val vacationTime =
-                if (workdayDetail?.clockInTime != null && workdayDetail.clockOutTime != null) {
-                    parseTimeRange(workdayDetail.clockInTime!!, workdayDetail.clockOutTime!!)
+                if (workdayDetail?.startHour !=null && workdayDetail.startMinute != null && workdayDetail.endHour!=null && workdayDetail.endMinute != null) {
+                    Time(
+                        workdayDetail.startHour!!,
+                        workdayDetail.startMinute!!,
+                        workdayDetail.endHour!!,
+                        workdayDetail.endMinute!!
+                    )
                 } else {
                     defaultWorkTime
                 }
@@ -409,7 +403,8 @@ class HistoryViewModel @Inject constructor(
 
         val paydayDay = _uiState.value.paydayDay
         val monthlyWorkSummary = state.monthlyWorkSummary
-        val paydayAmount = maxOf(monthlyWorkSummary.workedEarnings, monthlyWorkSummary.standardSalary)
+        val paydayAmount =
+            maxOf(monthlyWorkSummary.workedEarnings, monthlyWorkSummary.standardSalary)
         val paydaySchedule = if (paydayDay == selectedDate.day) {
             listOf(
                 Schedule(
@@ -424,20 +419,5 @@ class HistoryViewModel @Inject constructor(
         }
 
         return (existingSchedules + autoWorkSchedule + autoVacationSchedule + paydaySchedule).toImmutableList()
-    }
-
-    private fun parseTimeRange(clockInTime: String, clockOutTime: String): Time {
-        return try {
-            val inParts = clockInTime.split(":")
-            val outParts = clockOutTime.split(":")
-            Time(
-                startHour = inParts[0].toInt(),
-                startMinute = inParts[1].toInt(),
-                endHour = outParts[0].toInt(),
-                endMinute = outParts[1].toInt(),
-            )
-        } catch (_: Exception) {
-            _uiState.value.defaultWorkTime
-        }
     }
 }

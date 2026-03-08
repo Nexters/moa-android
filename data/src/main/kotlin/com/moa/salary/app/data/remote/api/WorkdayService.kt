@@ -3,8 +3,7 @@ package com.moa.salary.app.data.remote.api
 import com.moa.salary.app.data.remote.model.request.ClockOutRequest
 import com.moa.salary.app.data.remote.model.request.WorkdayRequest
 import com.moa.salary.app.data.remote.model.response.EarningsResponse
-import com.moa.salary.app.data.remote.model.response.WorkdayDetailResponse
-import com.moa.salary.app.data.remote.model.response.WorkdayListItem
+import com.moa.salary.app.data.remote.model.response.WorkdayItemResponse
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,7 +17,7 @@ interface WorkdayService {
     suspend fun updateWorkday(
         @Path("date") date: String,
         @Body request: WorkdayRequest,
-    )
+    ): WorkdayResponse
 
     @PATCH("/api/v1/workdays/{date}")
     suspend fun patchClockOut(
@@ -30,12 +29,12 @@ interface WorkdayService {
     suspend fun getWorkdays(
         @Query("year") year: Int,
         @Query("month") month: Int,
-    ): List<WorkdayListItem>
+    ): List<WorkdayItemResponse>
 
     @GET("/api/v1/workdays/{date}")
-    suspend fun getWorkdayDetail(
+    suspend fun getWorkday(
         @Path("date") date: String,
-    ): WorkdayDetailResponse
+    ): WorkdayResponse
 
     @GET("/api/v1/workdays/earnings")
     suspend fun getEarnings(

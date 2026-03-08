@@ -32,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.moa.salary.app.core.model.history.LocalDateModel
+import com.moa.salary.app.core.model.work.LocalDateModel
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Green40Main
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme

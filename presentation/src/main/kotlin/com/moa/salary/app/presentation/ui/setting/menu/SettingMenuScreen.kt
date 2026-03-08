@@ -34,6 +34,7 @@ import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.extensions.openPlayStore
 import com.moa.salary.app.presentation.extensions.sendEmail
 
 @Composable
@@ -218,8 +219,8 @@ private fun SettingMenuAppInfoContent(
     Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
     MoaRow(
-        modifier = Modifier.clickable {
-            // TODO 플레이스토어
+        modifier = Modifier.clickable(enabled = !isLatest) {
+            context.openPlayStore()
         },
         leadingContent = {
             Text(

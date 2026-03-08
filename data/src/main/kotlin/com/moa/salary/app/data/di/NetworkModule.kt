@@ -1,5 +1,6 @@
 package com.moa.salary.app.data.di
 
+import com.moa.salary.app.core.util.Constants.TIMEOUT_SECONDS
 import com.moa.salary.app.data.BuildConfig
 import com.moa.salary.app.data.remote.api.MoaService
 import com.moa.salary.app.data.remote.api.OnboardingService
@@ -24,8 +25,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    private const val TIMEOUT_SECONDS = 30L
 
     @Provides
     @Singleton

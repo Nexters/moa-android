@@ -18,6 +18,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
@@ -41,8 +44,6 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.component.MoaVacationButton
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
-import com.moa.salary.app.presentation.ui.home.beforework.model.BeforeWorkIntent
-import com.moa.salary.app.presentation.ui.home.beforework.model.BeforeWorkUiState
 
 @Composable
 fun BeforeWorkScreen(
@@ -53,28 +54,26 @@ fun BeforeWorkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(BeforeWorkIntent.GetHome)
+    }
+
     BeforeWorkScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
-}
 
-@Composable
-private fun BeforeWorkScreen(
-    uiState: BeforeWorkUiState,
-    onIntent: (BeforeWorkIntent) -> Unit,
-) {
     if (uiState.showTimeBottomSheet) {
         MoaTimeBottomSheet(
             time = Time(
-                startHour = uiState.startHour,
-                startMinute = uiState.startMinute,
-                endHour = uiState.endHour,
-                endMinute = uiState.endMinute,
+                startHour = uiState.home.startHour,
+                startMinute = uiState.home.startMinute,
+                endHour = uiState.home.endHour,
+                endMinute = uiState.home.endMinute,
             ),
             title = stringResource(R.string.before_work_time_bottom_sheet_title),
             onPositive = { time ->
-                onIntent(
+                viewModel.onIntent(
                     BeforeWorkIntent.UpdateWorkTime(
                         startHour = time.startHour,
                         startMinute = time.startMinute,
@@ -83,11 +82,17 @@ private fun BeforeWorkScreen(
                     )
                 )
             },
-            onDismissRequest = { onIntent(BeforeWorkIntent.DismissTimeBottomSheet) },
+            onDismissRequest = { viewModel.onIntent(BeforeWorkIntent.DismissTimeBottomSheet) },
         )
     }
+}
 
-    if (uiState.isWorkDay) {
+@Composable
+private fun BeforeWorkScreen(
+    uiState: BeforeWorkUiState,
+    onIntent: (BeforeWorkIntent) -> Unit,
+) {
+    if (uiState.home.type == WorkdayType.WORK) {
         WorkDayContent(uiState = uiState, onIntent = onIntent)
     } else {
         DayOffContent(uiState = uiState, onIntent = onIntent)
@@ -109,7 +114,7 @@ private fun WorkDayContent(
 
         MoaDateLocationBar(
             date = uiState.dateDisplay,
-            location = uiState.location,
+            workplace = uiState.home.workplace,
         )
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing32))
@@ -117,7 +122,6 @@ private fun WorkDayContent(
         AccumulatedSalarySection(
             month = uiState.month,
             accumulatedSalary = uiState.accumulatedSalary,
-            todayEarnedSalary = uiState.todayEarnedSalaryDisplay,
             additionalSalaryDisplay = uiState.additionalSalaryDisplay,
             isWorkDay = true,
         )
@@ -181,7 +185,7 @@ private fun DayOffContent(
 
         MoaDateLocationBar(
             date = uiState.dateDisplay,
-            location = uiState.location,
+            workplace = uiState.home.workplace,
         )
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing32))
@@ -189,7 +193,6 @@ private fun DayOffContent(
         AccumulatedSalarySection(
             month = uiState.month,
             accumulatedSalary = uiState.accumulatedSalary,
-            todayEarnedSalary = uiState.todayEarnedSalaryDisplay,
             additionalSalaryDisplay = uiState.additionalSalaryDisplay,
             isWorkDay = false,
         )
@@ -261,7 +264,6 @@ private fun DayOffInfoCard() {
 private fun AccumulatedSalarySection(
     month: Int,
     accumulatedSalary: String,
-    todayEarnedSalary: String?,
     additionalSalaryDisplay: String?,
     isWorkDay: Boolean = true,
 ) {
@@ -421,6 +423,21 @@ private fun TodayInfoCard(
     }
 }
 
+sealed interface BeforeWorkIntent {
+    data object GetHome : BeforeWorkIntent
+    data object ClickWorkTime : BeforeWorkIntent
+    data object ClickEarlyClockIn : BeforeWorkIntent
+    data object ClickVacation : BeforeWorkIntent
+    data object ClickClockInOnDayOff : BeforeWorkIntent
+    data object DismissTimeBottomSheet : BeforeWorkIntent
+    data class UpdateWorkTime(
+        val startHour: Int,
+        val startMinute: Int,
+        val endHour: Int,
+        val endMinute: Int,
+    ) : BeforeWorkIntent
+}
+
 @Preview
 @Composable
 private fun BeforeWorkScreenPreview() {
@@ -431,7 +448,19 @@ private fun BeforeWorkScreenPreview() {
                 .background(MoaTheme.colors.bgPrimary),
         ) {
             BeforeWorkScreen(
-                uiState = BeforeWorkUiState(),
+                uiState = BeforeWorkUiState(
+                    home = Home(
+                        workplace = "모아주식회사",
+                        workedEarnings = 1000000,
+                        standardSalary = 1000000,
+                        dailyPay = 100000,
+                        type = WorkdayType.WORK,
+                        startHour = 9,
+                        startMinute = 0,
+                        endHour = 18,
+                        endMinute = 0,
+                    )
+                ),
                 onIntent = {},
             )
         }

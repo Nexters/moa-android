@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.makeDateString
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.model.history.LocalDateModel
-import com.moa.salary.app.core.model.history.Schedule
-import com.moa.salary.app.core.model.history.ScheduleType
-import com.moa.salary.app.core.model.history.WorkdayType
+import com.moa.salary.app.core.model.work.LocalDateModel
+import com.moa.salary.app.core.model.work.Schedule
+import com.moa.salary.app.core.model.work.ScheduleType
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
@@ -41,17 +41,6 @@ data class ScheduleFormUiState(
     val showTimeBottomSheet: Boolean = false,
 )
 
-sealed interface ScheduleFormIntent {
-    data object ClickBack : ScheduleFormIntent
-    data class SelectScheduleType(val type: ScheduleInputType) : ScheduleFormIntent
-    data class SetDate(val date: LocalDateModel) : ScheduleFormIntent
-    data class SetTime(val time: Time) : ScheduleFormIntent
-    data class ShowDateBottomSheet(val visible: Boolean) : ScheduleFormIntent
-    data class ShowTimeBottomSheet(val visible: Boolean) : ScheduleFormIntent
-    data object ClickCancel : ScheduleFormIntent
-    data object ClickConfirm : ScheduleFormIntent
-}
-
 @HiltViewModel(assistedFactory = ScheduleFormViewModel.Factory::class)
 class ScheduleFormViewModel @AssistedInject constructor(
     @Assisted private val initialDate: LocalDateModel,
@@ -77,7 +66,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
         } else {
             ScheduleFormUiState(
                 isEditMode = false,
-                date = LocalDateModel.today(),
+                date = initialDate,
                 isDateSelected = false,
             )
         }
@@ -168,7 +157,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
                 moaSideEffectBus.emit(MoaSideEffect.Loading(true))
                 workdayRepository.updateWorkday(
                     date = date,
-                    type = workdayType,
+                    type = workdayType.name,
                     clockInTime = clockInTime,
                     clockOutTime = clockOutTime,
                 )
