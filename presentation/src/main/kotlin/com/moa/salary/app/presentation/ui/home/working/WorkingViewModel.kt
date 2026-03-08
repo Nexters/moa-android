@@ -7,13 +7,12 @@ import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toHourMinuteSecondString
 import com.moa.salary.app.core.model.work.Home
-import com.moa.salary.app.core.util.Constants
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
 import com.moa.salary.app.core.util.Constants.TOOLTIP_COUNT
 import com.moa.salary.app.core.util.Constants.TOOLTIP_ROTATION_INTERVAL_MS
+import com.moa.salary.app.core.util.SalaryUtils
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
-import com.moa.salary.app.domain.usecase.CalculateAccumulatedSalaryUseCase
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.HomeNavigation
@@ -83,7 +82,6 @@ class WorkingViewModel @AssistedInject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val workdayRepository: WorkdayRepository,
     private val homeRepository: HomeRepository,
-    private val calculateAccumulatedSalaryUseCase: CalculateAccumulatedSalaryUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkingUiState(home = args.home))
@@ -354,7 +352,7 @@ class WorkingViewModel @AssistedInject constructor(
         val elapsedSeconds = Duration.between(startTime, now).seconds.toInt()
 
         _uiState.update { state ->
-            val newTodaySalary = calculateAccumulatedSalaryUseCase.calculateSalaryForWorkedTime(
+            val newTodaySalary = SalaryUtils.calculateSalaryForWorkedTime(
                 workedSeconds = elapsedSeconds,
                 startHour = state.home.startHour,
                 startMinute = state.home.startMinute,

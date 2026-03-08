@@ -1,7 +1,6 @@
 package com.moa.salary.app.presentation.ui.widget
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,11 +17,9 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -43,20 +40,20 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.model.widget.Widget
 import com.moa.salary.app.core.model.work.WorkdayType
+import com.moa.salary.app.core.util.SalaryUtils
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Gray20
 import com.moa.salary.app.presentation.designsystem.theme.Gray70
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
-import com.moa.salary.app.presentation.ui.MainActivity
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import java.time.LocalTime
-import java.util.Locale
 
 class MoaWidget : GlanceAppWidget() {
 
@@ -71,10 +68,10 @@ class MoaWidget : GlanceAppWidget() {
                 MoaWidgetEntryPoint::class.java
             )
             val homeRepository = entryPoint.getHomeRepository()
-            val calculateSalaryUseCase = entryPoint.getCalculateAccumulatedSalaryUseCase()
 
             suspend fun getWidgetUiState() {
                 uiState = MoaWidgetUiState.Loading
+
                 try {
                     val homeResponse = homeRepository.getHome()
                     val now = LocalTime.now()
@@ -90,14 +87,14 @@ class MoaWidget : GlanceAppWidget() {
                         }
 
                         is HomeNavigation.Working -> {
-                            val todaySalary = calculateSalaryUseCase(
+                            val todaySalary = SalaryUtils.calculateSalaryForWorkedTime(
                                 startHour = homeNavigation.home.startHour,
                                 startMinute = homeNavigation.home.startMinute,
                                 endHour = homeNavigation.home.endHour,
                                 endMinute = homeNavigation.home.endMinute,
                                 dailyPay = homeNavigation.home.dailyPay,
-                                currentTime = now,
                             )
+
                             if (homeNavigation.home.type == WorkdayType.VACATION) {
                                 Widget.Vacation(
                                     daySalary = formatCurrency(todaySalary),
@@ -111,6 +108,7 @@ class MoaWidget : GlanceAppWidget() {
                             }
                         }
                     }
+
                     uiState = MoaWidgetUiState.Success(widget)
                 } catch (e: Exception) {
                     uiState = MoaWidgetUiState.Error(e.message ?: "알 수 없는 에러")
@@ -133,10 +131,6 @@ class MoaWidget : GlanceAppWidget() {
             }
         }
     }
-
-    private fun formatCurrency(amount: Long): String {
-        return String.format(Locale.getDefault(), "%,d", amount)
-    }
 }
 
 @Composable
@@ -144,19 +138,11 @@ fun MoaWidgetContent(
     uiState: MoaWidgetUiState,
     onClickRefresh: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val openAppAction = actionStartActivity(
-        Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-    )
-
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .appWidgetBackground()
-            .background(color = MoaTheme.colors.bgPrimary)
-            .clickable(openAppAction),
+            .background(color = MoaTheme.colors.bgPrimary),
     ) {
         when (uiState) {
             is MoaWidgetUiState.Loading -> {
