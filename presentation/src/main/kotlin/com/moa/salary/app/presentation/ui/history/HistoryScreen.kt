@@ -46,6 +46,7 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
+import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.model.work.LocalDateModel
 import com.moa.salary.app.core.model.work.MonthlyWorkSummary
 import com.moa.salary.app.core.model.work.Schedule
@@ -467,8 +468,14 @@ private fun ScheduleIcon(type: ScheduleType) {
     )
 }
 
-private fun formatCurrency(amount: Long): String {
-    return NumberFormat.getNumberInstance(Locale.KOREA).format(amount)
+sealed interface HistoryIntent {
+    data object ClickBack : HistoryIntent
+    data object ClickPreviousMonth : HistoryIntent
+    data object ClickNextMonth : HistoryIntent
+    data object ClickAddSchedule : HistoryIntent
+    data class ClickDate(val date: LocalDateModel) : HistoryIntent
+    data class ClickSchedule(val schedule: Schedule) : HistoryIntent
+    data class SetMonth(val year: Int, val month: Int) : HistoryIntent
 }
 
 @Preview

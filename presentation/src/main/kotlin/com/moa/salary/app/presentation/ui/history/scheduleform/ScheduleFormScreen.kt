@@ -306,6 +306,17 @@ private fun ScheduleTypeButton(
     }
 }
 
+sealed interface ScheduleFormIntent {
+    data object ClickBack : ScheduleFormIntent
+    data class SelectScheduleType(val type: ScheduleInputType) : ScheduleFormIntent
+    data class SetDate(val date: LocalDateModel) : ScheduleFormIntent
+    data class SetTime(val time: Time) : ScheduleFormIntent
+    data class ShowDateBottomSheet(val visible: Boolean) : ScheduleFormIntent
+    data class ShowTimeBottomSheet(val visible: Boolean) : ScheduleFormIntent
+    data object ClickCancel : ScheduleFormIntent
+    data object ClickConfirm : ScheduleFormIntent
+}
+
 @Preview
 @Composable
 private fun ScheduleFormScreenAddPreview() {

@@ -66,16 +66,6 @@ data class CalendarDay(
     val hasPayday: Boolean = false,
 )
 
-sealed interface HistoryIntent {
-    data object ClickBack : HistoryIntent
-    data object ClickPreviousMonth : HistoryIntent
-    data object ClickNextMonth : HistoryIntent
-    data object ClickAddSchedule : HistoryIntent
-    data class ClickDate(val date: LocalDateModel) : HistoryIntent
-    data class ClickSchedule(val schedule: Schedule) : HistoryIntent
-    data class SetMonth(val year: Int, val month: Int) : HistoryIntent
-}
-
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,

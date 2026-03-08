@@ -41,17 +41,6 @@ data class ScheduleFormUiState(
     val showTimeBottomSheet: Boolean = false,
 )
 
-sealed interface ScheduleFormIntent {
-    data object ClickBack : ScheduleFormIntent
-    data class SelectScheduleType(val type: ScheduleInputType) : ScheduleFormIntent
-    data class SetDate(val date: LocalDateModel) : ScheduleFormIntent
-    data class SetTime(val time: Time) : ScheduleFormIntent
-    data class ShowDateBottomSheet(val visible: Boolean) : ScheduleFormIntent
-    data class ShowTimeBottomSheet(val visible: Boolean) : ScheduleFormIntent
-    data object ClickCancel : ScheduleFormIntent
-    data object ClickConfirm : ScheduleFormIntent
-}
-
 @HiltViewModel(assistedFactory = ScheduleFormViewModel.Factory::class)
 class ScheduleFormViewModel @AssistedInject constructor(
     @Assisted private val initialDate: LocalDateModel,
@@ -77,7 +66,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
         } else {
             ScheduleFormUiState(
                 isEditMode = false,
-                date = LocalDateModel.today(),
+                date = initialDate,
                 isDateSelected = false,
             )
         }
