@@ -169,5 +169,4 @@ fun EarningsResponse.toDomain(): MonthlyWorkSummary = MonthlyWorkSummary(
     standardMinutes = standardMinutes,
     workedEarnings = workedEarnings,
     standardSalary = standardSalary,
-
-    )
+)

@@ -7,6 +7,7 @@ import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
+import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
@@ -29,8 +30,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
-private const val TIME_CHECK_INTERVAL_MS = 1000L
 
 @Stable
 data class BeforeWorkUiState(
@@ -86,7 +85,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             while (true) {
-                delay(TIME_CHECK_INTERVAL_MS)
+                delay(TIMER_INTERVAL_MS)
                 checkTime()
             }
         }

@@ -7,6 +7,10 @@ import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toHourMinuteSecondString
 import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.util.Constants
+import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
+import com.moa.salary.app.core.util.Constants.TOOLTIP_COUNT
+import com.moa.salary.app.core.util.Constants.TOOLTIP_ROTATION_INTERVAL_MS
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.domain.usecase.CalculateAccumulatedSalaryUseCase
@@ -27,10 +31,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
-private const val TOOLTIP_COUNT = 3
-private const val TOOLTIP_ROTATION_INTERVAL_MS = 5000L
-private const val TIMER_INTERVAL_MS = 1000L
 
 @Stable
 data class WorkingUiState(

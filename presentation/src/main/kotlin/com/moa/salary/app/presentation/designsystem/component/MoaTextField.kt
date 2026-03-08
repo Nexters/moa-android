@@ -14,7 +14,7 @@ import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
-import com.moa.salary.app.core.util.PayrollConstants
+import com.moa.salary.app.core.util.Constants
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -96,7 +96,7 @@ private fun MoaTextFieldPreview() {
 }
 
 class CurrencyInputTransformation(
-    private val maxAmount: Long = PayrollConstants.MAX_SALARY_AMOUNT
+    private val maxAmount: Long = Constants.MAX_SALARY_AMOUNT
 ) : InputTransformation {
     override fun TextFieldBuffer.transformInput() {
         val filtered = asCharSequence().filter { it.isDigit() }.toString()
