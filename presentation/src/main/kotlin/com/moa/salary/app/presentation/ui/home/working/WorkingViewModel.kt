@@ -54,9 +54,9 @@ data class WorkingUiState(
     val endTimeDisplay: String
         get() = makeTimeString(home.endHour, home.endMinute)
 
-    val progress : Float
+    val progress: Float
         get() {
-            if(elapsedTotalSeconds == 0) return 0f
+            if (elapsedTotalSeconds == 0) return 0f
             val startSeconds = home.startHour * 3600 + home.startMinute * 60
             val endSeconds = home.endHour * 3600 + home.endMinute * 60
             val totalSeconds = endSeconds - startSeconds
@@ -349,7 +349,7 @@ class WorkingViewModel @AssistedInject constructor(
         val endTime = LocalTime.of(state.home.endHour, state.home.endMinute)
 
         when {
-            now.isAfter(endTime) -> updateShowWorkCompletionOverlay()
+            now.isAfter(endTime) -> afterWork()
             now.isBefore(startTime) -> navigateToBeforeWork()
             else -> updateElapsedTime(
                 startTime = startTime,
@@ -387,8 +387,13 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun updateShowWorkCompletionOverlay() {
-        _uiState.update { it.copy(showWorkCompletionOverlay = true) }
+    private fun afterWork() {
+        _uiState.update {
+            it.copy(
+                showWorkCompletionOverlay = true,
+                showConfetti = true,
+            )
+        }
     }
 
     private fun navigateToBeforeWork() {
