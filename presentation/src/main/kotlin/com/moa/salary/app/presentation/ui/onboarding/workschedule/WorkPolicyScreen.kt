@@ -156,7 +156,7 @@ private fun WorkScheduleScreen(
                 onClick = { onIntent(WorkScheduleIntent.ClickNext) },
             ) {
                 Text(
-                    text = "다음",
+                    text = if (isOnboarding) "다음" else "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }

@@ -190,7 +190,7 @@ private fun SalaryScreen(
                 },
             ) {
                 Text(
-                    text = "다음",
+                    text = if (isOnboarding) "다음" else "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }
