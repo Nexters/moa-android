@@ -127,6 +127,7 @@ private fun WorkingScreen(
                         startMinute = time.startMinute,
                         endHour = time.endHour,
                         endMinute = time.endMinute,
+                        type = uiState.home.type.name,
                     )
                 )
             },
@@ -163,10 +164,17 @@ private fun WorkingScreen(
             ),
             title = stringResource(R.string.working_work_time_edit_title),
             negativeText = stringResource(R.string.working_today_vacation),
-            endTimeOnly = true,
             onNegative = { onIntent(WorkingIntent.ClickTodayVacation) },
             onPositive = { time ->
-                onIntent(WorkingIntent.ConfirmWorkTimeEdit(time.endHour, time.endMinute))
+                onIntent(
+                    WorkingIntent.UpdateWorkTime(
+                        startHour = time.startHour,
+                        startMinute = time.startMinute,
+                        endHour = time.endHour,
+                        endMinute = time.endMinute,
+                        type = uiState.home.type.name,
+                    )
+                )
             },
             onDismissRequest = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
         )
@@ -756,13 +764,13 @@ sealed interface WorkingIntent {
         val startMinute: Int,
         val endHour: Int,
         val endMinute: Int,
+        val type: String,
     ) : WorkingIntent
 
     data object ClickCompleteWork : WorkingIntent
 
     data object ClickTodayVacation : WorkingIntent
     data class ConfirmMoreWork(val endHour: Int, val endMinute: Int) : WorkingIntent
-    data class ConfirmWorkTimeEdit(val endHour: Int, val endMinute: Int) : WorkingIntent
 }
 
 @Preview

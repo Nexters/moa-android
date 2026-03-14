@@ -141,6 +141,7 @@ class WorkingViewModel @AssistedInject constructor(
                 startMinute = intent.startMinute,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
+                type = intent.type
             )
 
             is WorkingIntent.ShowWorkTimeEditBottomSheet -> showWorkTimeEditBottomSheet(intent.show)
@@ -151,11 +152,6 @@ class WorkingViewModel @AssistedInject constructor(
 
             WorkingIntent.ClickTodayVacation -> clickTodayVacation()
             is WorkingIntent.ConfirmMoreWork -> confirmMoreWork(
-                endHour = intent.endHour,
-                endMinute = intent.endMinute,
-            )
-
-            is WorkingIntent.ConfirmWorkTimeEdit -> confirmWorkTimeEdit(
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
             )
@@ -246,16 +242,6 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun confirmMoreWork(
-        endHour: Int,
-        endMinute: Int,
-    ) {
-        patchClockOut(
-            endHour = endHour,
-            endMinute = endMinute,
-        )
-    }
-
-    private fun confirmWorkTimeEdit(
         endHour: Int,
         endMinute: Int,
     ) {

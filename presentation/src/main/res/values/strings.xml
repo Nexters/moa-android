@@ -83,15 +83,6 @@
     <string name="after_work_complete">완료</string>
     <string name="after_work_coin_description">모아 코인</string>
 
-    <!-- AfterWorkScreen - BottomSheet -->
-    <string name="after_work_actual_time_title">실제 근무 시간을 알려주세요</string>
-    <string name="after_work_more_work_title">얼마나 더 일하나요?</string>
-    <string name="after_work_clock_in">출근</string>
-    <string name="after_work_clock_out">퇴근</string>
-    <string name="after_work_today_vacation">오늘 휴가</string>
-    <string name="after_work_cancel">취소</string>
-    <string name="after_work_confirm">확인</string>
-
     <!-- Common Components -->
     <string name="date_location_bar_date_icon_description">날짜</string>
     <string name="date_location_bar_location_icon_description">위치</string>
