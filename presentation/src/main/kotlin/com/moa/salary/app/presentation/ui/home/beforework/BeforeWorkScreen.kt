@@ -286,8 +286,8 @@ private fun AccumulatedSalarySection(
 
         Text(
             text = stringResource(R.string.before_work_accumulated_salary_title, month),
-            style = MoaTheme.typography.b1_500,
-            color = MoaTheme.colors.textMediumEmphasis,
+            style = MoaTheme.typography.t3_500,
+            color = MoaTheme.colors.textHighEmphasis,
         )
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing4))
@@ -298,9 +298,7 @@ private fun AccumulatedSalarySection(
             MoaTheme.colors.textBlue
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = accumulatedSalary,
                 style = MoaTheme.typography.h1_700,
@@ -311,8 +309,8 @@ private fun AccumulatedSalarySection(
 
             Text(
                 text = stringResource(R.string.before_work_currency_won),
-                style = MoaTheme.typography.t2_700,
-                color = MoaTheme.colors.textHighEmphasis,
+                style = MoaTheme.typography.h3_500,
+                color = MoaTheme.colors.textMediumEmphasis,
             )
         }
 
@@ -354,11 +352,12 @@ private fun TodayInfoCard(
                 shape = RoundedCornerShape(MoaTheme.radius.radius16),
             ),
     ) {
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = MoaTheme.spacing.spacing20)
-                .padding(start = 16.dp, end = 12.dp),
+                .padding(horizontal = MoaTheme.spacing.spacing16),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -377,24 +376,21 @@ private fun TodayInfoCard(
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
-            thickness = 1.dp,
+            modifier = Modifier
+                .padding(
+                    vertical = 14.dp,
+                    horizontal = MoaTheme.spacing.spacing16
+                ),
             color = MoaTheme.colors.dividerSecondary,
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        bottomStart = MoaTheme.radius.radius16,
-                        bottomEnd = MoaTheme.radius.radius16
-                    )
-                )
                 .clickable { onWorkTimeClick() }
                 .padding(
-                    horizontal = MoaTheme.spacing.spacing20,
-                    vertical = MoaTheme.spacing.spacing16,
+                    start = MoaTheme.spacing.spacing16,
+                    end = MoaTheme.spacing.spacing12,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -420,6 +416,8 @@ private fun TodayInfoCard(
                 tint = MoaTheme.colors.textLowEmphasis,
             )
         }
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
     }
 }
 

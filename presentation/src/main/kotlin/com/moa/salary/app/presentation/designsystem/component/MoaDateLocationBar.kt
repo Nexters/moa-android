@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moa.salary.app.presentation.R
@@ -68,6 +69,8 @@ fun MoaDateLocationBar(
                 text = workplace,
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textHighEmphasis,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
@@ -79,7 +82,7 @@ private fun MoaDateLocationBarPreview() {
     MoaTheme {
         MoaDateLocationBar(
             date = "2월 15일 (토)",
-            workplace = "모아주식회사",
+            workplace = "모아주식회사모아주식회사모아주식회사모아주식회사모아주식회사",
         )
     }
 }
