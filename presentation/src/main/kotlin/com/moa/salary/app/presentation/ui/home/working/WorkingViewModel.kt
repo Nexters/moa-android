@@ -352,8 +352,14 @@ class WorkingViewModel @AssistedInject constructor(
         val endTime = LocalTime.of(state.home.endHour, state.home.endMinute)
 
         when {
-            now.isAfter(endTime) -> afterWork()
+            now.isAfter(endTime) -> afterWork(
+                startTime = startTime,
+                endTime = endTime,
+                now = now,
+            )
+
             now.isBefore(startTime) -> navigateToBeforeWork()
+
             else -> updateElapsedTime(
                 startTime = startTime,
                 endTime = endTime,
@@ -390,12 +396,24 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun afterWork() {
-        _uiState.update {
-            it.copy(
-                showWorkCompletionOverlay = true,
-                showConfetti = true,
+    private fun afterWork(
+        startTime: LocalTime,
+        endTime: LocalTime,
+        now: LocalTime,
+    ) {
+        if (!_uiState.value.showWorkCompletionOverlay) {
+            updateElapsedTime(
+                startTime = startTime,
+                endTime = endTime,
+                now = now,
             )
+
+            _uiState.update {
+                it.copy(
+                    showWorkCompletionOverlay = true,
+                    showConfetti = true,
+                )
+            }
         }
     }
 
