@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,26 +21,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.moa.salary.app.presentation.R
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Green40Main
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.extensions.toFixedSize
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun CalendarHeader(daysOfWeek: List<DayOfWeek>) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+fun CalendarHeader(
+    modifier: Modifier = Modifier,
+    daysOfWeek: List<DayOfWeek>
+) {
+    Row(modifier = modifier) {
         daysOfWeek.forEach { dayOfWeek ->
             Text(
                 modifier = Modifier.weight(1f),
                 text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREAN),
-                style = MoaTheme.typography.b2_400,
+                style = MoaTheme.typography.b2_400.toFixedSize(),
                 color = MoaTheme.colors.textLowEmphasis,
                 textAlign = TextAlign.Center,
             )
@@ -71,7 +72,7 @@ fun Day(
         modifier = Modifier
             .aspectRatio(0.7f)
             .padding(horizontal = 4.dp)
-            .padding(top = 2.dp, bottom = 24.dp)
+            .padding(top = 2.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -91,7 +92,7 @@ fun Day(
         ) {
             Text(
                 text = day.date.dayOfMonth.toString(),
-                style = MoaTheme.typography.b1_400,
+                style = MoaTheme.typography.b1_400.toFixedSize(),
                 color = when {
                     isToday -> MoaTheme.colors.textGreen
                     else -> MoaTheme.colors.textHighEmphasis
@@ -107,44 +108,47 @@ fun Day(
             calendarDay?.hasPayday == true && (calendarDay.hasWorkScheduled || calendarDay.hasWorkCompleted) -> {
                 Text(
                     text = stringResource(R.string.history_calendar_payday),
-                    style = MoaTheme.typography.c1_400,
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
                     color = MoaTheme.colors.textGreen,
                     maxLines = 1,
                 )
             }
+
             calendarDay?.hasPayday == true && calendarDay.hasVacation -> {
                 Row(modifier = Modifier.wrapContentWidth(unbounded = true)) {
                     Text(
                         text = stringResource(R.string.history_calendar_payday),
-                        style = MoaTheme.typography.c1_400,
+                        style = MoaTheme.typography.c1_400.toFixedSize(),
                         color = MoaTheme.colors.textGreen,
                     )
                     Spacer(Modifier.width(2.dp))
                     Text(
                         text = stringResource(R.string.history_calendar_separator),
-                        style = MoaTheme.typography.c1_400,
+                        style = MoaTheme.typography.c1_400.toFixedSize(),
                         color = MoaTheme.colors.textLowEmphasis,
                     )
                     Spacer(Modifier.width(2.dp))
                     Text(
                         text = stringResource(R.string.history_schedule_vacation),
-                        style = MoaTheme.typography.c1_400,
+                        style = MoaTheme.typography.c1_400.toFixedSize(),
                         color = MoaTheme.colors.textMediumEmphasis,
                     )
                 }
             }
+
             calendarDay?.hasPayday == true -> {
                 Text(
                     text = stringResource(R.string.history_calendar_payday),
-                    style = MoaTheme.typography.c1_400,
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
                     color = MoaTheme.colors.textGreen,
                     maxLines = 1,
                 )
             }
+
             calendarDay?.hasVacation == true -> {
                 Text(
                     text = stringResource(R.string.history_schedule_vacation),
-                    style = MoaTheme.typography.c1_400,
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
                     color = MoaTheme.colors.textMediumEmphasis,
                     maxLines = 1,
                 )
@@ -162,6 +166,7 @@ fun Day(
                         .background(MoaTheme.colors.textLowEmphasis),
                 )
             }
+
             calendarDay?.hasWorkCompleted == true -> {
                 Box(
                     modifier = Modifier
@@ -170,6 +175,7 @@ fun Day(
                         .background(Green40Main),
                 )
             }
+
             calendarDay?.hasWorkScheduled == true -> {
                 Box(
                     modifier = Modifier

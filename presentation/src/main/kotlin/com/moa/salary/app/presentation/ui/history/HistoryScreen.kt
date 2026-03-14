@@ -210,7 +210,6 @@ private fun HistoryCalendar(
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
             .background(MoaTheme.colors.containerPrimary)
-            .padding(horizontal = MoaTheme.spacing.spacing16)
     ) {
         MonthNavigator(
             month = uiState.currentMonth,
@@ -233,10 +232,17 @@ private fun HistoryCalendar(
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing32))
 
-        CalendarHeader(daysOfWeek = daysOfWeek)
+        CalendarHeader(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoaTheme.spacing.spacing8),
+            daysOfWeek = daysOfWeek
+        )
 
         HorizontalCalendar(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoaTheme.spacing.spacing8),
             state = calendarState,
             dayContent = { day ->
                 val calendarDay = uiState.calendarDays.find {
@@ -277,7 +283,9 @@ private fun MonthNavigator(
     onAddClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing16),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -333,6 +341,7 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
 
     Column(
         modifier = Modifier
+            .padding(horizontal = MoaTheme.spacing.spacing16)
             .fillMaxWidth()
             .clip(RoundedCornerShape(MoaTheme.radius.radius16))
             .background(MoaTheme.colors.containerSecondary)
