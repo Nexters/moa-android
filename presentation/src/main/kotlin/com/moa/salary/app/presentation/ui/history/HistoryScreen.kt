@@ -410,8 +410,8 @@ private fun ScheduleItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = MoaTheme.spacing.spacing16)
-            .clip(RoundedCornerShape(MoaTheme.radius.radius12))
-            .background(MoaTheme.colors.containerSecondary)
+            .clip(RoundedCornerShape(MoaTheme.radius.radius16))
+            .background(MoaTheme.colors.containerPrimary)
             .clickable(onClick = onClick)
             .padding(MoaTheme.spacing.spacing16),
         verticalAlignment = Alignment.CenterVertically,
@@ -431,11 +431,11 @@ private fun ScheduleItem(
                         schedule.date.day
                     )
                 },
-                style = MoaTheme.typography.b2_500,
+                style = MoaTheme.typography.c1_400,
                 color = MoaTheme.colors.textLowEmphasis,
             )
 
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(4.dp))
 
             Text(
                 text = when (schedule.type) {
@@ -445,7 +445,7 @@ private fun ScheduleItem(
                     ScheduleType.VACATION -> schedule.time?.getFormattedTimeRange() ?: ""
                     ScheduleType.PAYDAY -> "+ ${formatCurrency(schedule.amount ?: 0)}원"
                 },
-                style = MoaTheme.typography.t2_700,
+                style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
         }
