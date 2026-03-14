@@ -80,9 +80,12 @@ data class WorkingUiState(
         }
 
     val todaySalaryDisplay: String
-        get() = "${formatCurrency(todaySalary)}원"
+        get() = formatCurrency(todaySalary)
 
     val monthSalaryDisplay: String
+        get() = formatCurrency(home.workedEarnings)
+
+    val totalSalaryDisplay: String
         get() = formatCurrency(home.workedEarnings + todaySalary)
 }
 

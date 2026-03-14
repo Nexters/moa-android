@@ -29,9 +29,9 @@ import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 
 enum class ScheduleAdjustOption(val strRes: Int) {
-    VACATION(R.string.schedule_adjust_option_vacation),
     END_WORK(R.string.schedule_adjust_option_end_work),
     ADJUST_TIME(R.string.schedule_adjust_option_adjust_time),
+    VACATION(R.string.schedule_adjust_option_vacation),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,6 +124,11 @@ private fun ScheduleOptionItem(
     } else {
         MoaTheme.colors.dividerSecondary
     }
+    val textColor = if (isSelected) {
+        MoaTheme.colors.textGreen
+    } else {
+        MoaTheme.colors.textHighEmphasis
+    }
 
     val backgroundColor = MoaTheme.colors.containerSecondary
 
@@ -149,7 +154,7 @@ private fun ScheduleOptionItem(
         Text(
             text = text,
             style = MoaTheme.typography.b1_600,
-            color = MoaTheme.colors.textHighEmphasis,
+            color = textColor,
         )
     }
 }

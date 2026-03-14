@@ -1,6 +1,7 @@
 package com.moa.salary.app.presentation.ui.home.working
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -30,8 +31,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
@@ -218,7 +224,7 @@ private fun WorkingScreen(
 
             if (uiState.showWorkCompletionOverlay) {
                 WorkCompletionSection(
-                    accumulatedSalary = uiState.monthSalaryDisplay,
+                    accumulatedSalary = uiState.totalSalaryDisplay,
                     workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
                     onContinueWorking = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true)) },
                     onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
@@ -305,18 +311,35 @@ private fun TooltipBanner(
     }
 
     val displayIndex = if (type == WorkdayType.VACATION) 0 else currentIndex % tooltipMessages.size
+    val targetMessage = tooltipMessages.getOrElse(displayIndex) { tooltipMessages.first() }
+    var visibleIndex by remember { mutableIntStateOf(displayIndex) }
+    var visibleMessage by remember { mutableStateOf(targetMessage) }
+    val bannerAlpha = remember { Animatable(1f) }
 
-    AnimatedContent(
-        targetState = displayIndex,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(durationMillis = 500, delayMillis = 500)) togetherWith
-                    fadeOut(animationSpec = tween(durationMillis = 500))
-        },
-        label = "tooltipBannerAnimation",
-    ) { targetIndex ->
-        val message = tooltipMessages.getOrElse(targetIndex) { tooltipMessages.first() }
-        MoaTooltipBanner(text = message)
+    LaunchedEffect(displayIndex, targetMessage) {
+        if (visibleIndex == displayIndex) {
+            visibleMessage = targetMessage
+            bannerAlpha.snapTo(1f)
+            return@LaunchedEffect
+        }
+
+        bannerAlpha.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 300),
+        )
+        visibleIndex = displayIndex
+        visibleMessage = targetMessage
+        bannerAlpha.snapTo(0f)
+        bannerAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 300),
+        )
     }
+
+    MoaTooltipBanner(
+        modifier = Modifier.alpha(bannerAlpha.value),
+        text = visibleMessage,
+    )
 }
 
 @Composable
@@ -396,7 +419,7 @@ private fun CoinGraph(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        val imageWidth = maxWidth * (96f / 375f)
+        val imageWidth = maxWidth * (112f / 375f)
 
         Box(
             modifier = Modifier
@@ -490,17 +513,15 @@ private fun WorkingStatusSection(
 private fun WorkdayTypeTag(
     type: WorkdayType,
 ) {
-    val (text, borderColor, textColor) = when (type) {
-        WorkdayType.WORK -> Triple(
+    val (text, color) = when (type) {
+        WorkdayType.WORK -> Pair(
             stringResource(R.string.working_status_working),
-            Color(0xFF4ADE80),
-            Color(0xFF4ADE80),
+            MoaTheme.colors.textGreen
         )
 
-        else -> Triple(
+        else -> Pair(
             stringResource(R.string.working_status_vacation),
-            Color(0xFF60A5FA),
-            Color(0xFF60A5FA),
+            MoaTheme.colors.textBlue,
         )
     }
 
@@ -508,7 +529,7 @@ private fun WorkdayTypeTag(
         modifier = Modifier
             .border(
                 width = 1.dp,
-                color = borderColor,
+                color = color,
                 shape = RoundedCornerShape(MoaTheme.radius.radius8),
             )
             .padding(
@@ -519,7 +540,7 @@ private fun WorkdayTypeTag(
         Text(
             text = text,
             style = MoaTheme.typography.b2_500,
-            color = textColor,
+            color = color,
         )
     }
 }
@@ -537,10 +558,10 @@ private fun WorkProgressBar(
         label = "progressAnimation",
     )
 
-    val progressColors = if (type == WorkdayType.VACATION) {
-        listOf(Color(0xFF60A5FA), Color(0xFF3B82F6))
+    val progressColor = if (type == WorkdayType.VACATION) {
+        MoaTheme.colors.textBlue
     } else {
-        listOf(Color(0xFF4ADE80), Color(0xFF22C55E))
+        MoaTheme.colors.textGreen
     }
 
     Column {
@@ -556,9 +577,7 @@ private fun WorkProgressBar(
                     .fillMaxWidth(animatedProgress)
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(
-                        brush = Brush.horizontalGradient(colors = progressColors)
-                    ),
+                    .background(progressColor),
             )
         }
 
