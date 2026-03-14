@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -175,6 +176,7 @@ private fun WorkInfoSalaryContent(
             Image(
                 painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
+                colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis),
             )
         }
     )
@@ -201,6 +203,7 @@ private fun WorkInfoSalaryContent(
             Image(
                 painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
+                colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis),
             )
         }
     )
@@ -249,6 +252,7 @@ private fun WorkInfoContent(
             Image(
                 painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
+                colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis),
             )
         }
     )
@@ -275,6 +279,7 @@ private fun WorkInfoContent(
             Image(
                 painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
+                colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis),
             )
         }
     )
@@ -301,6 +306,7 @@ private fun WorkInfoContent(
             Image(
                 painter = painterResource(R.drawable.ic_24_chevron_right),
                 contentDescription = "Chevron Right",
+                colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis),
             )
         }
     )
