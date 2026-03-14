@@ -231,7 +231,7 @@ private fun RowScope.SalaryTypeItem(
                 color = MoaTheme.colors.containerPrimary,
                 shape = RoundedCornerShape(MoaTheme.radius.radius12)
             )
-            .padding(vertical = MoaTheme.spacing.spacing12)
+            .padding(vertical = MoaTheme.spacing.spacing16)
             .clickable { onClick() },
         text = text,
         color = if (selected) MoaTheme.colors.textHighEmphasis else MoaTheme.colors.textDisabled,
