@@ -23,13 +23,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,12 +63,7 @@ private fun NicknameScreen(
     onIntent: (NicknameIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
     val isKeyboardOpen by rememberIsKeyboardOpen()
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     Scaffold(
         topBar = {
@@ -109,9 +100,7 @@ private fun NicknameScreen(
             Spacer(Modifier.weight(1f))
 
             MoaTextFieldWithDescription(
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .padding(horizontal = MoaTheme.spacing.spacing20),
+                modifier = Modifier.padding(horizontal = MoaTheme.spacing.spacing20),
                 description1 = "닉네임",
                 state = nickNameTextFieldState,
                 description2 = if (isOnboarding) "로 가입할래요" else "로 수정할게요",
