@@ -289,7 +289,7 @@ private fun MoaTimeBottomSheetButtonContent(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(MoaTheme.spacing.spacing12))
+            Spacer(modifier = Modifier.width(MoaTheme.spacing.spacing12))
         }
 
         MoaPrimaryButton(
