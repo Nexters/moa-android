@@ -66,6 +66,13 @@ private fun CompanyNameScreen(
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    Text(
+                        text = "회사명",
+                        color = MoaTheme.colors.textHighEmphasis,
+                        style = MoaTheme.typography.t3_500,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(CompanyNameIntent.ClickBack) }) {
                         Icon(
@@ -127,7 +134,7 @@ private fun CompanyNameScreen(
                 },
             ) {
                 Text(
-                    text = "다음",
+                    text = "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }
