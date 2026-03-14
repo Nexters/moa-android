@@ -78,7 +78,7 @@ fun Day(
     ) {
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .then(
                     if (isSelected) {
                         Modifier

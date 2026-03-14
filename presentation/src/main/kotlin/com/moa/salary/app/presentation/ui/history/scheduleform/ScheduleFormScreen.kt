@@ -61,7 +61,7 @@ fun ScheduleFormScreen(
 
     if (uiState.showDateBottomSheet) {
         DatePickerBottomSheet(
-            selectedDate = uiState.date,
+            currentDate = uiState.date,
             onConfirm = { viewModel.onIntent(ScheduleFormIntent.SetDate(it)) },
             onDismissRequest = { viewModel.onIntent(ScheduleFormIntent.ShowDateBottomSheet(false)) },
         )

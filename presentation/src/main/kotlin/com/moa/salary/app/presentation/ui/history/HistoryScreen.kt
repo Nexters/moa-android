@@ -182,8 +182,7 @@ private fun HistoryScreen(
 private fun HistoryCalendar(
     uiState: HistoryUiState,
     onIntent: (HistoryIntent) -> Unit,
-
-    ) {
+) {
     val currentMonth = YearMonth.of(uiState.currentYear, uiState.currentMonth)
     val startMonth = currentMonth.minusMonths(100)
     val endMonth = currentMonth.plusMonths(100)
