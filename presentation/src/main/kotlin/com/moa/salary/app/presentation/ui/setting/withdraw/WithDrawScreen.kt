@@ -107,7 +107,7 @@ private fun WithDrawScreen(
                 onClick = { onIntent(WithDrawIntent.ClickWithDraw) },
             ) {
                 Text(
-                    text = "다음",
+                    text = "탈퇴하기",
                     style = MoaTheme.typography.t3_700,
                 )
             }
