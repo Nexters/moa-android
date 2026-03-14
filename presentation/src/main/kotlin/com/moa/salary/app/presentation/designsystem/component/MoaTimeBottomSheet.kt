@@ -246,7 +246,7 @@ private fun MoaTimeBottomSheetTimeContent(
 
                 MoaWheelPicker(
                     modifier = Modifier.width(120.dp),
-                    items = (0..59).toList().toImmutableList(),
+                    items = (0..59).filter { it % 5 == 0 }.toList().toImmutableList(),
                     initialSelectedIndex = if (selectedStartTime) {
                         startMinute
                     } else {
