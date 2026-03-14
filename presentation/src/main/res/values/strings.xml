@@ -14,7 +14,7 @@
     <string name="before_work_work_time">근무 시간</string>
     <string name="before_work_edit_icon_description">수정</string>
     <string name="before_work_auto_clock_in">%1$s 자동 출근 예정</string>
-    <string name="before_work_day_off_no_schedule">근무 예정 없음</string>
+    <string name="before_work_day_off_no_schedule">예정 없음</string>
     <string name="before_work_day_off_clock_in">쉬는 날 출근하기</string>
 
     <!-- WorkingScreen -->

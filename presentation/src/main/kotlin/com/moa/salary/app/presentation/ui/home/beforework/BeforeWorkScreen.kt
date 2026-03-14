@@ -249,7 +249,7 @@ private fun DayOffInfoCard() {
                 color = MoaTheme.colors.textMediumEmphasis,
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.width(MoaTheme.spacing.spacing12))
 
             Text(
                 text = stringResource(R.string.before_work_day_off_no_schedule),
