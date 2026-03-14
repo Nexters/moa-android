@@ -88,8 +88,8 @@ private fun AfterWorkScreen(
 
             Text(
                 text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
-                style = MoaTheme.typography.b1_500,
-                color = MoaTheme.colors.textMediumEmphasis,
+                style = MoaTheme.typography.t3_500,
+                color = MoaTheme.colors.textHighEmphasis,
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing4))
@@ -108,8 +108,8 @@ private fun AfterWorkScreen(
                 Text(
                     modifier = Modifier.padding(bottom = 4.dp),
                     text = stringResource(R.string.after_work_currency_won),
-                    style = MoaTheme.typography.t2_700,
-                    color = MoaTheme.colors.textHighEmphasis,
+                    style = MoaTheme.typography.h3_500,
+                    color = MoaTheme.colors.textMediumEmphasis,
                 )
             }
 
