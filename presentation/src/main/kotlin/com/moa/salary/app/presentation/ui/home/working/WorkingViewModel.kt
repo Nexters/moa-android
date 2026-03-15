@@ -67,6 +67,7 @@ data class WorkingUiState(
     val confettiProgress: Float
         get() {
             if (elapsedTotalSeconds == 0) return 0f
+            if (showWorkCompletionOverlay) return 1f
 
             val secInMinute = elapsedTotalSeconds % 1800
             return if (secInMinute == 0) 1f else (secInMinute / 1800f).coerceIn(0f, 1f)
@@ -395,10 +396,7 @@ class WorkingViewModel @AssistedInject constructor(
             )
 
             _uiState.update {
-                it.copy(
-                    showWorkCompletionOverlay = true,
-                    showConfetti = true,
-                )
+                it.copy(showWorkCompletionOverlay = true)
             }
         }
     }
