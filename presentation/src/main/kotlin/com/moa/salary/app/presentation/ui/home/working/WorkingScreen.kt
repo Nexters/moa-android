@@ -62,7 +62,6 @@ import com.moa.salary.app.presentation.designsystem.component.MoaScheduleAdjustB
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
-import com.moa.salary.app.presentation.designsystem.component.MoaVacationButton
 import com.moa.salary.app.presentation.designsystem.component.ScheduleAdjustOption
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
@@ -633,7 +632,7 @@ private fun WorkCompletionSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing12),
         ) {
-            MoaVacationButton(
+            MoaTertiaryButton(
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp),
