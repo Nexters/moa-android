@@ -104,7 +104,6 @@ fun MoaTertiaryButton(
     }
 }
 
-// TODO 추후 수정
 @Composable
 fun MoaBlueButton(
     onClick: () -> Unit,
