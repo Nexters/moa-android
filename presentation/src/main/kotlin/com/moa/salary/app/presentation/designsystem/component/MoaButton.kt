@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.moa.salary.app.presentation.designsystem.theme.Gray90
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
@@ -26,6 +27,7 @@ fun MoaPrimaryButton(
     enabled: Boolean = true,
     shape: Shape = RoundedCornerShape(32.dp),
     border: BorderStroke? = null,
+    height: Dp = 64.dp,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
@@ -44,7 +46,7 @@ fun MoaPrimaryButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(height),
         enabled = enabled,
         shape = shape,
         border = border,
@@ -67,6 +69,7 @@ fun MoaTertiaryButton(
     enabled: Boolean = true,
     shape: Shape = RoundedCornerShape(32.dp),
     border: BorderStroke? = null,
+    height: Dp = 64.dp,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
@@ -85,7 +88,7 @@ fun MoaTertiaryButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(height),
         enabled = enabled,
         shape = shape,
         border = border,
@@ -109,6 +112,7 @@ fun MoaBlueButton(
     enabled: Boolean = true,
     shape: Shape = RoundedCornerShape(32.dp),
     border: BorderStroke? = null,
+    height: Dp = 64.dp,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable () -> Unit,
 ) {
@@ -116,7 +120,7 @@ fun MoaBlueButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val containerColor = when {
-        !enabled -> MoaTheme.colors.textBlue
+        !enabled -> MoaTheme.colors.btnPrimaryDisabled
         isPressed -> MoaTheme.colors.textBlue
         else -> MoaTheme.colors.textBlue
     }
@@ -128,7 +132,7 @@ fun MoaBlueButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.height(height),
         enabled = enabled,
         shape = shape,
         border = border,

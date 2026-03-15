@@ -503,6 +503,7 @@ private fun WorkingStatusSection(
             Spacer(Modifier.weight(1f))
 
             MoaTertiaryButton(
+                height = 36.dp,
                 onClick = onAdjustScheduleClick,
             ) {
                 Text(
