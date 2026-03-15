@@ -143,9 +143,7 @@ private fun WorkDayContent(
         Spacer(Modifier.height(MoaTheme.spacing.spacing12))
 
         MoaPrimaryButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { onIntent(BeforeWorkIntent.ClickEarlyClockIn) },
         ) {
             Text(
@@ -208,9 +206,7 @@ private fun DayOffContent(
         Spacer(Modifier.height(MoaTheme.spacing.spacing12))
 
         MoaTertiaryButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
+            modifier = Modifier.fillMaxWidth(),
             onClick = { onIntent(BeforeWorkIntent.ClickClockInOnDayOff) },
         ) {
             Text(

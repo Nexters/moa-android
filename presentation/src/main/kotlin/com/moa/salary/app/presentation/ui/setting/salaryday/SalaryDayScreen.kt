@@ -135,8 +135,7 @@ private fun SalaryDayScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing24)
-                    .height(64.dp),
+                    .padding(bottom = MoaTheme.spacing.spacing24),
                 onClick = { onIntent(SalaryDateIntent.Confirm) },
             ) {
                 Text(

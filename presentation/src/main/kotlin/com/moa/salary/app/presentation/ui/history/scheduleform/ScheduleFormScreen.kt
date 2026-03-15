@@ -242,9 +242,7 @@ private fun ScheduleFormContent(
                 .padding(bottom = MoaTheme.spacing.spacing24),
         ) {
             MoaTertiaryButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(64.dp),
+                modifier = Modifier.weight(1f),
                 onClick = onCancelClick,
             ) {
                 Text(
@@ -256,9 +254,7 @@ private fun ScheduleFormContent(
             Spacer(Modifier.width(MoaTheme.spacing.spacing12))
 
             MoaPrimaryButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(64.dp),
+                modifier = Modifier.weight(1f),
                 onClick = onConfirmClick,
                 enabled = isDateSelected,
             ) {

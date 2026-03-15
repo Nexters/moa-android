@@ -133,7 +133,7 @@ class WorkingViewModel @AssistedInject constructor(
             is WorkingIntent.ShowConfetti -> showConfetti(intent.show)
             is WorkingIntent.ShowScheduleAdjustBottomSheet -> showScheduleAdjustBottomSheet(intent.show)
             WorkingIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
-            WorkingIntent.SelectVacation -> selectVacation()
+            is WorkingIntent.SelectChangeType -> selectChangeType(intent.type)
             WorkingIntent.SelectEndWork -> selectEndWork()
             WorkingIntent.SelectAdjustTime -> selectAdjustTime()
 
@@ -195,7 +195,7 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectVacation() {
+    private fun selectChangeType(type : String) {
         val state = _uiState.value
 
         updateWorkday(
@@ -203,7 +203,7 @@ class WorkingViewModel @AssistedInject constructor(
             startMinute = state.home.startMinute,
             endHour = state.home.endHour,
             endMinute = state.home.endMinute,
-            type = "VACATION",
+            type = type,
         )
     }
 

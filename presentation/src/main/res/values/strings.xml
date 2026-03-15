@@ -61,10 +61,13 @@
     <string name="working_today_vacation">오늘 휴가</string>
 
     <!-- WorkingScreen - Schedule Adjust BottomSheet -->
-    <string name="schedule_adjust_title">근무 일정에 변동이 생겼나요?</string>
+    <string name="schedule_adjust_work_title">근무 일정에 변동이 생겼나요?</string>
+    <string name="schedule_adjust_vacation_title">휴가 일정에 변동이 생겼나요?</string>
     <string name="schedule_adjust_option_vacation">오늘 휴가예요</string>
     <string name="schedule_adjust_option_end_work">오늘 근무를 마칠 거예요</string>
     <string name="schedule_adjust_option_adjust_time">근무 시간 조정이 필요해요</string>
+    <string name="schedule_adjust_option_work">오늘 근무 중이에요</string>
+    <string name="schedule_adjust_option_none">오늘 휴일이에요</string>
     <string name="schedule_adjust_cancel">취소</string>
     <string name="schedule_adjust_confirm">확인</string>
 

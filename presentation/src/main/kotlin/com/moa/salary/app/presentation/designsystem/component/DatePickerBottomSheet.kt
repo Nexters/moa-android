@@ -131,8 +131,7 @@ fun DatePickerBottomSheet(
                     .padding(
                         top = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
-                    )
-                    .height(64.dp),
+                    ),
                 onClick = {
                     onConfirm(selectedDate)
                 },

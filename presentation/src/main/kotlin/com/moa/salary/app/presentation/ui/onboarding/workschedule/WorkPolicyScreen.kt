@@ -150,8 +150,7 @@ private fun WorkScheduleScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing24)
-                    .height(64.dp),
+                    .padding(bottom = MoaTheme.spacing.spacing24),
                 enabled = uiState.selectedWorkScheduleDays.isNotEmpty(),
                 onClick = { onIntent(WorkScheduleIntent.ClickNext) },
             ) {

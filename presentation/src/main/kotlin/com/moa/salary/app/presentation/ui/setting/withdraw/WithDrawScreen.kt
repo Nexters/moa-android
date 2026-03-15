@@ -101,8 +101,7 @@ private fun WithDrawScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing24)
-                    .height(64.dp),
+                    .padding(bottom = MoaTheme.spacing.spacing24),
                 enabled = selectedReasons.isNotEmpty(),
                 onClick = { onIntent(WithDrawIntent.ClickWithDraw) },
             ) {

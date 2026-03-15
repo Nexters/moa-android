@@ -181,8 +181,7 @@ private fun SalaryScreen(
                         start = MoaTheme.spacing.spacing20,
                         end = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
-                    )
-                    .height(64.dp),
+                    ),
                 enabled = uiState.salaryTextField.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()

@@ -127,9 +127,7 @@ private fun AfterWorkScreen(
             Spacer(Modifier.weight(1f))
 
             MoaPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
+                modifier = Modifier.fillMaxWidth(),
                 onClick = { onIntent(AfterWorkIntent.ClickHistory) },
             ) {
                 Text(

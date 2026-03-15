@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,7 +44,7 @@ fun MoaPrimaryButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.height(64.dp),
         enabled = enabled,
         shape = shape,
         border = border,
@@ -84,7 +85,50 @@ fun MoaTertiaryButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.height(64.dp),
+        enabled = enabled,
+        shape = shape,
+        border = border,
+        contentPadding = contentPadding,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContentColor = contentColor,
+            disabledContainerColor = containerColor
+        )
+    ) {
+        content()
+    }
+}
+
+// TODO 추후 수정
+@Composable
+fun MoaBlueButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(32.dp),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    content: @Composable () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val containerColor = when {
+        !enabled -> MoaTheme.colors.textBlue
+        isPressed -> MoaTheme.colors.textBlue
+        else -> MoaTheme.colors.textBlue
+    }
+
+    val contentColor = when {
+        !enabled -> MoaTheme.colors.textDisabled
+        else -> Gray90
+    }
+
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(64.dp),
         enabled = enabled,
         shape = shape,
         border = border,

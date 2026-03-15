@@ -282,9 +282,7 @@ private fun MoaTimeBottomSheetButtonContent(
     ) {
         if (negativeText != null) {
             MoaTertiaryButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(64.dp),
+                modifier = Modifier.weight(1f),
                 onClick = onNegative,
             ) {
                 Text(
@@ -297,9 +295,7 @@ private fun MoaTimeBottomSheetButtonContent(
         }
 
         MoaPrimaryButton(
-            modifier = Modifier
-                .weight(1f)
-                .height(64.dp),
+            modifier = Modifier.weight(1f),
             enabled = enabled,
             onClick = onPositive,
         ) {

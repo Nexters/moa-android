@@ -62,9 +62,7 @@ private fun MoaNotificationBottomSheetContent(
 
         MoaPrimaryButton(
             onClick = onAllowClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
                 text = "알림 받을게요",

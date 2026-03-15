@@ -102,9 +102,16 @@ private fun WorkingScreen(
             onDismissRequest = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
             onConfirm = { option ->
                 when (option) {
-                    ScheduleAdjustOption.VACATION -> onIntent(WorkingIntent.SelectVacation)
-                    ScheduleAdjustOption.END_WORK -> onIntent(WorkingIntent.SelectEndWork)
-                    ScheduleAdjustOption.ADJUST_TIME -> onIntent(WorkingIntent.SelectAdjustTime)
+                    ScheduleAdjustOption.Vacation -> onIntent(
+                        WorkingIntent.SelectChangeType(
+                            WorkdayType.VACATION.name
+                        )
+                    )
+
+                    ScheduleAdjustOption.EndWork -> onIntent(WorkingIntent.SelectEndWork)
+                    ScheduleAdjustOption.AdjustTime -> onIntent(WorkingIntent.SelectAdjustTime)
+                    ScheduleAdjustOption.Work -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK.name))
+                    ScheduleAdjustOption.None -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE.name))
                 }
             },
         )
@@ -754,7 +761,9 @@ sealed interface WorkingIntent {
     value class ShowConfetti(val show: Boolean) : WorkingIntent
 
     data object DismissTimeBottomSheet : WorkingIntent
-    data object SelectVacation : WorkingIntent
+
+    @JvmInline
+    value class SelectChangeType(val type: String) : WorkingIntent
     data object SelectEndWork : WorkingIntent
     data object SelectAdjustTime : WorkingIntent
 

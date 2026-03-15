@@ -125,8 +125,7 @@ private fun CompanyNameScreen(
                         start = MoaTheme.spacing.spacing20,
                         end = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
-                    )
-                    .height(64.dp),
+                    ),
                 enabled = companyNameTextFieldState.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
