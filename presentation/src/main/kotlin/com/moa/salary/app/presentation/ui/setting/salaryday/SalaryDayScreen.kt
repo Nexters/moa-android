@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -15,18 +16,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.presentation.R
+import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun SalaryDayScreen(
-    day : Int,
+    day: Int,
     viewModel: SalaryDayViewModel = hiltViewModel(
         creationCallback = { factory: SalaryDayViewModel.Factory ->
             factory.create(day)
@@ -94,7 +97,7 @@ private fun SalaryDayScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing32))
 
             Text(
-                text = "언제 월급 받나요?",
+                text = "월급일",
                 style = MoaTheme.typography.b2_500,
                 color = MoaTheme.colors.textMediumEmphasis,
             )
@@ -102,7 +105,13 @@ private fun SalaryDayScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
             MoaRow(
-                modifier = Modifier.clickable { onIntent(SalaryDateIntent.ShowSalaryDayBottomSheet(true)) },
+                modifier = Modifier.clickable {
+                    onIntent(
+                        SalaryDateIntent.ShowSalaryDayBottomSheet(
+                            true
+                        )
+                    )
+                },
                 leadingContent = {
                     Text(
                         text = "${salaryDay}일",
@@ -115,9 +124,24 @@ private fun SalaryDayScreen(
                         modifier = Modifier.rotate(90f),
                         painter = painterResource(R.drawable.ic_24_chevron_right),
                         contentDescription = "Chevron Right",
+                        colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis)
                     )
                 }
             )
+
+            Spacer(Modifier.weight(1f))
+
+            MoaPrimaryButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = MoaTheme.spacing.spacing24),
+                onClick = { onIntent(SalaryDateIntent.Confirm) },
+            ) {
+                Text(
+                    text = "완료",
+                    style = MoaTheme.typography.t3_700,
+                )
+            }
         }
     }
 }
@@ -130,6 +154,8 @@ sealed interface SalaryDateIntent {
 
     @JvmInline
     value class SetSalaryDay(val day: Int) : SalaryDateIntent
+
+    data object Confirm : SalaryDateIntent
 }
 
 @Preview

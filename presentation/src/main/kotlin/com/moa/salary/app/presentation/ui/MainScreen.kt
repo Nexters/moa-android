@@ -1,15 +1,29 @@
 package com.moa.salary.app.presentation.ui
 
 import android.widget.Toast
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
@@ -24,6 +38,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaDialog
 import com.moa.salary.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.salary.app.presentation.designsystem.component.MoaFullScreenProgress
 import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
+import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaDialogProperties
 import com.moa.salary.app.presentation.model.MoaSideEffect
@@ -37,6 +52,7 @@ import com.moa.salary.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.salary.app.presentation.ui.setting.SettingScreen
 import com.moa.salary.app.presentation.ui.splash.SplashScreen
 import com.moa.salary.app.presentation.ui.webview.WebViewScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun MainScreen(
@@ -47,6 +63,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val toastAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {
@@ -114,7 +131,7 @@ fun MainScreen(
                 }
 
                 is MoaSideEffect.Toast -> {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    viewModel.onIntent(MainIntent.SetToast(it.message))
                 }
 
                 is MoaSideEffect.Loading -> {
@@ -156,18 +173,54 @@ fun MainScreen(
         }
     }
 
-    MainNavHost(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        focusManager.clearFocus()
-                    }
-                )
-            },
-        backStack = backStack,
-    )
+    LaunchedEffect(uiState.toastMessage) {
+        if (uiState.toastMessage != null) {
+            toastAlpha.animateTo(
+                targetValue = 1f,
+                animationSpec = tween()
+            )
+            delay(1000)
+            toastAlpha.animateTo(
+                targetValue = 0f,
+                animationSpec = tween()
+            )
+            viewModel.onIntent(MainIntent.SetToast(null))
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        MainNavHost(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            focusManager.clearFocus()
+                        }
+                    )
+                },
+            backStack = backStack,
+        )
+
+        Text(
+            modifier = Modifier
+                .alpha(toastAlpha.value)
+                .navigationBarsPadding()
+                .padding(bottom = 32.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(color = MoaTheme.colors.containerSecondary)
+                .padding(
+                    horizontal = 20.dp,
+                    vertical = 12.dp,
+                ),
+            text = uiState.toastMessage ?: "",
+            style = MoaTheme.typography.b1_400,
+            color = Color.White
+        )
+    }
 
     uiState.dialog?.let {
         MoaDialog(
@@ -242,4 +295,7 @@ sealed interface MainIntent {
 
     @JvmInline
     value class SetErrorRetry(val retry: (() -> Unit)?) : MainIntent
+
+    @JvmInline
+    value class SetToast(val message: String?) : MainIntent
 }

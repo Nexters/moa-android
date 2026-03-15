@@ -67,6 +67,7 @@ data class WorkingUiState(
     val confettiProgress: Float
         get() {
             if (elapsedTotalSeconds == 0) return 0f
+            if (showWorkCompletionOverlay) return 1f
 
             val secInMinute = elapsedTotalSeconds % 1800
             return if (secInMinute == 0) 1f else (secInMinute / 1800f).coerceIn(0f, 1f)
@@ -80,9 +81,12 @@ data class WorkingUiState(
         }
 
     val todaySalaryDisplay: String
-        get() = "${formatCurrency(todaySalary)}원"
+        get() = formatCurrency(todaySalary)
 
     val monthSalaryDisplay: String
+        get() = formatCurrency(home.workedEarnings)
+
+    val totalSalaryDisplay: String
         get() = formatCurrency(home.workedEarnings + todaySalary)
 }
 
@@ -129,7 +133,7 @@ class WorkingViewModel @AssistedInject constructor(
             is WorkingIntent.ShowConfetti -> showConfetti(intent.show)
             is WorkingIntent.ShowScheduleAdjustBottomSheet -> showScheduleAdjustBottomSheet(intent.show)
             WorkingIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
-            WorkingIntent.SelectVacation -> selectVacation()
+            is WorkingIntent.SelectChangeType -> selectChangeType(intent.type)
             WorkingIntent.SelectEndWork -> selectEndWork()
             WorkingIntent.SelectAdjustTime -> selectAdjustTime()
 
@@ -138,6 +142,7 @@ class WorkingViewModel @AssistedInject constructor(
                 startMinute = intent.startMinute,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
+                type = intent.type
             )
 
             is WorkingIntent.ShowWorkTimeEditBottomSheet -> showWorkTimeEditBottomSheet(intent.show)
@@ -148,11 +153,6 @@ class WorkingViewModel @AssistedInject constructor(
 
             WorkingIntent.ClickTodayVacation -> clickTodayVacation()
             is WorkingIntent.ConfirmMoreWork -> confirmMoreWork(
-                endHour = intent.endHour,
-                endMinute = intent.endMinute,
-            )
-
-            is WorkingIntent.ConfirmWorkTimeEdit -> confirmWorkTimeEdit(
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
             )
@@ -195,7 +195,7 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectVacation() {
+    private fun selectChangeType(type : String) {
         val state = _uiState.value
 
         updateWorkday(
@@ -203,7 +203,7 @@ class WorkingViewModel @AssistedInject constructor(
             startMinute = state.home.startMinute,
             endHour = state.home.endHour,
             endMinute = state.home.endMinute,
-            type = "VACATION",
+            type = type,
         )
     }
 
@@ -243,16 +243,6 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun confirmMoreWork(
-        endHour: Int,
-        endMinute: Int,
-    ) {
-        patchClockOut(
-            endHour = endHour,
-            endMinute = endMinute,
-        )
-    }
-
-    private fun confirmWorkTimeEdit(
         endHour: Int,
         endMinute: Int,
     ) {
@@ -349,8 +339,14 @@ class WorkingViewModel @AssistedInject constructor(
         val endTime = LocalTime.of(state.home.endHour, state.home.endMinute)
 
         when {
-            now.isAfter(endTime) -> afterWork()
+            now.isAfter(endTime) -> afterWork(
+                startTime = startTime,
+                endTime = endTime,
+                now = now,
+            )
+
             now.isBefore(startTime) -> navigateToBeforeWork()
+
             else -> updateElapsedTime(
                 startTime = startTime,
                 endTime = endTime,
@@ -387,12 +383,21 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun afterWork() {
-        _uiState.update {
-            it.copy(
-                showWorkCompletionOverlay = true,
-                showConfetti = true,
+    private fun afterWork(
+        startTime: LocalTime,
+        endTime: LocalTime,
+        now: LocalTime,
+    ) {
+        if (!_uiState.value.showWorkCompletionOverlay) {
+            updateElapsedTime(
+                startTime = startTime,
+                endTime = endTime,
+                now = now,
             )
+
+            _uiState.update {
+                it.copy(showWorkCompletionOverlay = true)
+            }
         }
     }
 

@@ -37,6 +37,7 @@ class SalaryDayViewModel @AssistedInject constructor(
             is SalaryDateIntent.ClickBack -> back()
             is SalaryDateIntent.ShowSalaryDayBottomSheet -> showSalaryDayBottomSheet(intent.visible)
             is SalaryDateIntent.SetSalaryDay -> setSalaryDay(intent.day)
+            is SalaryDateIntent.Confirm -> confirm()
         }
     }
 
@@ -53,16 +54,18 @@ class SalaryDayViewModel @AssistedInject constructor(
     }
 
     private fun setSalaryDay(day: Int) {
+        _uiState.value = _uiState.value.copy(salaryDay = day)
+    }
+
+    private fun confirm() {
         suspend {
-            settingRepository.patchPaydayDay(day)
+            settingRepository.patchPaydayDay(_uiState.value.salaryDay)
         }.execute(
             bus = moaSideEffectBus,
             scope = viewModelScope,
-            onRetry = { setSalaryDay(day) },
+            onRetry = { setSalaryDay(_uiState.value.salaryDay) },
         ) {
-            _uiState.value = _uiState.value.copy(
-                salaryDay = day,
-            )
+            back()
         }
     }
 

@@ -107,7 +107,6 @@ private fun WidgetGuideScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
                     .padding(horizontal = MoaTheme.spacing.spacing20),
                 onClick = {
                     onIntent(WidgetGuideIntent.ClickNext)

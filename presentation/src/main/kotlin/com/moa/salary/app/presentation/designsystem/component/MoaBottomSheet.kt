@@ -29,7 +29,10 @@ fun MoaBottomSheet(
     ),
     containerColor: Color = MoaTheme.colors.containerPrimary,
     onDismissRequest: () -> Unit,
-    properties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
+    properties: ModalBottomSheetProperties = ModalBottomSheetProperties(
+        isAppearanceLightNavigationBars = false,
+        isAppearanceLightStatusBars = false,
+    ),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
