@@ -14,6 +14,7 @@ data class MainUiState(
     val isLoading: Boolean = false,
     val dialog: MoaDialogProperties? = null,
     val errorRetry: (() -> Unit)? = null,
+    val toastMessage: String? = null,
 )
 
 @HiltViewModel
@@ -30,6 +31,7 @@ class MainViewModel @Inject constructor(
             is MainIntent.SetDialog -> setDialog(intent.dialog)
             is MainIntent.SetLoading -> setLoading(intent.visible)
             is MainIntent.SetErrorRetry -> setErrorRetry(intent.retry)
+            is MainIntent.SetToast -> setToast(intent.message)
         }
     }
 
@@ -41,7 +43,11 @@ class MainViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = visible)
     }
 
-    private fun setErrorRetry(retry: (() -> Unit)?){
+    private fun setErrorRetry(retry: (() -> Unit)?) {
         _uiState.value = _uiState.value.copy(errorRetry = retry)
+    }
+
+    private fun setToast(message: String?) {
+        _uiState.value = _uiState.value.copy(toastMessage = message)
     }
 }
