@@ -14,7 +14,7 @@
     <string name="before_work_work_time">근무 시간</string>
     <string name="before_work_edit_icon_description">수정</string>
     <string name="before_work_auto_clock_in">%1$s 자동 출근 예정</string>
-    <string name="before_work_day_off_no_schedule">근무 예정 없음</string>
+    <string name="before_work_day_off_no_schedule">예정 없음</string>
     <string name="before_work_day_off_clock_in">쉬는 날 출근하기</string>
 
     <!-- WorkingScreen -->
@@ -61,10 +61,13 @@
     <string name="working_today_vacation">오늘 휴가</string>
 
     <!-- WorkingScreen - Schedule Adjust BottomSheet -->
-    <string name="schedule_adjust_title">근무 일정에 변동이 생겼나요?</string>
+    <string name="schedule_adjust_work_title">근무 일정에 변동이 생겼나요?</string>
+    <string name="schedule_adjust_vacation_title">휴가 일정에 변동이 생겼나요?</string>
     <string name="schedule_adjust_option_vacation">오늘 휴가예요</string>
     <string name="schedule_adjust_option_end_work">오늘 근무를 마칠 거예요</string>
     <string name="schedule_adjust_option_adjust_time">근무 시간 조정이 필요해요</string>
+    <string name="schedule_adjust_option_work">오늘 근무 중이에요</string>
+    <string name="schedule_adjust_option_none">오늘 휴일이에요</string>
     <string name="schedule_adjust_cancel">취소</string>
     <string name="schedule_adjust_confirm">확인</string>
 
@@ -82,15 +85,6 @@
     <string name="after_work_more_work">더 일할게요</string>
     <string name="after_work_complete">완료</string>
     <string name="after_work_coin_description">모아 코인</string>
-
-    <!-- AfterWorkScreen - BottomSheet -->
-    <string name="after_work_actual_time_title">실제 근무 시간을 알려주세요</string>
-    <string name="after_work_more_work_title">얼마나 더 일하나요?</string>
-    <string name="after_work_clock_in">출근</string>
-    <string name="after_work_clock_out">퇴근</string>
-    <string name="after_work_today_vacation">오늘 휴가</string>
-    <string name="after_work_cancel">취소</string>
-    <string name="after_work_confirm">확인</string>
 
     <!-- Common Components -->
     <string name="date_location_bar_date_icon_description">날짜</string>

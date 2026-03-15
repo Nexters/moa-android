@@ -23,14 +23,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -75,11 +71,6 @@ private fun SalaryScreen(
     onIntent: (SalaryIntent) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     Scaffold(
         topBar = {
@@ -160,9 +151,7 @@ private fun SalaryScreen(
                 Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
                 MoaFilledTextField(
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     state = uiState.salaryTextField,
                     placeholder = "0",
                     trailingText = "원",
@@ -192,8 +181,7 @@ private fun SalaryScreen(
                         start = MoaTheme.spacing.spacing20,
                         end = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
-                    )
-                    .height(64.dp),
+                    ),
                 enabled = uiState.salaryTextField.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
@@ -201,7 +189,7 @@ private fun SalaryScreen(
                 },
             ) {
                 Text(
-                    text = "다음",
+                    text = if (isOnboarding) "다음" else "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }
@@ -242,7 +230,7 @@ private fun RowScope.SalaryTypeItem(
                 color = MoaTheme.colors.containerPrimary,
                 shape = RoundedCornerShape(MoaTheme.radius.radius12)
             )
-            .padding(vertical = MoaTheme.spacing.spacing12)
+            .padding(vertical = MoaTheme.spacing.spacing16)
             .clickable { onClick() },
         text = text,
         color = if (selected) MoaTheme.colors.textHighEmphasis else MoaTheme.colors.textDisabled,

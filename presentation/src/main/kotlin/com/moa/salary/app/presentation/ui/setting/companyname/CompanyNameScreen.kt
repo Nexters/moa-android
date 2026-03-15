@@ -26,7 +26,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
@@ -66,6 +65,13 @@ private fun CompanyNameScreen(
     Scaffold(
         topBar = {
             MoaTopAppBar(
+                title = {
+                    Text(
+                        text = "회사명",
+                        color = MoaTheme.colors.textHighEmphasis,
+                        style = MoaTheme.typography.t3_500,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onIntent(CompanyNameIntent.ClickBack) }) {
                         Icon(
@@ -118,8 +124,7 @@ private fun CompanyNameScreen(
                         start = MoaTheme.spacing.spacing20,
                         end = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
-                    )
-                    .height(64.dp),
+                    ),
                 enabled = companyNameTextFieldState.text.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
@@ -127,7 +132,7 @@ private fun CompanyNameScreen(
                 },
             ) {
                 Text(
-                    text = "다음",
+                    text = "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }

@@ -182,8 +182,7 @@ private fun HistoryScreen(
 private fun HistoryCalendar(
     uiState: HistoryUiState,
     onIntent: (HistoryIntent) -> Unit,
-
-    ) {
+) {
     val currentMonth = YearMonth.of(uiState.currentYear, uiState.currentMonth)
     val startMonth = currentMonth.minusMonths(100)
     val endMonth = currentMonth.plusMonths(100)
@@ -210,7 +209,6 @@ private fun HistoryCalendar(
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
             .background(MoaTheme.colors.containerPrimary)
-            .padding(horizontal = MoaTheme.spacing.spacing16)
     ) {
         MonthNavigator(
             month = uiState.currentMonth,
@@ -233,10 +231,17 @@ private fun HistoryCalendar(
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing32))
 
-        CalendarHeader(daysOfWeek = daysOfWeek)
+        CalendarHeader(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoaTheme.spacing.spacing8),
+            daysOfWeek = daysOfWeek
+        )
 
         HorizontalCalendar(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoaTheme.spacing.spacing8),
             state = calendarState,
             dayContent = { day ->
                 val calendarDay = uiState.calendarDays.find {
@@ -277,7 +282,9 @@ private fun MonthNavigator(
     onAddClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing16),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -333,6 +340,7 @@ private fun WorkSummaryCard(summary: MonthlyWorkSummary) {
 
     Column(
         modifier = Modifier
+            .padding(horizontal = MoaTheme.spacing.spacing16)
             .fillMaxWidth()
             .clip(RoundedCornerShape(MoaTheme.radius.radius16))
             .background(MoaTheme.colors.containerSecondary)
@@ -401,8 +409,8 @@ private fun ScheduleItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = MoaTheme.spacing.spacing16)
-            .clip(RoundedCornerShape(MoaTheme.radius.radius12))
-            .background(MoaTheme.colors.containerSecondary)
+            .clip(RoundedCornerShape(MoaTheme.radius.radius16))
+            .background(MoaTheme.colors.containerPrimary)
             .clickable(onClick = onClick)
             .padding(MoaTheme.spacing.spacing16),
         verticalAlignment = Alignment.CenterVertically,
@@ -422,11 +430,11 @@ private fun ScheduleItem(
                         schedule.date.day
                     )
                 },
-                style = MoaTheme.typography.b2_500,
+                style = MoaTheme.typography.c1_400,
                 color = MoaTheme.colors.textLowEmphasis,
             )
 
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(4.dp))
 
             Text(
                 text = when (schedule.type) {
@@ -436,7 +444,7 @@ private fun ScheduleItem(
                     ScheduleType.VACATION -> schedule.time?.getFormattedTimeRange() ?: ""
                     ScheduleType.PAYDAY -> "+ ${formatCurrency(schedule.amount ?: 0)}원"
                 },
-                style = MoaTheme.typography.t2_700,
+                style = MoaTheme.typography.b1_500,
                 color = MoaTheme.colors.textHighEmphasis,
             )
         }

@@ -150,13 +150,12 @@ private fun WorkScheduleScreen(
             MoaPrimaryButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = MoaTheme.spacing.spacing24)
-                    .height(64.dp),
+                    .padding(bottom = MoaTheme.spacing.spacing24),
                 enabled = uiState.selectedWorkScheduleDays.isNotEmpty(),
                 onClick = { onIntent(WorkScheduleIntent.ClickNext) },
             ) {
                 Text(
-                    text = "다음",
+                    text = if (isOnboarding) "다음" else "완료",
                     style = MoaTheme.typography.t3_700,
                 )
             }
