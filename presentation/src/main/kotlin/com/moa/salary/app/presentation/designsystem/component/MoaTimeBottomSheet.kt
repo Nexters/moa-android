@@ -154,6 +154,10 @@ private fun MoaTimeBottomSheetTimeContent(
     onClickStartTime: () -> Unit,
     onClickEndTime: () -> Unit,
 ) {
+    val minuteItems = remember {
+        (0..59).filter { it % 5 == 0 }.toImmutableList()
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -246,11 +250,11 @@ private fun MoaTimeBottomSheetTimeContent(
 
                 MoaWheelPicker(
                     modifier = Modifier.width(120.dp),
-                    items = (0..59).filter { it % 5 == 0 }.toList().toImmutableList(),
+                    items = minuteItems,
                     initialSelectedIndex = if (selectedStartTime) {
-                        startMinute
+                        minuteItems.indexOf(startMinute).coerceAtLeast(0)
                     } else {
-                        endMinute
+                        minuteItems.indexOf(endMinute).coerceAtLeast(0)
                     },
                     onItemSelected = onSelectedMinute,
                     itemToString = { "${it}분" }
