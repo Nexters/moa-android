@@ -42,7 +42,7 @@ data class WorkingUiState(
     val showTimeBottomSheet: Boolean = false,
     val showMoreWorkBottomSheet: Boolean = false,
     val showWorkTimeEditBottomSheet: Boolean = false,
-    val showWorkCompletionOverlay: Boolean = false,
+    val showWorkCompletionOverlay: Boolean,
     val showConfetti: Boolean = false,
 ) {
     val elapsedTimeDisplay: String
@@ -98,7 +98,12 @@ class WorkingViewModel @AssistedInject constructor(
     private val homeRepository: HomeRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(WorkingUiState(home = args.home))
+    private val _uiState = MutableStateFlow(
+        WorkingUiState(
+            home = args.home,
+            showWorkCompletionOverlay = args.showWorkCompletionOverlay
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -195,7 +200,7 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectChangeType(type : String) {
+    private fun selectChangeType(type: String) {
         val state = _uiState.value
 
         updateWorkday(
@@ -227,7 +232,11 @@ class WorkingViewModel @AssistedInject constructor(
 
 
     private fun clickCompleteWork() {
-        navigateToAfterWork()
+        viewModelScope.launch {
+            homeRepository.putCompletedWorkDay(LocalDate.now())
+        }.invokeOnCompletion {
+            navigateToAfterWork()
+        }
     }
 
     private fun clickTodayVacation() {
