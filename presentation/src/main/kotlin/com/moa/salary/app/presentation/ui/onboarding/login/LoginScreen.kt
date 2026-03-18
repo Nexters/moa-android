@@ -119,6 +119,7 @@ private fun LoginScreen(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(64.dp)
                     .padding(horizontal = MoaTheme.spacing.spacing16),
                 shape = RoundedCornerShape(32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500)),
