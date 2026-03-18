@@ -1,6 +1,7 @@
 package com.moa.salary.app.presentation.ui.home
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,6 +11,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -30,14 +33,28 @@ fun HomeScreen(
     startDestination: HomeNavigation,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val backStack = rememberNavBackStack(startDestination)
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { _ -> }
+        onResult = { isGranted ->
+            if (!isGranted) {
+                viewModel.onIntent(HomeIntent.GetShownNotificationBottomSheet)
+            }
+        }
     )
 
+    fun launchPostNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permissionStatus = ContextCompat.checkSelfPermission(context, POST_NOTIFICATIONS)
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                permissionLauncher.launch(POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.onIntent(HomeIntent.GetShownNotificationBottomSheet)
+        launchPostNotificationPermission()
 
         viewModel.moaSideEffects.collect {
             when (it) {
@@ -74,13 +91,11 @@ fun HomeScreen(
         )
     }
 
-    if (!viewModel.shownNotificationBottomSheet.value) {
+    if (viewModel.shownNotificationBottomSheet.value == false) {
         MoaNotificationBottomSheet(
             onAllowClick = {
                 viewModel.onIntent(HomeIntent.SetShownNotificationBottomSheet)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(POST_NOTIFICATIONS)
-                }
+                launchPostNotificationPermission()
             },
             onDismissRequest = {
                 viewModel.onIntent(HomeIntent.SetShownNotificationBottomSheet)

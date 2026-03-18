@@ -17,7 +17,7 @@ class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
 ) : ViewModel() {
     val moaSideEffects = moaSideEffectBus.sideEffects
-    var shownNotificationBottomSheet = mutableStateOf(false)
+    var shownNotificationBottomSheet = mutableStateOf<Boolean?>(null)
 
     fun onIntent(intent: HomeIntent) {
         when (intent) {
