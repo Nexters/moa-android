@@ -7,3 +7,9 @@ fun LocalDate.toYearMonthDayString(): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
     return this.format(formatter)
 }
+
+fun String?.toLocalDateOrNull(): LocalDate? {
+    return runCatching {
+        LocalDate.parse(this)
+    }.getOrNull()
+}

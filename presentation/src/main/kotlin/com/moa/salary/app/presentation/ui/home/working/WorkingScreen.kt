@@ -804,6 +804,7 @@ private fun WorkingScreenPreview() {
                         endHour = 18,
                         endMinute = 0,
                     ),
+                    showWorkCompletionOverlay = false,
                 ),
                 onIntent = {},
             )

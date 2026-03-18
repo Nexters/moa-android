@@ -279,7 +279,7 @@ private fun MoaWidgetFinishContent(
         Text(
             text = "이번달 누적 월급",
             style = TextStyle(
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = ColorProvider(
                     day = MoaTheme.colors.textMediumEmphasis,
@@ -382,7 +382,7 @@ private fun MoaWidgetChip(text: String) {
             .cornerRadius(4.dp),
         text = text,
         style = TextStyle(
-            fontSize = 10.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
             color = ColorProvider(
                 day = MoaTheme.colors.textMediumEmphasis,
@@ -401,7 +401,7 @@ private fun MoaWidgetPrice(
         Text(
             text = price,
             style = TextStyle(
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = ColorProvider(
                     day = priceColor,

@@ -169,7 +169,7 @@ class AfterWorkViewModel @AssistedInject constructor(
 
     private fun checkTime() {
         val state = _uiState.value
-        val homeNavigation = state.home.determineHomeNavigation()
+        val homeNavigation = state.home.determineHomeNavigation(LocalDate.now())
 
         when (homeNavigation) {
             is HomeNavigation.Working -> navigate(homeNavigation)
