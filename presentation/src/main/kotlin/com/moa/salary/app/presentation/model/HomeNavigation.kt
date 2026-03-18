@@ -13,6 +13,7 @@ sealed interface HomeNavigation : RootNavigation {
     @Serializable
     data class Working(
         val home: Home,
+        val showWorkCompletionOverlay: Boolean = false,
     ) : HomeNavigation
 
     @Serializable

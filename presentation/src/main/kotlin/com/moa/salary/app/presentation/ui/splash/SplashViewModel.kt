@@ -11,6 +11,7 @@ import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -98,7 +99,8 @@ class SplashViewModel @Inject constructor(
             runCatching {
                 homeRepository.getHome()
             }.onSuccess {
-                val homeNavigation = it.determineHomeNavigation()
+                val completedWorkDay = homeRepository.getCompletedWorkDay()
+                val homeNavigation = it.determineHomeNavigation(completedWorkDay)
                 navigate(RootNavigation.Home(homeNavigation))
             }.onFailure {
                 navigate(RootNavigation.Onboarding())

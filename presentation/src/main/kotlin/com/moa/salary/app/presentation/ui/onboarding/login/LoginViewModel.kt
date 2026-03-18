@@ -153,7 +153,8 @@ class LoginViewModel @Inject constructor(
             runCatching {
                 homeRepository.getHome()
             }.onSuccess {
-                val homeNavigation = it.determineHomeNavigation()
+                val completedWorkDay = homeRepository.getCompletedWorkDay()
+                val homeNavigation = it.determineHomeNavigation(completedWorkDay)
                 navigate(RootNavigation.Home(homeNavigation))
             }.onFailure {
                 toast()
