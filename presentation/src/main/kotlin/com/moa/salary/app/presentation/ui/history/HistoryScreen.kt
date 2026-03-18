@@ -460,10 +460,10 @@ private fun ScheduleItem(
 @Composable
 private fun ScheduleIcon(type: ScheduleType) {
     val iconRes = when (type) {
-        ScheduleType.WORK_SCHEDULED -> R.drawable.ic_24_working_yet
-        ScheduleType.WORK_COMPLETED -> R.drawable.ic_24_working_done
-        ScheduleType.VACATION -> R.drawable.ic_24_vacation
-        ScheduleType.PAYDAY -> R.drawable.ic_24_salary_day
+        ScheduleType.WORK_SCHEDULED -> R.drawable.ic_40_working_yet
+        ScheduleType.WORK_COMPLETED -> R.drawable.ic_40_working_done
+        ScheduleType.VACATION -> R.drawable.ic_40_vacation
+        ScheduleType.PAYDAY -> R.drawable.ic_40_salary_day
     }
 
     Icon(

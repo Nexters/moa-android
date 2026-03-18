@@ -17,6 +17,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -51,6 +52,7 @@ import com.moa.salary.app.presentation.designsystem.theme.Gray70
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
+import com.moa.salary.app.presentation.ui.MainActivity
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import java.time.LocalTime
@@ -142,7 +144,8 @@ fun MoaWidgetContent(
         modifier = GlanceModifier
             .fillMaxSize()
             .appWidgetBackground()
-            .background(color = MoaTheme.colors.bgPrimary),
+            .background(color = MoaTheme.colors.bgPrimary)
+            .clickable(actionStartActivity<MainActivity>()),
     ) {
         when (uiState) {
             is MoaWidgetUiState.Loading -> {
@@ -429,11 +432,13 @@ private fun MoaWidgetTimeWithRefresh(
     onClickRefresh: () -> Unit,
 ) {
     Row(
-        modifier = GlanceModifier.clickable { onClickRefresh() },
+        modifier = GlanceModifier
+            .height(24.dp)
+            .clickable { onClickRefresh() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            provider = ImageProvider(R.drawable.ic_14_gray_restart),
+            provider = ImageProvider(R.drawable.ic_16_gray_restart),
             contentDescription = null,
         )
 
