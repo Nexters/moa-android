@@ -25,7 +25,7 @@ fun MoaRow(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
     leadingContent: @Composable RowScope.() -> Unit = {},
-    subTrailingContent: @Composable RowScope.() -> Unit = {},
+    subTrailingContent: @Composable (RowScope.() -> Unit)? = null,
     trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
@@ -45,9 +45,13 @@ fun MoaRow(
 
         Spacer(Modifier.weight(1f))
 
-        subTrailingContent()
+        Spacer(Modifier.width(MoaTheme.spacing.spacing16))
 
-        Spacer(Modifier.width(MoaTheme.spacing.spacing4))
+        if (subTrailingContent != null) {
+            subTrailingContent()
+            Spacer(Modifier.width(MoaTheme.spacing.spacing4))
+        }
+
 
         trailingContent()
     }
