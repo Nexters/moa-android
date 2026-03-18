@@ -195,7 +195,7 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectChangeType(type : String) {
+    private fun selectChangeType(type: String) {
         val state = _uiState.value
 
         updateWorkday(
@@ -227,7 +227,11 @@ class WorkingViewModel @AssistedInject constructor(
 
 
     private fun clickCompleteWork() {
-        navigateToAfterWork()
+        viewModelScope.launch {
+            homeRepository.putCompletedWorkDay(LocalDate.now())
+        }.invokeOnCompletion {
+            navigateToAfterWork()
+        }
     }
 
     private fun clickTodayVacation() {

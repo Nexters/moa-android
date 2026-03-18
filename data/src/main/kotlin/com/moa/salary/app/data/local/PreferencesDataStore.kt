@@ -86,8 +86,17 @@ class PreferencesDataStore @Inject constructor(
         putBoolean(KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET, value)
     }
 
+    suspend fun getCompletedWorkDay(): String? {
+        return getString(KEY_WORK_COMPLETED_DAY)
+    }
+
+    suspend fun putCompletedWorkDay(completedWorkDay: String) {
+        putString(KEY_WORK_COMPLETED_DAY, completedWorkDay)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
+        private const val KEY_WORK_COMPLETED_DAY = "work_completed_day"
     }
 }
