@@ -206,16 +206,12 @@ private fun VacationContent(
 
         Spacer(Modifier.weight(1f))
 
-        MoaTooltipBanner(text = "설마 쉬는 날 일하시나요?")
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-
         MoaTertiaryButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onIntent(BeforeWorkIntent.ClickClockInOnWorkOff) },
+            onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
         ) {
             Text(
-                text = stringResource(R.string.before_work_day_off_clock_in),
+                text = "이번달 근무 기록 확인하기",
                 style = MoaTheme.typography.t3_700,
             )
         }
@@ -257,16 +253,12 @@ private fun DayOffContent(
 
         Spacer(Modifier.weight(1f))
 
-        MoaTooltipBanner(text = "설마 쉬는 날 일하시나요?")
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-
         MoaTertiaryButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onIntent(BeforeWorkIntent.ClickClockInOnWorkOff) },
+            onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
         ) {
             Text(
-                text = stringResource(R.string.before_work_day_off_clock_in),
+                text = "이번달 근무 기록 확인하기",
                 style = MoaTheme.typography.t3_700,
             )
         }
@@ -484,7 +476,7 @@ sealed interface BeforeWorkIntent {
     data object ClickWorkTime : BeforeWorkIntent
     data object ClickEarlyClockIn : BeforeWorkIntent
     data object ClickVacation : BeforeWorkIntent
-    data object ClickClockInOnWorkOff : BeforeWorkIntent
+    data object NavigateToHistory : BeforeWorkIntent
     data object DismissTimeBottomSheet : BeforeWorkIntent
     data class UpdateWorkTime(
         val startHour: Int,
