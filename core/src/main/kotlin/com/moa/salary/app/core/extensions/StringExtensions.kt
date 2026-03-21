@@ -11,16 +11,12 @@ fun makeDateString(year: Int, month: Int, day: Int): String {
     return String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day)
 }
 
-fun formatCurrency(amount : Long) : String {
+fun formatCurrency(amount: Long): String {
     return String.format(Locale.getDefault(), "%,d", amount)
 }
 
 fun String.makePriceString(): String {
     val value = this.toDoubleOrNull() ?: return ""
-
-    if (value < Constants.MAN) {
-        return ""
-    }
 
     if (value < Constants.EOK) {
         val divided = value / Constants.MAN

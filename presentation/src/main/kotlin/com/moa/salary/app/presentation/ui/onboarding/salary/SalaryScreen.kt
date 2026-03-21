@@ -1,5 +1,6 @@
 package com.moa.salary.app.presentation.ui.onboarding.salary
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makePriceString
 import com.moa.salary.app.core.model.onboarding.Payroll
+import com.moa.salary.app.core.util.Constants
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.CurrencyInputTransformation
 import com.moa.salary.app.presentation.designsystem.component.CurrencyOutputTransformation
@@ -142,32 +146,9 @@ private fun SalaryScreen(
 
                 Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-                Text(
-                    text = "금액",
-                    color = MoaTheme.colors.textMediumEmphasis,
-                    style = MoaTheme.typography.b2_400,
-                )
-
-                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-                MoaFilledTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = uiState.salaryTextField,
-                    placeholder = "0",
-                    trailingText = "원",
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    inputTransformation = CurrencyInputTransformation(),
-                    outputTransformation = CurrencyOutputTransformation(),
-                )
-
-                Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End,
-                    text = uiState.salaryTextField.text.toString().makePriceString(),
-                    color = MoaTheme.colors.textGreen,
-                    style = MoaTheme.typography.b2_500,
+                SalaryTextField(
+                    salaryTextField = uiState.salaryTextField,
+                    salaryNumber = uiState.salaryNumber
                 )
 
                 Spacer(Modifier.height(96.dp))
@@ -182,7 +163,7 @@ private fun SalaryScreen(
                         end = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
                     ),
-                enabled = uiState.salaryTextField.text.isNotBlank(),
+                enabled = uiState.salaryNumber >= Constants.MAN,
                 onClick = {
                     focusManager.clearFocus()
                     onIntent(SalaryIntent.ClickNext)
@@ -237,6 +218,57 @@ private fun RowScope.SalaryTypeItem(
         style = if (selected) MoaTheme.typography.t2_700 else MoaTheme.typography.t2_500,
         textAlign = TextAlign.Center,
     )
+}
+
+@Composable
+private fun SalaryTextField(
+    salaryTextField: TextFieldState,
+    salaryNumber: Int,
+) {
+    Text(
+        text = "금액",
+        color = MoaTheme.colors.textMediumEmphasis,
+        style = MoaTheme.typography.b2_400,
+    )
+
+    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+    MoaFilledTextField(
+        modifier = Modifier.fillMaxWidth(),
+        state = salaryTextField,
+        placeholder = "0",
+        trailingText = "원",
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        inputTransformation = CurrencyInputTransformation(),
+        outputTransformation = CurrencyOutputTransformation(),
+    )
+
+    Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+
+    if (salaryNumber < Constants.MAN) {
+        Row {
+            Image(
+                painter = painterResource(R.drawable.ic_16_warning),
+                contentDescription = null,
+            )
+
+            Spacer(Modifier.width(MoaTheme.spacing.spacing4))
+
+            Text(
+                text = "금액은 1만원 이상 입력해 주세요",
+                color = MoaTheme.colors.textError,
+                style = MoaTheme.typography.b2_500,
+            )
+        }
+    } else {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.End,
+            text = salaryTextField.text.toString().makePriceString(),
+            color = MoaTheme.colors.textGreen,
+            style = MoaTheme.typography.b2_500,
+        )
+    }
 }
 
 sealed interface SalaryIntent {
