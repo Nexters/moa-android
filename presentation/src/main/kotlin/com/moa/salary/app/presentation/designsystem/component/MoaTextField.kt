@@ -10,11 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
-import com.moa.salary.app.core.util.Constants
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,15 +24,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moa.salary.app.core.util.Constants
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 
 @Composable
 fun MoaFilledTextField(
     state: TextFieldState,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     placeholder: String,
     trailingText: String,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    onKeyboardAction: KeyboardActionHandler? = null,
     inputTransformation: InputTransformation? = null,
     outputTransformation: OutputTransformation? = null,
 ) {
@@ -50,12 +53,13 @@ fun MoaFilledTextField(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicTextField(
-            modifier = Modifier.weight(1f),
+            modifier = textFieldModifier.weight(1f),
             state = state,
             inputTransformation = inputTransformation,
             outputTransformation = outputTransformation,
             cursorBrush = SolidColor(Color.White),
             keyboardOptions = keyboardOptions,
+            onKeyboardAction = onKeyboardAction,
             textStyle = MoaTheme.typography.t2_700.copy(
                 color = MoaTheme.colors.textHighEmphasis
             ),
