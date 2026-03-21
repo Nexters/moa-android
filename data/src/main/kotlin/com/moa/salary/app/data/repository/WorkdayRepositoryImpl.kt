@@ -3,6 +3,7 @@ package com.moa.salary.app.data.repository
 import com.moa.salary.app.core.model.work.MonthlyWorkSummary
 import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayItem
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.data.remote.api.WorkdayService
 import com.moa.salary.app.data.remote.mapper.toDomain
 import com.moa.salary.app.data.remote.model.request.ClockOutRequest
@@ -19,10 +20,10 @@ class WorkdayRepositoryImpl @Inject constructor(
         date: String,
         clockInTime: String,
         clockOutTime: String,
-        type: String,
+        type: WorkdayType,
     ): Workday {
         val request = WorkdayRequest(
-            type = type,
+            type = type.name,
             clockInTime = clockInTime,
             clockOutTime = clockOutTime,
         )

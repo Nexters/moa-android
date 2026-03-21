@@ -104,14 +104,14 @@ private fun WorkingScreen(
                 when (option) {
                     ScheduleAdjustOption.Vacation -> onIntent(
                         WorkingIntent.SelectChangeType(
-                            WorkdayType.VACATION.name
+                            WorkdayType.VACATION
                         )
                     )
 
                     ScheduleAdjustOption.EndWork -> onIntent(WorkingIntent.SelectEndWork)
                     ScheduleAdjustOption.AdjustTime -> onIntent(WorkingIntent.SelectAdjustTime)
-                    ScheduleAdjustOption.Work -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK.name))
-                    ScheduleAdjustOption.None -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE.name))
+                    ScheduleAdjustOption.Work -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK))
+                    ScheduleAdjustOption.None -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE))
                 }
             },
         )
@@ -133,7 +133,7 @@ private fun WorkingScreen(
                         startMinute = time.startMinute,
                         endHour = time.endHour,
                         endMinute = time.endMinute,
-                        type = uiState.home.type.name,
+                        type = uiState.home.type,
                     )
                 )
             },
@@ -178,7 +178,7 @@ private fun WorkingScreen(
                         startMinute = time.startMinute,
                         endHour = time.endHour,
                         endMinute = time.endMinute,
-                        type = uiState.home.type.name,
+                        type = uiState.home.type,
                     )
                 )
             },
@@ -764,7 +764,7 @@ sealed interface WorkingIntent {
     data object DismissTimeBottomSheet : WorkingIntent
 
     @JvmInline
-    value class SelectChangeType(val type: String) : WorkingIntent
+    value class SelectChangeType(val type: WorkdayType) : WorkingIntent
     data object SelectEndWork : WorkingIntent
     data object SelectAdjustTime : WorkingIntent
 
@@ -773,7 +773,7 @@ sealed interface WorkingIntent {
         val startMinute: Int,
         val endHour: Int,
         val endMinute: Int,
-        val type: String,
+        val type: WorkdayType,
     ) : WorkingIntent
 
     data object ClickCompleteWork : WorkingIntent

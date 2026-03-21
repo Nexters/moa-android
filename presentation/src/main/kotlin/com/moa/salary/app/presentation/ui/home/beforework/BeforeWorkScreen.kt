@@ -79,6 +79,7 @@ fun BeforeWorkScreen(
                         startMinute = time.startMinute,
                         endHour = time.endHour,
                         endMinute = time.endMinute,
+                        type = WorkdayType.WORK,
                     )
                 )
             },
@@ -490,6 +491,7 @@ sealed interface BeforeWorkIntent {
         val startMinute: Int,
         val endHour: Int,
         val endMinute: Int,
+        val type : WorkdayType,
     ) : BeforeWorkIntent
 }
 

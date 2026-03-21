@@ -104,6 +104,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
                 startMinute = intent.startMinute,
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
+                type = intent.type
             )
         }
     }
@@ -146,6 +147,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             startMinute = now.minute,
             endHour = endTime.hour,
             endMinute = endTime.minute,
+            type = WorkdayType.WORK,
         )
     }
 
@@ -163,7 +165,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             startMinute = now.minute,
             endHour = endTime.hour,
             endMinute = endTime.minute,
-            type = "VACATION",
+            type = WorkdayType.VACATION,
         )
     }
 
@@ -182,6 +184,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             startMinute = now.minute,
             endHour = endTime.hour,
             endMinute = endTime.minute,
+            type = WorkdayType.WORK,
         )
     }
 
@@ -190,7 +193,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
         startMinute: Int,
         endHour: Int,
         endMinute: Int,
-        type: String = "WORK",
+        type: WorkdayType,
     ) {
         val clockInTime = makeTimeString(startHour, startMinute)
         val clockOutTime = makeTimeString(endHour, endMinute)
@@ -206,7 +209,14 @@ class BeforeWorkViewModel @AssistedInject constructor(
         }.execute(
             scope = viewModelScope,
             bus = moaSideEffectBus,
-            onRetry = { updateWorkday(startHour, startMinute, endHour, endMinute) },
+            onRetry = {
+                updateWorkday(
+                    startHour = startHour,
+                    startMinute = startMinute,
+                    endHour = endHour,
+                    endMinute = endMinute,
+                    type = type
+                ) },
         ) { workday ->
             _uiState.update {
                 it.copy(
