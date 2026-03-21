@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.extensions.toHourMinuteSecondString
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
@@ -46,9 +45,6 @@ data class WorkingUiState(
     val showWorkCompletionOverlay: Boolean,
     val showConfetti: Boolean = false,
 ) {
-    val elapsedTimeDisplay: String
-        get() = elapsedTotalSeconds.toHourMinuteSecondString()
-
     val startTimeDisplay: String
         get() = makeTimeString(home.startHour, home.startMinute)
 

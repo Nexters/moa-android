@@ -246,7 +246,7 @@ private fun WorkingScreen(
                 )
             } else {
                 WorkingStatusSection(
-                    elapsedTime = uiState.elapsedTimeDisplay,
+                    elapsedTotalSeconds = uiState.elapsedTotalSeconds,
                     progress = uiState.progress,
                     startTime = uiState.startTimeDisplay,
                     endTime = uiState.endTimeDisplay,
@@ -474,7 +474,7 @@ private fun CoinGraph(
 
 @Composable
 private fun WorkingStatusSection(
-    elapsedTime: String,
+    elapsedTotalSeconds: Int,
     progress: Float,
     startTime: String,
     endTime: String,
@@ -493,11 +493,7 @@ private fun WorkingStatusSection(
 
                 Spacer(Modifier.height(MoaTheme.spacing.spacing12))
 
-                Text(
-                    text = elapsedTime,
-                    style = MoaTheme.typography.h1_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
+                WorkingTime(elapsedTotalSeconds = elapsedTotalSeconds)
             }
 
             Spacer(Modifier.weight(1f))
@@ -520,6 +516,45 @@ private fun WorkingStatusSection(
             startTime = startTime,
             endTime = endTime,
             type = type,
+        )
+    }
+}
+
+@Composable
+private fun WorkingTime(elapsedTotalSeconds: Int) {
+    val hours = (elapsedTotalSeconds / 3600).toString()
+    val minutes = (elapsedTotalSeconds % 3600 / 60).toString().padStart(2, '0')
+    val seconds = (elapsedTotalSeconds % 60).toString().padStart(2, '0')
+
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = hours,
+            style = MoaTheme.typography.h3_700,
+            color = MoaTheme.colors.textHighEmphasis,
+        )
+
+        Text(
+            text = ":",
+            style = MoaTheme.typography.h3_500,
+            color = MoaTheme.colors.textMediumEmphasis,
+        )
+
+        Text(
+            text = minutes,
+            style = MoaTheme.typography.h3_700,
+            color = MoaTheme.colors.textHighEmphasis,
+        )
+
+        Text(
+            text = ":",
+            style = MoaTheme.typography.h3_500,
+            color = MoaTheme.colors.textMediumEmphasis,
+        )
+
+        Text(
+            text = seconds,
+            style = MoaTheme.typography.h3_700,
+            color = MoaTheme.colors.textHighEmphasis,
         )
     }
 }
