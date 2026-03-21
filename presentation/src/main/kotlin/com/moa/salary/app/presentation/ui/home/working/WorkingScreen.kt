@@ -89,29 +89,19 @@ fun WorkingScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
-}
 
-@Composable
-private fun WorkingScreen(
-    uiState: WorkingUiState,
-    onIntent: (WorkingIntent) -> Unit,
-) {
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
             type = uiState.home.type,
-            onDismissRequest = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
+            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
             onConfirm = { option ->
                 when (option) {
-                    ScheduleAdjustOption.Vacation -> onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.VACATION
-                        )
-                    )
+                    ScheduleAdjustOption.Vacation -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.VACATION))
 
-                    ScheduleAdjustOption.EndWork -> onIntent(WorkingIntent.SelectEndWork)
-                    ScheduleAdjustOption.AdjustTime -> onIntent(WorkingIntent.SelectAdjustTime)
-                    ScheduleAdjustOption.Work -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK))
-                    ScheduleAdjustOption.None -> onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE))
+                    ScheduleAdjustOption.EndWork -> viewModel.onIntent(WorkingIntent.SelectEndWork)
+                    ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.SelectAdjustTime)
+                    ScheduleAdjustOption.Work -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK))
+                    ScheduleAdjustOption.None -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE))
                 }
             },
         )
@@ -127,7 +117,7 @@ private fun WorkingScreen(
             ),
             title = stringResource(R.string.working_time_bottom_sheet_title),
             onPositive = { time ->
-                onIntent(
+                viewModel.onIntent(
                     WorkingIntent.UpdateWorkTime(
                         startHour = time.startHour,
                         startMinute = time.startMinute,
@@ -137,7 +127,7 @@ private fun WorkingScreen(
                     )
                 )
             },
-            onDismissRequest = { onIntent(WorkingIntent.DismissTimeBottomSheet) },
+            onDismissRequest = { viewModel.onIntent(WorkingIntent.DismissTimeBottomSheet) },
         )
     }
 
@@ -152,11 +142,11 @@ private fun WorkingScreen(
             title = stringResource(R.string.working_more_work_title),
             negativeText = stringResource(R.string.schedule_adjust_cancel),
             endTimeOnly = true,
-            onNegative = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
+            onNegative = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
             onPositive = { time ->
-                onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
+                viewModel. onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
             },
-            onDismissRequest = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
+            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
         )
     }
 
@@ -170,9 +160,9 @@ private fun WorkingScreen(
             ),
             title = stringResource(R.string.working_work_time_edit_title),
             negativeText = stringResource(R.string.working_today_vacation),
-            onNegative = { onIntent(WorkingIntent.ClickTodayVacation) },
+            onNegative = { viewModel.onIntent(WorkingIntent.ClickTodayVacation) },
             onPositive = { time ->
-                onIntent(
+                viewModel.onIntent(
                     WorkingIntent.UpdateWorkTime(
                         startHour = time.startHour,
                         startMinute = time.startMinute,
@@ -182,9 +172,17 @@ private fun WorkingScreen(
                     )
                 )
             },
-            onDismissRequest = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
+            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
         )
     }
+}
+
+@Composable
+private fun WorkingScreen(
+    uiState: WorkingUiState,
+    onIntent: (WorkingIntent) -> Unit,
+) {
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -223,9 +221,7 @@ private fun WorkingScreen(
                         Spacer(Modifier.height(MoaTheme.spacing.spacing20))
                     }
 
-                    TodaySalarySection(
-                        todaySalaryDisplay = uiState.todaySalaryDisplay,
-                    )
+                    TodaySalarySection(todaySalaryDisplay = uiState.todaySalaryDisplay)
 
                     Spacer(Modifier.height(22.dp))
 
@@ -251,13 +247,7 @@ private fun WorkingScreen(
                     startTime = uiState.startTimeDisplay,
                     endTime = uiState.endTimeDisplay,
                     type = uiState.home.type,
-                    onAdjustScheduleClick = {
-                        onIntent(
-                            WorkingIntent.ShowScheduleAdjustBottomSheet(
-                                true
-                            )
-                        )
-                    },
+                    onAdjustScheduleClick = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true)) },
                 )
             }
 
@@ -357,9 +347,7 @@ private fun TooltipBanner(
 }
 
 @Composable
-private fun TodaySalarySection(
-    todaySalaryDisplay: String,
-) {
+private fun TodaySalarySection(todaySalaryDisplay: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

@@ -53,7 +53,9 @@ data class WorkingUiState(
 
     val progress: Float
         get() {
+            if (showWorkCompletionOverlay) return 1f
             if (elapsedTotalSeconds == 0) return 0f
+
             val startSeconds = home.startHour * 3600 + home.startMinute * 60
             val endSeconds = home.endHour * 3600 + home.endMinute * 60
             val totalSeconds = endSeconds - startSeconds
@@ -63,8 +65,8 @@ data class WorkingUiState(
 
     val confettiProgress: Float
         get() {
-            if (elapsedTotalSeconds == 0) return 0f
             if (showWorkCompletionOverlay) return 1f
+            if (elapsedTotalSeconds == 0) return 0f
 
             val secInMinute = elapsedTotalSeconds % 1800
             return if (secInMinute == 0) 1f else (secInMinute / 1800f).coerceIn(0f, 1f)
@@ -98,7 +100,8 @@ class WorkingViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(
         WorkingUiState(
             home = args.home,
-            showWorkCompletionOverlay = args.showWorkCompletionOverlay
+            showWorkCompletionOverlay = args.showWorkCompletionOverlay,
+            todaySalary = if (args.showWorkCompletionOverlay) args.home.dailyPay else 0L,
         )
     )
     val uiState = _uiState.asStateFlow()
