@@ -157,7 +157,7 @@ class ScheduleFormViewModel @AssistedInject constructor(
                 moaSideEffectBus.emit(MoaSideEffect.Loading(true))
                 workdayRepository.updateWorkday(
                     date = date,
-                    type = workdayType.name,
+                    type = workdayType,
                     clockInTime = clockInTime,
                     clockOutTime = clockOutTime,
                 )

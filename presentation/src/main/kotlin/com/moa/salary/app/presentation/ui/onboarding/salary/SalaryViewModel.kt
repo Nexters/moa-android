@@ -23,7 +23,10 @@ import kotlinx.coroutines.launch
 data class SalaryUiState(
     val selectedSalaryType: Payroll.SalaryType = Payroll.SalaryType.MONTHLY,
     val salaryTextField: TextFieldState = TextFieldState(),
-)
+) {
+    val salaryNumber
+        get() = salaryTextField.text.toString().toIntOrNull() ?: 0
+}
 
 @HiltViewModel(assistedFactory = SalaryViewModel.Factory::class)
 class SalaryViewModel @AssistedInject constructor(

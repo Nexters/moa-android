@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.extensions.toHourMinuteSecondString
 import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
 import com.moa.salary.app.core.util.Constants.TOOLTIP_COUNT
 import com.moa.salary.app.core.util.Constants.TOOLTIP_ROTATION_INTERVAL_MS
@@ -45,9 +45,6 @@ data class WorkingUiState(
     val showWorkCompletionOverlay: Boolean,
     val showConfetti: Boolean = false,
 ) {
-    val elapsedTimeDisplay: String
-        get() = elapsedTotalSeconds.toHourMinuteSecondString()
-
     val startTimeDisplay: String
         get() = makeTimeString(home.startHour, home.startMinute)
 
@@ -56,7 +53,9 @@ data class WorkingUiState(
 
     val progress: Float
         get() {
+            if (showWorkCompletionOverlay) return 1f
             if (elapsedTotalSeconds == 0) return 0f
+
             val startSeconds = home.startHour * 3600 + home.startMinute * 60
             val endSeconds = home.endHour * 3600 + home.endMinute * 60
             val totalSeconds = endSeconds - startSeconds
@@ -66,8 +65,8 @@ data class WorkingUiState(
 
     val confettiProgress: Float
         get() {
-            if (elapsedTotalSeconds == 0) return 0f
             if (showWorkCompletionOverlay) return 1f
+            if (elapsedTotalSeconds == 0) return 0f
 
             val secInMinute = elapsedTotalSeconds % 1800
             return if (secInMinute == 0) 1f else (secInMinute / 1800f).coerceIn(0f, 1f)
@@ -101,7 +100,8 @@ class WorkingViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(
         WorkingUiState(
             home = args.home,
-            showWorkCompletionOverlay = args.showWorkCompletionOverlay
+            showWorkCompletionOverlay = args.showWorkCompletionOverlay,
+            todaySalary = if (args.showWorkCompletionOverlay) args.home.dailyPay else 0L,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -200,7 +200,7 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectChangeType(type: String) {
+    private fun selectChangeType(type: WorkdayType) {
         val state = _uiState.value
 
         updateWorkday(
@@ -230,7 +230,6 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-
     private fun clickCompleteWork() {
         viewModelScope.launch {
             homeRepository.putCompletedWorkDay(LocalDate.now())
@@ -247,7 +246,7 @@ class WorkingViewModel @AssistedInject constructor(
             startMinute = state.home.startMinute,
             endHour = state.home.endHour,
             endMinute = state.home.endMinute,
-            type = "VACATION",
+            type = WorkdayType.VACATION,
         )
     }
 
@@ -266,7 +265,7 @@ class WorkingViewModel @AssistedInject constructor(
         startMinute: Int,
         endHour: Int,
         endMinute: Int,
-        type: String = "WORK",
+        type: WorkdayType,
     ) {
         val clockInTime = makeTimeString(startHour, startMinute)
         val clockOutTime = makeTimeString(endHour, endMinute)
@@ -282,7 +281,15 @@ class WorkingViewModel @AssistedInject constructor(
         }.execute(
             scope = viewModelScope,
             bus = moaSideEffectBus,
-            onRetry = { updateWorkday(startHour, startMinute, endHour, endMinute) },
+            onRetry = {
+                updateWorkday(
+                    startHour = startHour,
+                    startMinute = startMinute,
+                    endHour = endHour,
+                    endMinute = endMinute,
+                    type = type
+                )
+            },
         ) { workday ->
             _uiState.update {
                 it.copy(
