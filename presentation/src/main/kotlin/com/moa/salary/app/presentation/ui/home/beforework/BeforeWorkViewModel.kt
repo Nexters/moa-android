@@ -97,7 +97,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
             BeforeWorkIntent.ClickWorkTime -> clockWorkTime()
             BeforeWorkIntent.ClickEarlyClockIn -> clickEarlyClockIn()
             BeforeWorkIntent.ClickVacation -> clickVacation()
-            BeforeWorkIntent.ClickClockInOnDayOff -> clickClockInOnDayOff()
+            BeforeWorkIntent.ClickClockInOnWorkOff -> clickClockInOnWorkOff()
             BeforeWorkIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
             is BeforeWorkIntent.UpdateWorkTime -> updateWorkday(
                 startHour = intent.startHour,
@@ -167,9 +167,15 @@ class BeforeWorkViewModel @AssistedInject constructor(
         )
     }
 
-    private fun clickClockInOnDayOff() {
+    private fun clickClockInOnWorkOff() {
         val now = LocalTime.now()
-        val endTime = now.plusHours(3)
+
+        val state = _uiState.value
+
+        val registeredStartMinutes = state.home.startHour * 60 + state.home.startMinute
+        val registeredEndMinutes = state.home.endHour * 60 + state.home.endMinute
+        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
+        val endTime = now.plusMinutes(workDurationMinutes.toLong())
 
         updateWorkday(
             startHour = now.hour,
