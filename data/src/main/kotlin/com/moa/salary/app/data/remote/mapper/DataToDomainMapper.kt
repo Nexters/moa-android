@@ -190,9 +190,9 @@ fun CalendarResponse.toDomain(): Calendar {
 }
 
 fun EarningsResponse.toADomain(): MonthlyInfo = MonthlyInfo(
-    accumulatedPay = workedMinutes.convertMinutesToRoundedHours().toString(),
+    accumulatedWorkTime = workedMinutes.convertMinutesToRoundedHours().toString(),
     totalWorkTime = standardMinutes.convertMinutesToRoundedHours().toString(),
-    accumulatedWorkTime = (workedEarnings / 10000).toString(),
+    accumulatedPay = (workedEarnings / 10000).toString(),
     totalPay = (standardSalary / 10000).toString(),
 )
 

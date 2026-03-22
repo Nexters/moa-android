@@ -1,5 +1,6 @@
 package com.moa.salary.app.presentation.ui.history
 
+import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,7 @@ import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.data.remote.api.CalendarService
+import com.moa.salary.app.data.repository.CalendarRepository
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
@@ -72,7 +74,7 @@ class HistoryViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val workdayRepository: WorkdayRepository,
     private val settingRepository: SettingRepository,
-    private val calendarService: CalendarService
+    private val calendarRepository: CalendarRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
@@ -80,7 +82,8 @@ class HistoryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            calendarService.getCalendar(2026,3)
+           val a =  calendarRepository.getCalendar(2026,3)
+            Log.e("ABC", a.toString())
         }
         loadWorkInfo()
         fetchEarnings()
