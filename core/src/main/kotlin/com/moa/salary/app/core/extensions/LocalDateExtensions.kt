@@ -13,3 +13,6 @@ fun String?.toLocalDateOrNull(): LocalDate? {
         LocalDate.parse(this)
     }.getOrNull()
 }
+
+fun String.toLocalDate(): LocalDate =
+    LocalDate.parse(this)

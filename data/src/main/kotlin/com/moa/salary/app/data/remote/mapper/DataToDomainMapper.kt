@@ -1,7 +1,14 @@
 package com.moa.salary.app.data.remote.mapper
 
+import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
 import com.moa.salary.app.core.extensions.toHourMinute
 import com.moa.salary.app.core.extensions.toHourMinuteOrNull
+import com.moa.salary.app.core.extensions.toLocalDate
+import com.moa.salary.app.core.model.calendar.Calendar
+import com.moa.salary.app.core.model.calendar.CalendarStatus
+import com.moa.salary.app.core.model.calendar.Event
+import com.moa.salary.app.core.model.calendar.MonthlyInfo
+import com.moa.salary.app.core.model.calendar.Schedule
 import com.moa.salary.app.core.model.onboarding.OnboardingStatus
 import com.moa.salary.app.core.model.onboarding.Payroll
 import com.moa.salary.app.core.model.onboarding.Profile
@@ -15,11 +22,13 @@ import com.moa.salary.app.core.model.work.MonthlyWorkSummary
 import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayItem
 import com.moa.salary.app.core.model.work.WorkdayType
+import com.moa.salary.app.data.remote.model.response.CalendarResponse
 import com.moa.salary.app.data.remote.model.response.EarningsResponse
 import com.moa.salary.app.data.remote.model.response.HomeResponse
 import com.moa.salary.app.data.remote.model.response.NotificationSettingResponse
 import com.moa.salary.app.data.remote.model.response.PayrollResponse
 import com.moa.salary.app.data.remote.model.response.ProfileResponse
+import com.moa.salary.app.data.remote.model.response.ScheduleResponse
 import com.moa.salary.app.data.remote.model.response.StatusResponse
 import com.moa.salary.app.data.remote.model.response.TermResponse
 import com.moa.salary.app.data.remote.model.response.WorkPolicyResponse
@@ -27,6 +36,7 @@ import com.moa.salary.app.data.remote.model.response.WorkdayItemResponse
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
     profile = profile?.toDomain(),
@@ -170,3 +180,37 @@ fun EarningsResponse.toDomain(): MonthlyWorkSummary = MonthlyWorkSummary(
     workedEarnings = workedEarnings,
     standardSalary = standardSalary,
 )
+
+fun CalendarResponse.toDomain(): Calendar {
+    return Calendar(
+        monthlyInfo = earnings.toADomain(),
+        schedules = schedules.associate { it.date.toLocalDate() to it.toDomain() }.toImmutableMap(),
+        joinedAt = joinedAt.toLocalDate(),
+    )
+}
+
+fun EarningsResponse.toADomain(): MonthlyInfo = MonthlyInfo(
+    accumulatedPay = workedMinutes.convertMinutesToRoundedHours().toString(),
+    totalWorkTime = standardMinutes.convertMinutesToRoundedHours().toString(),
+    accumulatedWorkTime = (workedEarnings / 10000).toString(),
+    totalPay = (standardSalary / 10000).toString(),
+)
+
+fun ScheduleResponse.toDomain(): Schedule = Schedule(
+    type = type.toWorkdayType(),
+    status = status.toCalendarStatus(),
+    events = events.map { it.toEvent() }.toImmutableList(),
+    dailyPay = dailyPay,
+    workTime = "${clockInTime}~${clockOutTime}"
+)
+
+fun String.toCalendarStatus(): CalendarStatus = when (this) {
+    "SCHEDULED" -> CalendarStatus.SCHEDULED
+    "COMPLETED" -> CalendarStatus.COMPLETED
+    else -> CalendarStatus.NONE
+}
+
+fun String.toEvent(): Event = when (this) {
+    "PAYDAY" -> Event.PAYDAY
+    else -> Event.NONE
+}
