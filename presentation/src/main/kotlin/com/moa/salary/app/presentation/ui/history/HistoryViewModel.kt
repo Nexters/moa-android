@@ -12,6 +12,7 @@ import com.moa.salary.app.core.model.work.WorkdayItem
 import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.data.remote.api.CalendarService
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
@@ -71,12 +72,16 @@ class HistoryViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val workdayRepository: WorkdayRepository,
     private val settingRepository: SettingRepository,
+    private val calendarService: CalendarService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            calendarService.getCalendar(2026,3)
+        }
         loadWorkInfo()
         fetchEarnings()
         fetchWorkdays()

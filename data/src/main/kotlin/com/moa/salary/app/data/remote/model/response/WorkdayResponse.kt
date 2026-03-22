@@ -16,11 +16,3 @@ data class WorkdayItemResponse(
     val date: String,
     val type: String,
 )
-
-@Serializable
-data class EarningsResponse(
-    val workedMinutes: Int,
-    val standardMinutes: Int,
-    val workedEarnings: Long,
-    val standardSalary: Long,
-)
