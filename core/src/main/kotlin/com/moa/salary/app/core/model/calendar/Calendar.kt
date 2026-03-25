@@ -1,16 +1,19 @@
 package com.moa.salary.app.core.model.calendar
 
+import androidx.compose.runtime.Stable
 import com.moa.salary.app.core.model.work.WorkdayType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import java.time.LocalDate
 
+@Stable
 data class Calendar(
     val monthlyInfo: MonthlyInfo,
     val schedules: ImmutableMap<LocalDate, Schedule>,
     val joinedAt: LocalDate,
 )
 
+@Stable
 data class MonthlyInfo(
     val accumulatedWorkTime : String,
     val totalWorkTime : String,
@@ -18,6 +21,7 @@ data class MonthlyInfo(
     val totalPay : String,
 )
 
+@Stable
 data class Schedule(
     val type: WorkdayType,
     val status: CalendarStatus,
