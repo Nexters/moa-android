@@ -45,7 +45,7 @@ import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
 import com.moa.salary.app.presentation.model.SettingNavigation
-import com.moa.salary.app.presentation.ui.history.HistoryScreen
+import com.moa.salary.app.presentation.ui.history.CalendarScreen
 import com.moa.salary.app.presentation.ui.home.HomeScreen
 import com.moa.salary.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.salary.app.presentation.ui.setting.SettingScreen
@@ -250,7 +250,7 @@ private fun MainNavHost(
             }
 
             entry<RootNavigation.History> {
-                HistoryScreen()
+                CalendarScreen()
             }
 
 //            entry<RootNavigation.ScheduleForm> { key ->

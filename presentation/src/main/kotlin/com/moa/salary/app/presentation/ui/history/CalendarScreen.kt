@@ -53,30 +53,30 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 @Composable
-fun HistoryScreen(viewModel: HistoryViewModel = hiltViewModel()) {
+fun CalendarScreen(viewModel: CalendarViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(HistoryIntent.GetCalendar)
+        viewModel.onIntent(CalendarIntent.GetCalendar)
     }
 
-    HistoryScreen(
+    CalendarScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
 }
 
 @Composable
-private fun HistoryScreen(
-    uiState: HistoryUiState,
-    onIntent: (HistoryIntent) -> Unit,
+private fun CalendarScreen(
+    uiState: CalendarUiState,
+    onIntent: (CalendarIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = { onIntent(HistoryIntent.ClickBack) }
+                        onClick = { onIntent(CalendarIntent.ClickBack) }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_24_arrow_left),
@@ -119,7 +119,7 @@ private fun HistoryScreen(
                         ),
                         onPreviousClick = {
                             onIntent(
-                                HistoryIntent.SetYearMonth(
+                                CalendarIntent.SetYearMonth(
                                     uiState.selectedYearMonth.minusMonths(
                                         1
                                     )
@@ -128,7 +128,7 @@ private fun HistoryScreen(
                         },
                         onNextClick = {
                             onIntent(
-                                HistoryIntent.SetYearMonth(
+                                CalendarIntent.SetYearMonth(
                                     uiState.selectedYearMonth.plusMonths(
                                         1
                                     )
@@ -141,7 +141,7 @@ private fun HistoryScreen(
                         onClick = {
                             val schedule = uiState.calendar?.schedules[uiState.selectedDate]
                             if (schedule != null) {
-                                onIntent(HistoryIntent.ClickSchedule(schedule))
+                                onIntent(CalendarIntent.ClickSchedule(schedule))
                             }
                         }
                     ) {
@@ -156,7 +156,7 @@ private fun HistoryScreen(
                 if (uiState.calendar != null) {
                     Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
-                    HistoryMonthlyInfoCard(monthlyInfo = uiState.calendar.monthlyInfo)
+                    CalendarMonthlyInfoCard(monthlyInfo = uiState.calendar.monthlyInfo)
 
                     Spacer(Modifier.height(MoaTheme.spacing.spacing32))
 
@@ -165,8 +165,8 @@ private fun HistoryScreen(
                         selectedDate = uiState.selectedDate,
                         selectedYearMonth = uiState.selectedYearMonth,
                         schedules = uiState.calendar.schedules,
-                        onScrollYearMonth = { onIntent(HistoryIntent.SetYearMonth(it)) },
-                        onClickDate = { onIntent(HistoryIntent.ClickDate(it)) }
+                        onScrollYearMonth = { onIntent(CalendarIntent.SetYearMonth(it)) },
+                        onClickDate = { onIntent(CalendarIntent.ClickDate(it)) }
                     )
                 }
             }
@@ -193,7 +193,7 @@ private fun HistoryScreen(
 }
 
 @Composable
-private fun HistoryMonthlyInfoCard(monthlyInfo: MonthlyInfo) {
+private fun CalendarMonthlyInfoCard(monthlyInfo: MonthlyInfo) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,7 +264,7 @@ private fun ScheduleItems(
     currentDay: Int,
     totalPay: Int,
     schedule: Schedule?,
-    onIntent: (HistoryIntent) -> Unit,
+    onIntent: (CalendarIntent) -> Unit,
 ) {
     if (schedule != null) {
         val info = when (schedule.type) {
@@ -306,7 +306,7 @@ private fun ScheduleItems(
                 imgRes = info.first,
                 title = info.second,
                 content = info.third,
-                onClick = { onIntent(HistoryIntent.ClickSchedule(schedule)) },
+                onClick = { onIntent(CalendarIntent.ClickSchedule(schedule)) },
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
@@ -319,7 +319,7 @@ private fun ScheduleItems(
                 imgRes = R.drawable.ic_40_salary_day,
                 title = stringResource(R.string.history_schedule_payday, currentDay),
                 content = "+ ${formatCurrency(totalPay * 10000L)}원",
-                onClick = { onIntent(HistoryIntent.ClickPayday(currentDay)) },
+                onClick = { onIntent(CalendarIntent.ClickPayday(currentDay)) },
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
@@ -390,29 +390,29 @@ private fun ScheduleItem(
     }
 }
 
-sealed interface HistoryIntent {
-    data object GetCalendar : HistoryIntent
-    data object ClickBack : HistoryIntent
+sealed interface CalendarIntent {
+    data object GetCalendar : CalendarIntent
+    data object ClickBack : CalendarIntent
 
     @JvmInline
-    value class SetYearMonth(val yearMonth: YearMonth) : HistoryIntent
+    value class SetYearMonth(val yearMonth: YearMonth) : CalendarIntent
 
     @JvmInline
-    value class ClickDate(val date: LocalDate) : HistoryIntent
+    value class ClickDate(val date: LocalDate) : CalendarIntent
 
     @JvmInline
-    value class ClickSchedule(val schedule: Schedule) : HistoryIntent
+    value class ClickSchedule(val schedule: Schedule) : CalendarIntent
 
     @JvmInline
-    value class ClickPayday(val day: Int) : HistoryIntent
+    value class ClickPayday(val day: Int) : CalendarIntent
 }
 
 @Preview
 @Composable
-private fun HistoryScreenPreview() {
+private fun CalendarScreenPreview() {
     MoaTheme {
-        HistoryScreen(
-            uiState = HistoryUiState(
+        CalendarScreen(
+            uiState = CalendarUiState(
                 calendar = Calendar(
                     monthlyInfo = MonthlyInfo(
                         accumulatedPay = "200",

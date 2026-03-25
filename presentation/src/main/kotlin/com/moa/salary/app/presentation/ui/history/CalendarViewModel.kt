@@ -20,29 +20,29 @@ import java.time.YearMonth
 import javax.inject.Inject
 
 @Stable
-data class HistoryUiState(
+data class CalendarUiState(
     val calendar: Calendar? = null,
     val selectedYearMonth: YearMonth = YearMonth.now(),
     val selectedDate: LocalDate = LocalDate.now(),
 )
 
 @HiltViewModel
-class HistoryViewModel @Inject constructor(
+class CalendarViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val calendarRepository: CalendarRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HistoryUiState())
+    private val _uiState = MutableStateFlow(CalendarUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun onIntent(intent: HistoryIntent) {
+    fun onIntent(intent: CalendarIntent) {
         when (intent) {
-            HistoryIntent.GetCalendar -> getCalendar(YearMonth.now())
-            HistoryIntent.ClickBack -> clickBack()
-            is HistoryIntent.SetYearMonth -> setYearMonth(intent.yearMonth)
-            is HistoryIntent.ClickDate -> clickDate(intent.date)
-            is HistoryIntent.ClickSchedule -> clickSchedule(intent.schedule)
-            is HistoryIntent.ClickPayday -> clickPayday(intent.day)
+            CalendarIntent.GetCalendar -> getCalendar(YearMonth.now())
+            CalendarIntent.ClickBack -> clickBack()
+            is CalendarIntent.SetYearMonth -> setYearMonth(intent.yearMonth)
+            is CalendarIntent.ClickDate -> clickDate(intent.date)
+            is CalendarIntent.ClickSchedule -> clickSchedule(intent.schedule)
+            is CalendarIntent.ClickPayday -> clickPayday(intent.day)
         }
     }
 
