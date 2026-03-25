@@ -10,9 +10,3 @@ data class WorkdayResponse(
     val clockInTime: String?,
     val clockOutTime: String?,
 )
-
-@Serializable
-data class WorkdayItemResponse(
-    val date: String,
-    val type: String,
-)

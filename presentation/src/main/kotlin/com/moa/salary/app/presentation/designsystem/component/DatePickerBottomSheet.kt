@@ -33,7 +33,6 @@ import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
-import com.moa.salary.app.core.model.work.LocalDateModel
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Green40Main
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
@@ -42,183 +41,183 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.YearMonth
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerBottomSheet(
-    currentDate: LocalDateModel,
-    onConfirm: (LocalDateModel) -> Unit,
-    onDismissRequest: () -> Unit,
-) {
-    val currentMonth by remember {
-        mutableStateOf(
-            YearMonth.of(
-                currentDate.year,
-                currentDate.month
-            )
-        )
-    }
-    val startMonth = currentMonth.minusMonths(100)
-    val endMonth = currentMonth.plusMonths(100)
-    var selectedDate by remember { mutableStateOf(currentDate) }
-    val scope = rememberCoroutineScope()
-
-    val calendarState = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = currentMonth,
-        firstDayOfWeek = DayOfWeek.SUNDAY,
-        outDateStyle = OutDateStyle.EndOfGrid,
-    )
-
-    MoaBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
-        ) {
-            Text(
-                text = "날짜를 선택해주세요",
-                style = MoaTheme.typography.t1_700,
-                color = MoaTheme.colors.textHighEmphasis,
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
-
-            MonthNavigator(
-                currentMonth = calendarState.firstVisibleMonth.yearMonth.monthValue,
-                onPreviousMonth = {
-                    scope.launch {
-                        calendarState.animateScrollToMonth(
-                            calendarState.firstVisibleMonth.yearMonth.minusMonths(
-                                1
-                            )
-                        )
-                    }
-                },
-                onNextMonth = {
-                    scope.launch {
-                        calendarState.animateScrollToMonth(
-                            calendarState.firstVisibleMonth.yearMonth.plusMonths(
-                                1
-                            )
-                        )
-                    }
-                },
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
-
-            HorizontalCalendar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = MoaTheme.spacing.spacing8),
-                state = calendarState,
-                dayContent = { day ->
-                    DatePickerDay(
-                        day = day,
-                        isSelected = selectedDate.year == day.date.year && selectedDate.month == day.date.monthValue && selectedDate.day == day.date.dayOfMonth,
-                        onDateClick = {
-                            selectedDate =
-                                LocalDateModel(it.date.year, it.date.monthValue, it.date.dayOfMonth)
-                        },
-                    )
-                },
-            )
-
-            MoaPrimaryButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = MoaTheme.spacing.spacing20,
-                        bottom = MoaTheme.spacing.spacing24,
-                    ),
-                onClick = {
-                    onConfirm(selectedDate)
-                },
-            ) {
-                Text(
-                    text = "확인",
-                    style = MoaTheme.typography.t3_700,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MonthNavigator(
-    currentMonth: Int,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = onPreviousMonth) {
-            Icon(
-                painter = painterResource(R.drawable.ic_24_chevron_left),
-                contentDescription = "Previous Month",
-                tint = MoaTheme.colors.textHighEmphasis,
-            )
-        }
-
-        Text(
-            text = "${currentMonth}월",
-            style = MoaTheme.typography.t2_700,
-            color = MoaTheme.colors.textHighEmphasis,
-        )
-
-        IconButton(onClick = onNextMonth) {
-            Icon(
-                painter = painterResource(R.drawable.ic_24_chevron_right),
-                contentDescription = "Next Month",
-                tint = MoaTheme.colors.textHighEmphasis,
-            )
-        }
-    }
-}
-
-@Composable
-private fun DatePickerDay(
-    day: CalendarDay,
-    isSelected: Boolean,
-    onDateClick: (CalendarDay) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .padding(
-                top = 2.dp,
-                bottom = 32.dp,
-                start = 4.dp,
-                end = 4.dp,
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .then(
-                    if (isSelected && day.position == DayPosition.MonthDate) {
-                        Modifier.background(Green40Main)
-                    } else {
-                        Modifier
-                    }
-                )
-                .clickable { onDateClick(day) },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = day.date.dayOfMonth.toString(),
-                style = MoaTheme.typography.b1_500.toFixedSize(),
-                color = when {
-                    day.position != DayPosition.MonthDate -> Color.Transparent
-                    isSelected -> MoaTheme.colors.textHighEmphasisReverse
-                    else -> MoaTheme.colors.textHighEmphasis
-                },
-            )
-        }
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun DatePickerBottomSheet(
+//    currentDate: LocalDateModel,
+//    onConfirm: (LocalDateModel) -> Unit,
+//    onDismissRequest: () -> Unit,
+//) {
+//    val currentMonth by remember {
+//        mutableStateOf(
+//            YearMonth.of(
+//                currentDate.year,
+//                currentDate.month
+//            )
+//        )
+//    }
+//    val startMonth = currentMonth.minusMonths(100)
+//    val endMonth = currentMonth.plusMonths(100)
+//    var selectedDate by remember { mutableStateOf(currentDate) }
+//    val scope = rememberCoroutineScope()
+//
+//    val calendarState = rememberCalendarState(
+//        startMonth = startMonth,
+//        endMonth = endMonth,
+//        firstVisibleMonth = currentMonth,
+//        firstDayOfWeek = DayOfWeek.SUNDAY,
+//        outDateStyle = OutDateStyle.EndOfGrid,
+//    )
+//
+//    MoaBottomSheet(onDismissRequest = onDismissRequest) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(horizontal = MoaTheme.spacing.spacing20),
+//        ) {
+//            Text(
+//                text = "날짜를 선택해주세요",
+//                style = MoaTheme.typography.t1_700,
+//                color = MoaTheme.colors.textHighEmphasis,
+//            )
+//
+//            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+//
+//            MonthNavigator(
+//                currentMonth = calendarState.firstVisibleMonth.yearMonth.monthValue,
+//                onPreviousMonth = {
+//                    scope.launch {
+//                        calendarState.animateScrollToMonth(
+//                            calendarState.firstVisibleMonth.yearMonth.minusMonths(
+//                                1
+//                            )
+//                        )
+//                    }
+//                },
+//                onNextMonth = {
+//                    scope.launch {
+//                        calendarState.animateScrollToMonth(
+//                            calendarState.firstVisibleMonth.yearMonth.plusMonths(
+//                                1
+//                            )
+//                        )
+//                    }
+//                },
+//            )
+//
+//            Spacer(Modifier.height(MoaTheme.spacing.spacing8))
+//
+//            HorizontalCalendar(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = MoaTheme.spacing.spacing8),
+//                state = calendarState,
+//                dayContent = { day ->
+//                    DatePickerDay(
+//                        day = day,
+//                        isSelected = selectedDate.year == day.date.year && selectedDate.month == day.date.monthValue && selectedDate.day == day.date.dayOfMonth,
+//                        onDateClick = {
+//                            selectedDate =
+//                                LocalDateModel(it.date.year, it.date.monthValue, it.date.dayOfMonth)
+//                        },
+//                    )
+//                },
+//            )
+//
+//            MoaPrimaryButton(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(
+//                        top = MoaTheme.spacing.spacing20,
+//                        bottom = MoaTheme.spacing.spacing24,
+//                    ),
+//                onClick = {
+//                    onConfirm(selectedDate)
+//                },
+//            ) {
+//                Text(
+//                    text = "확인",
+//                    style = MoaTheme.typography.t3_700,
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun MonthNavigator(
+//    currentMonth: Int,
+//    onPreviousMonth: () -> Unit,
+//    onNextMonth: () -> Unit,
+//) {
+//    Row(
+//        modifier = Modifier.fillMaxWidth(),
+//        horizontalArrangement = Arrangement.Center,
+//        verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//        IconButton(onClick = onPreviousMonth) {
+//            Icon(
+//                painter = painterResource(R.drawable.ic_24_chevron_left),
+//                contentDescription = "Previous Month",
+//                tint = MoaTheme.colors.textHighEmphasis,
+//            )
+//        }
+//
+//        Text(
+//            text = "${currentMonth}월",
+//            style = MoaTheme.typography.t2_700,
+//            color = MoaTheme.colors.textHighEmphasis,
+//        )
+//
+//        IconButton(onClick = onNextMonth) {
+//            Icon(
+//                painter = painterResource(R.drawable.ic_24_chevron_right),
+//                contentDescription = "Next Month",
+//                tint = MoaTheme.colors.textHighEmphasis,
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun DatePickerDay(
+//    day: CalendarDay,
+//    isSelected: Boolean,
+//    onDateClick: (CalendarDay) -> Unit,
+//) {
+//    Column(
+//        modifier = Modifier
+//            .padding(
+//                top = 2.dp,
+//                bottom = 32.dp,
+//                start = 4.dp,
+//                end = 4.dp,
+//            ),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .size(28.dp)
+//                .clip(CircleShape)
+//                .then(
+//                    if (isSelected && day.position == DayPosition.MonthDate) {
+//                        Modifier.background(Green40Main)
+//                    } else {
+//                        Modifier
+//                    }
+//                )
+//                .clickable { onDateClick(day) },
+//            contentAlignment = Alignment.Center,
+//        ) {
+//            Text(
+//                text = day.date.dayOfMonth.toString(),
+//                style = MoaTheme.typography.b1_500.toFixedSize(),
+//                color = when {
+//                    day.position != DayPosition.MonthDate -> Color.Transparent
+//                    isSelected -> MoaTheme.colors.textHighEmphasisReverse
+//                    else -> MoaTheme.colors.textHighEmphasis
+//                },
+//            )
+//        }
+//    }
+//}

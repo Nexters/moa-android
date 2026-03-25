@@ -18,9 +18,7 @@ import com.moa.salary.app.core.model.onboarding.WorkPolicy
 import com.moa.salary.app.core.model.setting.NotificationSetting
 import com.moa.salary.app.core.model.setting.SettingTerm
 import com.moa.salary.app.core.model.work.Home
-import com.moa.salary.app.core.model.work.MonthlyWorkSummary
 import com.moa.salary.app.core.model.work.Workday
-import com.moa.salary.app.core.model.work.WorkdayItem
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.data.remote.model.response.CalendarResponse
 import com.moa.salary.app.data.remote.model.response.EarningsResponse
@@ -32,7 +30,6 @@ import com.moa.salary.app.data.remote.model.response.ScheduleResponse
 import com.moa.salary.app.data.remote.model.response.StatusResponse
 import com.moa.salary.app.data.remote.model.response.TermResponse
 import com.moa.salary.app.data.remote.model.response.WorkPolicyResponse
-import com.moa.salary.app.data.remote.model.response.WorkdayItemResponse
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -163,23 +160,11 @@ fun WorkdayResponse.toDomain(): Workday {
     )
 }
 
-fun WorkdayItemResponse.toDomain(): WorkdayItem = WorkdayItem(
-    date = date,
-    type = type.toWorkdayType(),
-)
-
 fun String.toWorkdayType(): WorkdayType = when (this) {
     "WORK" -> WorkdayType.WORK
     "VACATION" -> WorkdayType.VACATION
     else -> WorkdayType.NONE
 }
-
-fun EarningsResponse.toDomain(): MonthlyWorkSummary = MonthlyWorkSummary(
-    workedMinutes = workedMinutes,
-    standardMinutes = standardMinutes,
-    workedEarnings = workedEarnings,
-    standardSalary = standardSalary,
-)
 
 fun CalendarResponse.toDomain(): Calendar {
     return Calendar(
