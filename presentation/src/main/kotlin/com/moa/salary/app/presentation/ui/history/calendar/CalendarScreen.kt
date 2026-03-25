@@ -1,4 +1,4 @@
-package com.moa.salary.app.presentation.ui.history
+package com.moa.salary.app.presentation.ui.history.calendar
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

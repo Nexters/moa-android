@@ -1,4 +1,4 @@
-package com.moa.salary.app.presentation.ui.history
+package com.moa.salary.app.presentation.ui.history.calendar
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel

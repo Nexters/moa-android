@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import com.moa.salary.app.core.model.work.WorkdayType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 @Stable
@@ -22,6 +23,7 @@ data class MonthlyInfo(
 )
 
 @Stable
+@Serializable
 data class Schedule(
     val type: WorkdayType,
     val status: CalendarStatus,

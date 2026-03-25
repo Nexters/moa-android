@@ -22,12 +22,6 @@ sealed interface RootNavigation : NavKey {
     @Serializable
     data object History : RootNavigation
 
-//    @Serializable
-//    data class ScheduleForm(
-//        val date: LocalDateModel,
-//        val schedule: Schedule? = null,
-//    ) : RootNavigation
-
     @Serializable
     @JvmInline
     value class Setting(

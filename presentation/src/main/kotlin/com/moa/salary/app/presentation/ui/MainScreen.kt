@@ -39,13 +39,15 @@ import com.moa.salary.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.salary.app.presentation.designsystem.component.MoaFullScreenProgress
 import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaDialogProperties
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
 import com.moa.salary.app.presentation.model.SettingNavigation
-import com.moa.salary.app.presentation.ui.history.CalendarScreen
+import com.moa.salary.app.presentation.ui.history.HistoryScreen
+import com.moa.salary.app.presentation.ui.history.calendar.CalendarScreen
 import com.moa.salary.app.presentation.ui.home.HomeScreen
 import com.moa.salary.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.salary.app.presentation.ui.setting.SettingScreen
@@ -106,6 +108,8 @@ fun MainScreen(
                         is SettingNavigation -> Unit
 
                         is HomeNavigation -> Unit
+
+                        is HistoryNavigation -> Unit
 
                         else -> backStack.add(it.destination)
                     }
@@ -250,15 +254,8 @@ private fun MainNavHost(
             }
 
             entry<RootNavigation.History> {
-                CalendarScreen()
+                HistoryScreen()
             }
-
-//            entry<RootNavigation.ScheduleForm> { key ->
-//                ScheduleFormScreen(
-//                    initialDate = key.date,
-//                    schedule = key.schedule
-//                )
-//            }
 
             entry<RootNavigation.Setting> { key ->
                 SettingScreen(startDestination = key.startDestination)
