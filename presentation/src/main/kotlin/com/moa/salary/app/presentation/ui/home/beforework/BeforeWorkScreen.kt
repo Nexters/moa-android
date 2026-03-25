@@ -211,7 +211,7 @@ private fun VacationContent(
             onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
         ) {
             Text(
-                text = "이번달 근무 기록 확인하기",
+                text = "이번달 일정 확인하기",
                 style = MoaTheme.typography.t3_700,
             )
         }
@@ -258,7 +258,7 @@ private fun DayOffContent(
             onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
         ) {
             Text(
-                text = "이번달 근무 기록 확인하기",
+                text = "이번달 일정 확인하기",
                 style = MoaTheme.typography.t3_700,
             )
         }
