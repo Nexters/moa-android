@@ -84,6 +84,7 @@ class CalendarViewModel @Inject constructor(
                     HistoryNavigation.ModifySchedule(
                         args = HistoryNavigation.ModifySchedule.ModifyScheduleArgs(
                             currentDate = uiState.value.selectedDate.toString(),
+                            joinedAt = (uiState.value.calendar?.joinedAt ?: LocalDate.now()).toString(),
                             schedule = schedule,
                         )
                     )

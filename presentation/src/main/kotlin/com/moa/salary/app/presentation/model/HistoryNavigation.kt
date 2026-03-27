@@ -16,6 +16,7 @@ sealed interface HistoryNavigation : RootNavigation {
         @Serializable
         data class ModifyScheduleArgs(
             val currentDate: String,
+            val joinedAt : String,
             val schedule: Schedule,
         )
     }

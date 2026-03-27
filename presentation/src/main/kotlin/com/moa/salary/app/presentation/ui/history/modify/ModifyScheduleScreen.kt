@@ -32,6 +32,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toKoreanDateString
+import com.moa.salary.app.core.extensions.toLocalDate
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
@@ -63,7 +64,7 @@ fun ModifyScheduleScreen(
 
     if (uiState.showDateBottomSheet) {
         MoaDateBottomSheet(
-            joinedAt = LocalDate.now(),
+            joinedAt = args.joinedAt.toLocalDate(),
             initialDate = uiState.date,
             onConfirm = { viewModel.onIntent(ModifyScheduleIntent.SetDate(it)) },
             onDismissRequest ={viewModel.onIntent(ModifyScheduleIntent.SetShowDateBottomSheet(false))}
