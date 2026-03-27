@@ -14,8 +14,8 @@ class WorkdayRepositoryImpl @Inject constructor(
 
     override suspend fun updateWorkday(
         date: String,
-        clockInTime: String,
-        clockOutTime: String,
+        clockInTime: String?,
+        clockOutTime: String?,
         type: WorkdayType,
     ): Workday {
         val request = WorkdayRequest(

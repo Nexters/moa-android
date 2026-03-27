@@ -3,12 +3,14 @@ package com.moa.salary.app.presentation.ui.history.modify
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toLocalDate
 import com.moa.salary.app.core.extensions.toTime
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
+import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import dagger.assisted.Assisted
@@ -87,13 +89,39 @@ class ModifyScheduleViewModel @AssistedInject constructor(
     }
 
     private fun cancel() {
-        viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(HistoryNavigation.Back))
-        }
+        back()
     }
 
     private fun confirm() {
-
+        val currentState = _uiState.value
+        suspend {
+            workdayRepository.updateWorkday(
+                date = currentState.date.toString(),
+                clockInTime = if (currentState.selectedWorkdayType == WorkdayType.WORK) {
+                    makeTimeString(
+                        currentState.time.startHour,
+                        currentState.time.startMinute
+                    )
+                } else {
+                    null
+                },
+                clockOutTime = if (currentState.selectedWorkdayType == WorkdayType.WORK) {
+                    makeTimeString(
+                        currentState.time.endHour,
+                        currentState.time.endMinute
+                    )
+                } else {
+                    null
+                },
+                type = currentState.selectedWorkdayType,
+            )
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { confirm() }
+        ) {
+            back()
+        }
     }
 
     @AssistedFactory

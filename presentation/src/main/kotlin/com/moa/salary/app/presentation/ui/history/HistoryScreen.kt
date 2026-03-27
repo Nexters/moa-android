@@ -1,6 +1,5 @@
 package com.moa.salary.app.presentation.ui.history
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,7 +65,6 @@ private fun HistoryNavHost(
             }
 
             entry<HistoryNavigation.ModifySchedule> { key ->
-                Log.e("ABC", key.args.schedule.toString())
                 ModifyScheduleScreen(args = key.args)
             }
         },

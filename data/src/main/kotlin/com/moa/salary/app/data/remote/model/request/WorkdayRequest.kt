@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WorkdayRequest(
     val type: String,
-    val clockInTime: String,
-    val clockOutTime: String,
+    val clockInTime: String?,
+    val clockOutTime: String?,
 )

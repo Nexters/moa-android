@@ -38,6 +38,7 @@ import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HistoryNavigation
@@ -58,6 +59,25 @@ fun ModifyScheduleScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
+
+    if (uiState.showDateBottomSheet) {
+
+    }
+
+    if (uiState.showTimeBottomSheet) {
+        MoaTimeBottomSheet(
+            time = uiState.time,
+            title = stringResource(R.string.schedule_form_work_time_title),
+            onPositive = { viewModel.onIntent(ModifyScheduleIntent.SetTime(it)) },
+            onDismissRequest = {
+                viewModel.onIntent(
+                    ModifyScheduleIntent.SetShowTimeBottomSheet(
+                        false
+                    )
+                )
+            }
+        )
+    }
 }
 
 @Composable

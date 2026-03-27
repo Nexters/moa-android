@@ -6,8 +6,8 @@ import com.moa.salary.app.core.model.work.WorkdayType
 interface WorkdayRepository {
     suspend fun updateWorkday(
         date: String,
-        clockInTime: String,
-        clockOutTime: String,
+        clockInTime: String?,
+        clockOutTime: String?,
         type: WorkdayType,
     ): Workday
 
