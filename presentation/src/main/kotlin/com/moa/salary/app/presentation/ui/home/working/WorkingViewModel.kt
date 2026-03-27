@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Stable
 data class WorkingUiState(
@@ -271,7 +270,7 @@ class WorkingViewModel @AssistedInject constructor(
         val clockOutTime = makeTimeString(endHour, endMinute)
 
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             workdayRepository.updateWorkday(
                 date = today,
                 clockInTime = clockInTime,
@@ -318,7 +317,7 @@ class WorkingViewModel @AssistedInject constructor(
         endMinute: Int
     ) {
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             val clockOutTime = makeTimeString(endHour, endMinute)
             workdayRepository.patchClockOUt(today, clockOutTime)
         }.execute(

@@ -184,7 +184,7 @@ class BeforeWorkViewModel @AssistedInject constructor(
         val clockOutTime = makeTimeString(endHour, endMinute)
 
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             workdayRepository.updateWorkday(
                 date = today,
                 clockInTime = clockInTime,

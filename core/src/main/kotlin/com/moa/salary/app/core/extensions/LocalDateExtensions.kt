@@ -16,3 +16,8 @@ fun String?.toLocalDateOrNull(): LocalDate? {
 
 fun String.toLocalDate(): LocalDate =
     LocalDate.parse(this)
+
+fun LocalDate.toKoreanDateString(): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
+    return this.format(formatter)
+}

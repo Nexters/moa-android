@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makeTimeString
+import com.moa.salary.app.core.extensions.toKoreanDateString
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
@@ -120,7 +121,7 @@ private fun ModifyScheduleScreen(
                 },
                 leadingContent = {
                     Text(
-                        text = uiState.date.toString(),
+                        text = uiState.date.toKoreanDateString(),
                         style = MoaTheme.typography.t2_700,
                         color = MoaTheme.colors.textHighEmphasis,
                     )
