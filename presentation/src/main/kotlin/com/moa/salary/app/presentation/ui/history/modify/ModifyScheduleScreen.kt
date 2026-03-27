@@ -35,6 +35,7 @@ import com.moa.salary.app.core.extensions.toKoreanDateString
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
+import com.moa.salary.app.presentation.designsystem.component.MoaDateBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
@@ -61,7 +62,12 @@ fun ModifyScheduleScreen(
     )
 
     if (uiState.showDateBottomSheet) {
-
+        MoaDateBottomSheet(
+            joinedAt = LocalDate.now(),
+            initialDate = uiState.date,
+            onConfirm = { viewModel.onIntent(ModifyScheduleIntent.SetDate(it)) },
+            onDismissRequest ={viewModel.onIntent(ModifyScheduleIntent.SetShowDateBottomSheet(false))}
+        )
     }
 
     if (uiState.showTimeBottomSheet) {

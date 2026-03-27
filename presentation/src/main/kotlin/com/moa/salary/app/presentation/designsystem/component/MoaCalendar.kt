@@ -29,6 +29,7 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.moa.salary.app.core.model.calendar.CalendarStatus
 import com.moa.salary.app.core.model.calendar.Event
@@ -53,6 +54,7 @@ fun MoaCalendar(
     selectedDate: LocalDate,
     selectedYearMonth: YearMonth,
     schedules: ImmutableMap<LocalDate, Schedule>,
+    outDateStyle: OutDateStyle = OutDateStyle.EndOfRow,
     onClickDate : (LocalDate) -> Unit,
     onScrollYearMonth : (YearMonth) -> Unit,
 ) {
@@ -65,6 +67,7 @@ fun MoaCalendar(
         endMonth = endMonth,
         firstVisibleMonth = selectedYearMonth,
         firstDayOfWeek = DayOfWeek.SUNDAY,
+        outDateStyle = outDateStyle
     )
 
     LaunchedEffect(selectedYearMonth) {
