@@ -8,10 +8,6 @@ fun makeTimeString(hour: Int, minute: Int): String {
     return String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
 }
 
-fun makeDateString(year: Int, month: Int, day: Int): String {
-    return String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day)
-}
-
 fun formatCurrency(amount: Long): String {
     return String.format(Locale.getDefault(), "%,d", amount)
 }
