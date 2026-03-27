@@ -8,6 +8,7 @@ import com.moa.salary.app.core.model.calendar.Schedule
 import com.moa.salary.app.data.repository.CalendarRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
+import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.RootNavigation
 import com.moa.salary.app.presentation.model.SettingNavigation
@@ -77,7 +78,18 @@ class CalendarViewModel @Inject constructor(
     }
 
     private fun clickSchedule(schedule: Schedule) {
-
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    HistoryNavigation.ModifySchedule(
+                        args = HistoryNavigation.ModifySchedule.ModifyScheduleArgs(
+                            currentDate = uiState.value.selectedDate.toString(),
+                            schedule = schedule,
+                        )
+                    )
+                )
+            )
+        }
     }
 
     private fun clickPayday(paydayDay: Int) {

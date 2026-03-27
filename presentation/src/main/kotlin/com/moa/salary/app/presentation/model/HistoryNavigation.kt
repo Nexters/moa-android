@@ -9,10 +9,16 @@ sealed interface HistoryNavigation : RootNavigation {
     data object Calendar : HistoryNavigation
 
     @Serializable
-    data class ScheduleForm(
-        val currentDate: String,
-        val schedule: Schedule,
-    ) : HistoryNavigation
+    @JvmInline
+    value class ModifySchedule(
+        val args: ModifyScheduleArgs,
+    ) : HistoryNavigation {
+        @Serializable
+        data class ModifyScheduleArgs(
+            val currentDate: String,
+            val schedule: Schedule,
+        )
+    }
 
     data object Back : HistoryNavigation
 }
