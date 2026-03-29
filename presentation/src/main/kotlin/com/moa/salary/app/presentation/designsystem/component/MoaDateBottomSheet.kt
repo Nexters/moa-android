@@ -34,12 +34,9 @@ fun MoaDateBottomSheet(
     var yearMonth by remember(initialDate) { mutableStateOf(initialDate.yearMonth) }
 
     MoaBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
+                modifier = Modifier.padding(start = MoaTheme.spacing.spacing20),
                 text = "날짜를 선택해주세요",
                 style = MoaTheme.typography.t1_700,
                 color = MoaTheme.colors.textHighEmphasis,
@@ -76,10 +73,15 @@ fun MoaDateBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
+                        start = MoaTheme.spacing.spacing20,
+                        end = MoaTheme.spacing.spacing20,
                         top = MoaTheme.spacing.spacing20,
                         bottom = MoaTheme.spacing.spacing24,
                     ),
-                onClick = { onConfirm(date) },
+                onClick = {
+                    onDismissRequest()
+                    onConfirm(date)
+                },
             ) {
                 Text(
                     text = "확인",

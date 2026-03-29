@@ -2,6 +2,7 @@ package com.moa.salary.app.core.model.work
 
 import androidx.compose.runtime.Stable
 import com.moa.salary.app.core.extensions.makeTimeString
+import com.moa.salary.app.core.model.ImmutableListSerializer
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.serialization.Serializable
 
@@ -11,6 +12,7 @@ data class Workday(
     val date: String,
     val type: WorkdayType,
     val status: WorkdayStatus,
+    @Serializable(with = ImmutableListSerializer::class)
     val events: ImmutableList<Event>,
     val dailyPay: Long,
     val startHour: Int?,
