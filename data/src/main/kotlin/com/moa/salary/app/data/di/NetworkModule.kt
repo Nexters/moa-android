@@ -2,11 +2,12 @@ package com.moa.salary.app.data.di
 
 import com.moa.salary.app.core.util.Constants.TIMEOUT_SECONDS
 import com.moa.salary.app.data.BuildConfig
+import com.moa.salary.app.data.remote.api.AuthService
+import com.moa.salary.app.data.remote.api.CalendarService
 import com.moa.salary.app.data.remote.api.MoaService
 import com.moa.salary.app.data.remote.api.OnboardingService
 import com.moa.salary.app.data.remote.api.SettingService
 import com.moa.salary.app.data.remote.api.WorkdayService
-import com.moa.salary.app.data.remote.api.AuthService
 import com.moa.salary.app.data.remote.converter.ContentOnlyConverterFactory
 import com.moa.salary.app.data.remote.interceptor.AuthInterceptor
 import dagger.Module
@@ -99,4 +100,9 @@ object NetworkModule {
     @Singleton
     fun provideWorkdayService(retrofit: Retrofit): WorkdayService =
         retrofit.create(WorkdayService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCalendarService(retrofit: Retrofit): CalendarService =
+        retrofit.create(CalendarService::class.java)
 }

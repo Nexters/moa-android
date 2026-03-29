@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -93,15 +94,34 @@ fun WorkingScreen(
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
             type = uiState.home.type,
-            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(false)) },
+            onDismissRequest = {
+                viewModel.onIntent(
+                    WorkingIntent.ShowScheduleAdjustBottomSheet(
+                        false
+                    )
+                )
+            },
             onConfirm = { option ->
                 when (option) {
-                    ScheduleAdjustOption.Vacation -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.VACATION))
+                    ScheduleAdjustOption.Vacation -> viewModel.onIntent(
+                        WorkingIntent.SelectChangeType(
+                            WorkdayType.VACATION
+                        )
+                    )
 
                     ScheduleAdjustOption.EndWork -> viewModel.onIntent(WorkingIntent.SelectEndWork)
                     ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.SelectAdjustTime)
-                    ScheduleAdjustOption.Work -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.WORK))
-                    ScheduleAdjustOption.None -> viewModel.onIntent(WorkingIntent.SelectChangeType(WorkdayType.NONE))
+                    ScheduleAdjustOption.Work -> viewModel.onIntent(
+                        WorkingIntent.SelectChangeType(
+                            WorkdayType.WORK
+                        )
+                    )
+
+                    ScheduleAdjustOption.None -> viewModel.onIntent(
+                        WorkingIntent.SelectChangeType(
+                            WorkdayType.NONE
+                        )
+                    )
                 }
             },
         )
@@ -144,7 +164,7 @@ fun WorkingScreen(
             endTimeOnly = true,
             onNegative = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
             onPositive = { time ->
-                viewModel. onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
+                viewModel.onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
             },
             onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
         )
@@ -247,7 +267,13 @@ private fun WorkingScreen(
                     startTime = uiState.startTimeDisplay,
                     endTime = uiState.endTimeDisplay,
                     type = uiState.home.type,
-                    onAdjustScheduleClick = { onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true)) },
+                    onAdjustScheduleClick = {
+                        onIntent(
+                            WorkingIntent.ShowScheduleAdjustBottomSheet(
+                                true
+                            )
+                        )
+                    },
                 )
             }
 
@@ -488,6 +514,7 @@ private fun WorkingStatusSection(
 
             MoaTertiaryButton(
                 height = 36.dp,
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                 onClick = onAdjustScheduleClick,
             ) {
                 Text(

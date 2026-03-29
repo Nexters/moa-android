@@ -100,10 +100,8 @@ class BeforeWorkViewModel @AssistedInject constructor(
             BeforeWorkIntent.NavigateToHistory -> navigateToHistory()
             BeforeWorkIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
             is BeforeWorkIntent.UpdateWorkTime -> updateWorkday(
-                startHour = intent.startHour,
-                startMinute = intent.startMinute,
-                endHour = intent.endHour,
-                endMinute = intent.endMinute,
+                clockInTime = makeTimeString(intent.startHour, intent.startMinute),
+                clockOutTime = makeTimeString(intent.endHour, intent.endMinute),
                 type = intent.type
             )
         }
@@ -143,28 +141,16 @@ class BeforeWorkViewModel @AssistedInject constructor(
         val endTime = now.plusMinutes(workDurationMinutes.toLong())
 
         updateWorkday(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
+            clockInTime = makeTimeString(now.hour, now.minute),
+            clockOutTime = makeTimeString(endTime.hour, endTime.minute),
             type = WorkdayType.WORK,
         )
     }
 
     private fun clickVacation() {
-        val state = _uiState.value
-        val now = LocalTime.now()
-
-        val registeredStartMinutes = state.home.startHour * 60 + state.home.startMinute
-        val registeredEndMinutes = state.home.endHour * 60 + state.home.endMinute
-        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
-        val endTime = now.plusMinutes(workDurationMinutes.toLong())
-
         updateWorkday(
-            startHour = now.hour,
-            startMinute = now.minute,
-            endHour = endTime.hour,
-            endMinute = endTime.minute,
+            clockInTime = null,
+            clockOutTime = null,
             type = WorkdayType.VACATION,
         )
     }
@@ -174,17 +160,12 @@ class BeforeWorkViewModel @AssistedInject constructor(
     }
 
     private fun updateWorkday(
-        startHour: Int,
-        startMinute: Int,
-        endHour: Int,
-        endMinute: Int,
+        clockInTime: String?,
+        clockOutTime: String?,
         type: WorkdayType,
     ) {
-        val clockInTime = makeTimeString(startHour, startMinute)
-        val clockOutTime = makeTimeString(endHour, endMinute)
-
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             workdayRepository.updateWorkday(
                 date = today,
                 clockInTime = clockInTime,
@@ -196,10 +177,8 @@ class BeforeWorkViewModel @AssistedInject constructor(
             bus = moaSideEffectBus,
             onRetry = {
                 updateWorkday(
-                    startHour = startHour,
-                    startMinute = startMinute,
-                    endHour = endHour,
-                    endMinute = endMinute,
+                    clockInTime = clockInTime,
+                    clockOutTime = clockOutTime,
                     type = type
                 )
             },

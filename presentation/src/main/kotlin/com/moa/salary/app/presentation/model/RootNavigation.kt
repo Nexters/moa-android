@@ -1,8 +1,6 @@
 package com.moa.salary.app.presentation.model
 
 import androidx.navigation3.runtime.NavKey
-import com.moa.salary.app.core.model.work.LocalDateModel
-import com.moa.salary.app.core.model.work.Schedule
 import kotlinx.serialization.Serializable
 
 sealed interface RootNavigation : NavKey {
@@ -25,13 +23,10 @@ sealed interface RootNavigation : NavKey {
     data object History : RootNavigation
 
     @Serializable
-    data class ScheduleForm(
-        val date: LocalDateModel,
-        val schedule: Schedule? = null,
+    @JvmInline
+    value class Setting(
+        val startDestination: SettingNavigation = SettingNavigation.SettingMenu,
     ) : RootNavigation
-
-    @Serializable
-    data object Setting : RootNavigation
 
     @Serializable
     @JvmInline

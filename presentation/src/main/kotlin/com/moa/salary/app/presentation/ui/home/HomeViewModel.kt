@@ -36,7 +36,7 @@ class HomeViewModel @Inject constructor(
 
     private fun navigateToSetting() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Setting))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.Setting()))
         }
     }
 

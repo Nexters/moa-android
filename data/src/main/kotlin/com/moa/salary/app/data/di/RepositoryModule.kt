@@ -2,6 +2,8 @@ package com.moa.salary.app.data.di
 
 import com.moa.salary.app.data.repository.AuthRepository
 import com.moa.salary.app.data.repository.AuthRepositoryImpl
+import com.moa.salary.app.data.repository.CalendarRepository
+import com.moa.salary.app.data.repository.CalendarRepositoryImpl
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.HomeRepositoryImpl
 import com.moa.salary.app.data.repository.OnboardingRepository
@@ -56,4 +58,10 @@ interface RepositoryModule {
     fun bindsHomeRepository(
         impl: HomeRepositoryImpl
     ): HomeRepository
+
+    @Binds
+    @Singleton
+    fun bindsCalendarRepository(
+        impl: CalendarRepositoryImpl,
+    ): CalendarRepository
 }

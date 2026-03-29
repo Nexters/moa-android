@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Stable
 data class WorkingUiState(
@@ -143,10 +142,8 @@ class WorkingViewModel @AssistedInject constructor(
             WorkingIntent.SelectAdjustTime -> selectAdjustTime()
 
             is WorkingIntent.UpdateWorkTime -> updateWorkday(
-                startHour = intent.startHour,
-                startMinute = intent.startMinute,
-                endHour = intent.endHour,
-                endMinute = intent.endMinute,
+                clockInTime = makeTimeString(intent.startHour, intent.startMinute),
+                clockOutTime = makeTimeString(intent.endHour, intent.endMinute),
                 type = intent.type
             )
 
@@ -202,12 +199,20 @@ class WorkingViewModel @AssistedInject constructor(
 
     private fun selectChangeType(type: WorkdayType) {
         val state = _uiState.value
+        val clockInTime = if (type == WorkdayType.WORK) {
+            makeTimeString(state.home.startHour, state.home.startMinute)
+        } else {
+            null
+        }
+        val clockOutTime = if (type == WorkdayType.WORK) {
+            makeTimeString(state.home.endHour, state.home.endMinute)
+        } else {
+            null
+        }
 
         updateWorkday(
-            startHour = state.home.startHour,
-            startMinute = state.home.startMinute,
-            endHour = state.home.endHour,
-            endMinute = state.home.endMinute,
+            clockInTime = clockInTime,
+            clockOutTime = clockOutTime,
             type = type,
         )
     }
@@ -239,13 +244,9 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun clickTodayVacation() {
-        val state = _uiState.value
-
         updateWorkday(
-            startHour = state.home.startHour,
-            startMinute = state.home.startMinute,
-            endHour = state.home.endHour,
-            endMinute = state.home.endMinute,
+            clockInTime = null,
+            clockOutTime = null,
             type = WorkdayType.VACATION,
         )
     }
@@ -261,17 +262,12 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun updateWorkday(
-        startHour: Int,
-        startMinute: Int,
-        endHour: Int,
-        endMinute: Int,
+        clockInTime: String?,
+        clockOutTime: String?,
         type: WorkdayType,
     ) {
-        val clockInTime = makeTimeString(startHour, startMinute)
-        val clockOutTime = makeTimeString(endHour, endMinute)
-
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             workdayRepository.updateWorkday(
                 date = today,
                 clockInTime = clockInTime,
@@ -283,10 +279,8 @@ class WorkingViewModel @AssistedInject constructor(
             bus = moaSideEffectBus,
             onRetry = {
                 updateWorkday(
-                    startHour = startHour,
-                    startMinute = startMinute,
-                    endHour = endHour,
-                    endMinute = endMinute,
+                    clockInTime = clockInTime,
+                    clockOutTime = clockOutTime,
                     type = type
                 )
             },
@@ -318,7 +312,7 @@ class WorkingViewModel @AssistedInject constructor(
         endMinute: Int
     ) {
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             val clockOutTime = makeTimeString(endHour, endMinute)
             workdayRepository.patchClockOUt(today, clockOutTime)
         }.execute(

@@ -39,6 +39,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaErrorScreen
 import com.moa.salary.app.presentation.designsystem.component.MoaFullScreenProgress
 import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaDialogProperties
 import com.moa.salary.app.presentation.model.MoaSideEffect
@@ -46,7 +47,6 @@ import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.RootNavigation
 import com.moa.salary.app.presentation.model.SettingNavigation
 import com.moa.salary.app.presentation.ui.history.HistoryScreen
-import com.moa.salary.app.presentation.ui.history.scheduleform.ScheduleFormScreen
 import com.moa.salary.app.presentation.ui.home.HomeScreen
 import com.moa.salary.app.presentation.ui.onboarding.OnboardingScreen
 import com.moa.salary.app.presentation.ui.setting.SettingScreen
@@ -102,27 +102,15 @@ fun MainScreen(
                             backStack.add(it.destination)
                         }
 
-                        is RootNavigation.History -> {
-                            backStack.add(it.destination)
-                        }
-
-                        is RootNavigation.ScheduleForm -> {
-                            backStack.add(it.destination)
-                        }
-
-                        is RootNavigation.Setting -> {
-                            backStack.add(it.destination)
-                        }
-
-                        is RootNavigation.Webview -> {
-                            backStack.add(it.destination)
-                        }
-
                         is OnboardingNavigation -> Unit
 
                         is SettingNavigation -> Unit
 
                         is HomeNavigation -> Unit
+
+                        is HistoryNavigation -> Unit
+
+                        else -> backStack.add(it.destination)
                     }
                 }
 
@@ -268,15 +256,8 @@ private fun MainNavHost(
                 HistoryScreen()
             }
 
-            entry<RootNavigation.ScheduleForm> { key ->
-                ScheduleFormScreen(
-                    initialDate = key.date,
-                    schedule = key.schedule
-                )
-            }
-
-            entry<RootNavigation.Setting> {
-                SettingScreen()
+            entry<RootNavigation.Setting> { key ->
+                SettingScreen(startDestination = key.startDestination)
             }
 
             entry<RootNavigation.Webview> { key ->
