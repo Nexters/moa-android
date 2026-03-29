@@ -1,5 +1,6 @@
 package com.moa.salary.app.presentation.ui.onboarding.nickname
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -49,6 +50,10 @@ fun NicknameScreen(
         }
     )
 ) {
+    BackHandler {
+        viewModel.onIntent(NicknameIntent.ClickBack)
+    }
+
     NicknameScreen(
         isOnboarding = args.isOnboarding,
         nickNameTextFieldState = viewModel.nicknameTextFieldState,

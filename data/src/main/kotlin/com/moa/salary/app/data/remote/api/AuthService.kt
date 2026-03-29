@@ -1,11 +1,13 @@
 package com.moa.salary.app.data.remote.api
 
+import com.moa.salary.app.data.remote.model.request.FcmRequest
 import com.moa.salary.app.data.remote.model.request.LogoutRequest
 import com.moa.salary.app.data.remote.model.request.TokenRequest
 import com.moa.salary.app.data.remote.model.request.WithDrawRequest
 import com.moa.salary.app.data.remote.model.response.TokenResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface AuthService {
     @POST("/api/v1/auth/kakao")
@@ -16,4 +18,7 @@ interface AuthService {
 
     @POST("/api/v1/member/withdrawal")
     suspend fun withdraw(@Body withDrawRequest: WithDrawRequest)
+
+    @PUT("/api/v1/fcm/token")
+    suspend fun updateToken(@Body fcmRequest: FcmRequest)
 }

@@ -2,17 +2,17 @@ package com.moa.salary.app.data.remote.api
 
 import com.moa.salary.app.data.remote.model.request.ClockOutRequest
 import com.moa.salary.app.data.remote.model.request.WorkdayRequest
-import com.moa.salary.app.data.remote.model.response.EarningsResponse
-import com.moa.salary.app.data.remote.model.response.WorkdayItemResponse
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface WorkdayService {
+    @GET("/api/v1/workdays/{date}")
+    suspend fun getWorkday(@Path("date") date: String): WorkdayResponse
+
     @PUT("/api/v1/workdays/{date}")
     suspend fun updateWorkday(
         @Path("date") date: String,
@@ -24,21 +24,4 @@ interface WorkdayService {
         @Path("date") date: String,
         @Body request: ClockOutRequest,
     ): WorkdayResponse
-
-    @GET("/api/v1/workdays")
-    suspend fun getWorkdays(
-        @Query("year") year: Int,
-        @Query("month") month: Int,
-    ): List<WorkdayItemResponse>
-
-    @GET("/api/v1/workdays/{date}")
-    suspend fun getWorkday(
-        @Path("date") date: String,
-    ): WorkdayResponse
-
-    @GET("/api/v1/workdays/earnings")
-    suspend fun getEarnings(
-        @Query("year") year: Int,
-        @Query("month") month: Int,
-    ): EarningsResponse
 }

@@ -79,6 +79,7 @@ fun BeforeWorkScreen(
                         startMinute = time.startMinute,
                         endHour = time.endHour,
                         endMinute = time.endMinute,
+                        type = WorkdayType.WORK,
                     )
                 )
             },
@@ -92,10 +93,10 @@ private fun BeforeWorkScreen(
     uiState: BeforeWorkUiState,
     onIntent: (BeforeWorkIntent) -> Unit,
 ) {
-    if (uiState.home.type == WorkdayType.WORK) {
-        WorkDayContent(uiState = uiState, onIntent = onIntent)
-    } else {
-        DayOffContent(uiState = uiState, onIntent = onIntent)
+    when (uiState.home.type) {
+        WorkdayType.WORK -> WorkDayContent(uiState = uiState, onIntent = onIntent)
+        WorkdayType.VACATION -> VacationContent(uiState = uiState, onIntent = onIntent)
+        WorkdayType.NONE -> DayOffContent(uiState = uiState, onIntent = onIntent)
     }
 }
 
@@ -169,6 +170,57 @@ private fun WorkDayContent(
 }
 
 @Composable
+private fun VacationContent(
+    uiState: BeforeWorkUiState,
+    onIntent: (BeforeWorkIntent) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+        MoaDateLocationBar(
+            date = uiState.dateDisplay,
+            workplace = uiState.home.workplace,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing32))
+
+        AccumulatedSalarySection(
+            month = uiState.month,
+            accumulatedSalary = uiState.accumulatedSalary,
+            additionalSalaryDisplay = uiState.additionalSalaryDisplay,
+            isWorkDay = false,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing36))
+
+        TodayInfoCard(
+            todaySalary = uiState.todaySalary,
+            workTime = uiState.workTimeDisplay,
+            onWorkTimeClick = null
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        MoaTertiaryButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
+        ) {
+            Text(
+                text = "이번달 일정 확인하기",
+                style = MoaTheme.typography.t3_700,
+            )
+        }
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
+    }
+}
+
+@Composable
 private fun DayOffContent(
     uiState: BeforeWorkUiState,
     onIntent: (BeforeWorkIntent) -> Unit,
@@ -201,16 +253,12 @@ private fun DayOffContent(
 
         Spacer(Modifier.weight(1f))
 
-        MoaTooltipBanner(text = "설마 쉬는 날 일하시나요?")
-
-        Spacer(Modifier.height(MoaTheme.spacing.spacing12))
-
         MoaTertiaryButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onIntent(BeforeWorkIntent.ClickClockInOnDayOff) },
+            onClick = { onIntent(BeforeWorkIntent.NavigateToHistory) },
         ) {
             Text(
-                text = stringResource(R.string.before_work_day_off_clock_in),
+                text = "이번달 일정 확인하기",
                 style = MoaTheme.typography.t3_700,
             )
         }
@@ -342,7 +390,7 @@ private fun AccumulatedSalarySection(
 private fun TodayInfoCard(
     todaySalary: String,
     workTime: String,
-    onWorkTimeClick: () -> Unit,
+    onWorkTimeClick: (() -> Unit)?,
 ) {
     Column(
         modifier = Modifier
@@ -387,7 +435,7 @@ private fun TodayInfoCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onWorkTimeClick() }
+                .clickable(enabled = onWorkTimeClick != null) { onWorkTimeClick?.invoke() }
                 .padding(
                     start = MoaTheme.spacing.spacing16,
                     end = MoaTheme.spacing.spacing12,
@@ -410,11 +458,13 @@ private fun TodayInfoCard(
 
             Spacer(Modifier.weight(1f))
 
-            Icon(
-                painter = painterResource(R.drawable.ic_24_chevron_right),
-                contentDescription = stringResource(R.string.before_work_edit_icon_description),
-                tint = MoaTheme.colors.textLowEmphasis,
-            )
+            if (onWorkTimeClick != null) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_24_chevron_right),
+                    contentDescription = stringResource(R.string.before_work_edit_icon_description),
+                    tint = MoaTheme.colors.textLowEmphasis,
+                )
+            }
         }
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing16))
@@ -426,13 +476,14 @@ sealed interface BeforeWorkIntent {
     data object ClickWorkTime : BeforeWorkIntent
     data object ClickEarlyClockIn : BeforeWorkIntent
     data object ClickVacation : BeforeWorkIntent
-    data object ClickClockInOnDayOff : BeforeWorkIntent
+    data object NavigateToHistory : BeforeWorkIntent
     data object DismissTimeBottomSheet : BeforeWorkIntent
     data class UpdateWorkTime(
         val startHour: Int,
         val startMinute: Int,
         val endHour: Int,
         val endMinute: Int,
+        val type : WorkdayType,
     ) : BeforeWorkIntent
 }
 

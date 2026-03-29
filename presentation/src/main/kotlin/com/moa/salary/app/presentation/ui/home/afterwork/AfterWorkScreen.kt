@@ -131,7 +131,7 @@ private fun AfterWorkScreen(
                 onClick = { onIntent(AfterWorkIntent.ClickHistory) },
             ) {
                 Text(
-                    text = stringResource(R.string.after_work_check_work_history),
+                    text = "이번달 일정 확인하기",
                     style = MoaTheme.typography.t3_700,
                 )
             }

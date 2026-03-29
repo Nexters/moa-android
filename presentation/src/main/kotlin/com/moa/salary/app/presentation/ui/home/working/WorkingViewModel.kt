@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
-import com.moa.salary.app.core.extensions.toHourMinuteSecondString
 import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
 import com.moa.salary.app.core.util.Constants.TOOLTIP_COUNT
 import com.moa.salary.app.core.util.Constants.TOOLTIP_ROTATION_INTERVAL_MS
@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Stable
 data class WorkingUiState(
@@ -45,9 +44,6 @@ data class WorkingUiState(
     val showWorkCompletionOverlay: Boolean,
     val showConfetti: Boolean = false,
 ) {
-    val elapsedTimeDisplay: String
-        get() = elapsedTotalSeconds.toHourMinuteSecondString()
-
     val startTimeDisplay: String
         get() = makeTimeString(home.startHour, home.startMinute)
 
@@ -56,7 +52,9 @@ data class WorkingUiState(
 
     val progress: Float
         get() {
+            if (showWorkCompletionOverlay) return 1f
             if (elapsedTotalSeconds == 0) return 0f
+
             val startSeconds = home.startHour * 3600 + home.startMinute * 60
             val endSeconds = home.endHour * 3600 + home.endMinute * 60
             val totalSeconds = endSeconds - startSeconds
@@ -66,8 +64,8 @@ data class WorkingUiState(
 
     val confettiProgress: Float
         get() {
-            if (elapsedTotalSeconds == 0) return 0f
             if (showWorkCompletionOverlay) return 1f
+            if (elapsedTotalSeconds == 0) return 0f
 
             val secInMinute = elapsedTotalSeconds % 1800
             return if (secInMinute == 0) 1f else (secInMinute / 1800f).coerceIn(0f, 1f)
@@ -101,7 +99,8 @@ class WorkingViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(
         WorkingUiState(
             home = args.home,
-            showWorkCompletionOverlay = args.showWorkCompletionOverlay
+            showWorkCompletionOverlay = args.showWorkCompletionOverlay,
+            todaySalary = if (args.showWorkCompletionOverlay) args.home.dailyPay else 0L,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -143,10 +142,8 @@ class WorkingViewModel @AssistedInject constructor(
             WorkingIntent.SelectAdjustTime -> selectAdjustTime()
 
             is WorkingIntent.UpdateWorkTime -> updateWorkday(
-                startHour = intent.startHour,
-                startMinute = intent.startMinute,
-                endHour = intent.endHour,
-                endMinute = intent.endMinute,
+                clockInTime = makeTimeString(intent.startHour, intent.startMinute),
+                clockOutTime = makeTimeString(intent.endHour, intent.endMinute),
                 type = intent.type
             )
 
@@ -200,14 +197,22 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showTimeBottomSheet = false) }
     }
 
-    private fun selectChangeType(type: String) {
+    private fun selectChangeType(type: WorkdayType) {
         val state = _uiState.value
+        val clockInTime = if (type == WorkdayType.WORK) {
+            makeTimeString(state.home.startHour, state.home.startMinute)
+        } else {
+            null
+        }
+        val clockOutTime = if (type == WorkdayType.WORK) {
+            makeTimeString(state.home.endHour, state.home.endMinute)
+        } else {
+            null
+        }
 
         updateWorkday(
-            startHour = state.home.startHour,
-            startMinute = state.home.startMinute,
-            endHour = state.home.endHour,
-            endMinute = state.home.endMinute,
+            clockInTime = clockInTime,
+            clockOutTime = clockOutTime,
             type = type,
         )
     }
@@ -230,7 +235,6 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-
     private fun clickCompleteWork() {
         viewModelScope.launch {
             homeRepository.putCompletedWorkDay(LocalDate.now())
@@ -240,14 +244,10 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun clickTodayVacation() {
-        val state = _uiState.value
-
         updateWorkday(
-            startHour = state.home.startHour,
-            startMinute = state.home.startMinute,
-            endHour = state.home.endHour,
-            endMinute = state.home.endMinute,
-            type = "VACATION",
+            clockInTime = null,
+            clockOutTime = null,
+            type = WorkdayType.VACATION,
         )
     }
 
@@ -262,17 +262,12 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun updateWorkday(
-        startHour: Int,
-        startMinute: Int,
-        endHour: Int,
-        endMinute: Int,
-        type: String = "WORK",
+        clockInTime: String?,
+        clockOutTime: String?,
+        type: WorkdayType,
     ) {
-        val clockInTime = makeTimeString(startHour, startMinute)
-        val clockOutTime = makeTimeString(endHour, endMinute)
-
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             workdayRepository.updateWorkday(
                 date = today,
                 clockInTime = clockInTime,
@@ -282,7 +277,13 @@ class WorkingViewModel @AssistedInject constructor(
         }.execute(
             scope = viewModelScope,
             bus = moaSideEffectBus,
-            onRetry = { updateWorkday(startHour, startMinute, endHour, endMinute) },
+            onRetry = {
+                updateWorkday(
+                    clockInTime = clockInTime,
+                    clockOutTime = clockOutTime,
+                    type = type
+                )
+            },
         ) { workday ->
             _uiState.update {
                 it.copy(
@@ -311,7 +312,7 @@ class WorkingViewModel @AssistedInject constructor(
         endMinute: Int
     ) {
         suspend {
-            val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val today = LocalDate.now().toString()
             val clockOutTime = makeTimeString(endHour, endMinute)
             workdayRepository.patchClockOUt(today, clockOutTime)
         }.execute(

@@ -1,5 +1,6 @@
 package com.moa.salary.app.core.extensions
 
+import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.util.Constants
 import java.util.Locale
 
@@ -7,20 +8,12 @@ fun makeTimeString(hour: Int, minute: Int): String {
     return String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
 }
 
-fun makeDateString(year: Int, month: Int, day: Int): String {
-    return String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month, day)
-}
-
-fun formatCurrency(amount : Long) : String {
+fun formatCurrency(amount: Long): String {
     return String.format(Locale.getDefault(), "%,d", amount)
 }
 
 fun String.makePriceString(): String {
     val value = this.toDoubleOrNull() ?: return ""
-
-    if (value < Constants.MAN) {
-        return ""
-    }
 
     if (value < Constants.EOK) {
         val divided = value / Constants.MAN
@@ -71,4 +64,16 @@ fun Char.isKoreanEnglishOrDigit(): Boolean {
             this in '\uAC00'..'\uD7AF' ||       // 완성형 한글
             this in '\u1100'..'\u11FF' ||       // 한글 자음/모음 (조합 중)
             this in '\u3130'..'\u318F'          // 한글 호환 자모
+}
+
+fun String.toTime(): Time {
+    val parts = this.split("~")
+    val startTimePair = parts[0].toHourMinuteOrNull()
+    val endTimeString = parts[1].toHourMinuteOrNull()
+    return Time(
+        startHour = startTimePair?.first ?: 9,
+        startMinute = startTimePair?.second ?: 0,
+        endHour = endTimeString?.first ?: 18,
+        endMinute = endTimeString?.second ?: 0,
+    )
 }

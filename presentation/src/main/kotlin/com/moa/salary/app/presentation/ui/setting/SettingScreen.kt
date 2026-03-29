@@ -21,8 +21,11 @@ import com.moa.salary.app.presentation.ui.setting.withdraw.WithDrawScreen
 import com.moa.salary.app.presentation.ui.setting.workinfo.WorkInfoScreen
 
 @Composable
-fun SettingScreen(viewModel: SettingViewModel = hiltViewModel()) {
-    val backStack = rememberNavBackStack(SettingNavigation.SettingMenu)
+fun SettingScreen(
+    startDestination: SettingNavigation,
+    viewModel: SettingViewModel = hiltViewModel()
+) {
+    val backStack = rememberNavBackStack(startDestination)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {

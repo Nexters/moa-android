@@ -60,12 +60,12 @@ fun MoaScheduleAdjustBottomSheet(
                 ScheduleAdjustOption.EndWork,
                 ScheduleAdjustOption.AdjustTime,
                 ScheduleAdjustOption.Vacation,
+                ScheduleAdjustOption.None
             )
         } else {
             mutableStateListOf(
                 ScheduleAdjustOption.Work,
-                // TODO 휴일 처리 백엔드 스펙 이후
-               // ScheduleAdjustOption.None
+                ScheduleAdjustOption.None
             )
         }
     }
