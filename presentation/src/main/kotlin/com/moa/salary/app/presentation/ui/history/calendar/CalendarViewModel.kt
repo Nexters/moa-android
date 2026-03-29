@@ -3,8 +3,8 @@ package com.moa.salary.app.presentation.ui.history.calendar
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moa.salary.app.core.model.calendar.Calendar
-import com.moa.salary.app.core.model.calendar.Schedule
+import com.moa.salary.app.core.model.work.Calendar
+import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.data.repository.CalendarRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
@@ -42,7 +42,7 @@ class CalendarViewModel @Inject constructor(
             CalendarIntent.ClickBack -> clickBack()
             is CalendarIntent.SetYearMonth -> setYearMonth(intent.yearMonth)
             is CalendarIntent.ClickDate -> clickDate(intent.date)
-            is CalendarIntent.ClickSchedule -> clickSchedule(intent.schedule)
+            is CalendarIntent.ClickWorkday -> clickWorkday(intent.workday)
             is CalendarIntent.ClickPayday -> clickPayday(intent.day)
         }
     }
@@ -77,15 +77,15 @@ class CalendarViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(selectedDate = date)
     }
 
-    private fun clickSchedule(schedule: Schedule) {
+    private fun clickWorkday(workday: Workday) {
         viewModelScope.launch {
             moaSideEffectBus.emit(
                 MoaSideEffect.Navigate(
-                    HistoryNavigation.ModifySchedule(
-                        args = HistoryNavigation.ModifySchedule.ModifyScheduleArgs(
-                            currentDate = uiState.value.selectedDate.toString(),
-                            joinedAt = (uiState.value.calendar?.joinedAt ?: LocalDate.now()).toString(),
-                            schedule = schedule,
+                    HistoryNavigation.ModifyWorkday(
+                        args = HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs(
+                            joinedAt = (uiState.value.calendar?.joinedAt
+                                ?: LocalDate.now()).toString(),
+                            workday = workday,
                         )
                     )
                 )

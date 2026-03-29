@@ -36,11 +36,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kizitonwose.calendar.core.yearMonth
 import com.moa.salary.app.core.extensions.formatCurrency
-import com.moa.salary.app.core.model.calendar.Calendar
-import com.moa.salary.app.core.model.calendar.CalendarStatus
-import com.moa.salary.app.core.model.calendar.Event
-import com.moa.salary.app.core.model.calendar.MonthlyInfo
-import com.moa.salary.app.core.model.calendar.Schedule
+import com.moa.salary.app.core.model.work.Calendar
+import com.moa.salary.app.core.model.work.Event
+import com.moa.salary.app.core.model.work.MonthlyInfo
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayStatus
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaCalendar
@@ -139,9 +139,9 @@ private fun CalendarScreen(
 
                     IconButton(
                         onClick = {
-                            val schedule = uiState.calendar?.schedules[uiState.selectedDate]
-                            if (schedule != null) {
-                                onIntent(CalendarIntent.ClickSchedule(schedule))
+                            val workday = uiState.calendar?.workdays[uiState.selectedDate]
+                            if (workday != null) {
+                                onIntent(CalendarIntent.ClickWorkday(workday))
                             }
                         }
                     ) {
@@ -164,7 +164,7 @@ private fun CalendarScreen(
                         joinedAt = uiState.calendar.joinedAt,
                         selectedDate = uiState.selectedDate,
                         selectedYearMonth = uiState.selectedYearMonth,
-                        schedules = uiState.calendar.schedules,
+                        workdays = uiState.calendar.workdays,
                         onScrollYearMonth = { onIntent(CalendarIntent.SetYearMonth(it)) },
                         onClickDate = { onIntent(CalendarIntent.ClickDate(it)) }
                     )
@@ -185,7 +185,7 @@ private fun CalendarScreen(
             ScheduleItems(
                 currentDay = uiState.selectedDate.dayOfMonth,
                 totalPay = uiState.calendar?.monthlyInfo?.totalPay?.toInt() ?: 0,
-                schedule = uiState.calendar?.schedules[uiState.selectedDate],
+                workday = uiState.calendar?.workdays[uiState.selectedDate],
                 onIntent = onIntent,
             )
         }
@@ -263,30 +263,30 @@ private fun CalendarMonthlyInfoCard(monthlyInfo: MonthlyInfo) {
 private fun ScheduleItems(
     currentDay: Int,
     totalPay: Int,
-    schedule: Schedule?,
+    workday: Workday?,
     onIntent: (CalendarIntent) -> Unit,
 ) {
-    if (schedule != null) {
-        val info = when (schedule.type) {
+    if (workday != null) {
+        val info = when (workday.type) {
             WorkdayType.WORK -> {
-                when (schedule.status) {
-                    CalendarStatus.SCHEDULED -> {
+                when (workday.status) {
+                    WorkdayStatus.SCHEDULED -> {
                         Triple(
                             R.drawable.ic_40_working_yet,
                             stringResource(R.string.history_schedule_work_scheduled),
-                            schedule.workTime,
+                            "${workday.clockInTime}~${workday.clockOutTime}",
                         )
                     }
 
-                    CalendarStatus.COMPLETED -> {
+                    WorkdayStatus.COMPLETED -> {
                         Triple(
                             R.drawable.ic_40_working_done,
                             stringResource(R.string.history_schedule_work_completed),
-                            schedule.workTime,
+                            "${workday.clockInTime}~${workday.clockOutTime}",
                         )
                     }
 
-                    CalendarStatus.NONE -> null
+                    WorkdayStatus.NONE -> null
                 }
             }
 
@@ -294,7 +294,7 @@ private fun ScheduleItems(
                 Triple(
                     R.drawable.ic_40_vacation,
                     stringResource(R.string.history_schedule_vacation),
-                    schedule.workTime
+                    "${workday.clockInTime}~${workday.clockOutTime}",
                 )
             }
 
@@ -302,20 +302,20 @@ private fun ScheduleItems(
         }
 
         if (info != null) {
-            ScheduleItem(
+            WorkdayItem(
                 imgRes = info.first,
                 title = info.second,
                 content = info.third,
-                onClick = { onIntent(CalendarIntent.ClickSchedule(schedule)) },
+                onClick = { onIntent(CalendarIntent.ClickWorkday(workday)) },
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
         } else {
-            ScheduleEmpty()
+            WorkdayEmpty()
         }
 
-        if (schedule.events.contains(Event.PAYDAY)) {
-            ScheduleItem(
+        if (workday.events.contains(Event.PAYDAY)) {
+            WorkdayItem(
                 imgRes = R.drawable.ic_40_salary_day,
                 title = stringResource(R.string.history_schedule_payday, currentDay),
                 content = "+ ${formatCurrency(totalPay * 10000L)}원",
@@ -325,12 +325,12 @@ private fun ScheduleItems(
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
         }
     } else {
-        ScheduleEmpty()
+        WorkdayEmpty()
     }
 }
 
 @Composable
-private fun ScheduleEmpty() {
+private fun WorkdayEmpty() {
     Spacer(Modifier.height(MoaTheme.spacing.spacing20))
     Text(
         modifier = Modifier.fillMaxWidth(),
@@ -343,7 +343,7 @@ private fun ScheduleEmpty() {
 }
 
 @Composable
-private fun ScheduleItem(
+private fun WorkdayItem(
     @DrawableRes imgRes: Int,
     title: String,
     content: String,
@@ -401,7 +401,7 @@ sealed interface CalendarIntent {
     value class ClickDate(val date: LocalDate) : CalendarIntent
 
     @JvmInline
-    value class ClickSchedule(val schedule: Schedule) : CalendarIntent
+    value class ClickWorkday(val workday: Workday) : CalendarIntent
 
     @JvmInline
     value class ClickPayday(val day: Int) : CalendarIntent
@@ -420,7 +420,7 @@ private fun CalendarScreenPreview() {
                         totalPay = "300",
                         totalWorkTime = "300",
                     ),
-                    schedules = persistentMapOf(),
+                    workdays = persistentMapOf(),
                     joinedAt = LocalDate.now().minusDays(100),
                 ),
                 selectedDate = LocalDate.now(),

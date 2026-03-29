@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CalendarResponse(
     val earnings: EarningsResponse,
-    val schedules: List<ScheduleResponse>,
+    val schedules: List<WorkdayResponse>,
     val joinedAt: String,
 )
 
@@ -15,15 +15,4 @@ data class EarningsResponse(
     val standardMinutes: Long,
     val workedEarnings: Long,
     val standardSalary: Long,
-)
-
-@Serializable
-data class ScheduleResponse(
-    val date: String,
-    val type: String,
-    val status: String,
-    val events: List<String>,
-    val dailyPay: Int,
-    val clockInTime: String?,
-    val clockOutTime: String?,
 )

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toLocalDate
-import com.moa.salary.app.core.extensions.toTime
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.data.repository.WorkdayRepository
@@ -23,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @Stable
-data class ModifyScheduleUiState(
+data class ModifyWorkdayUiState(
     val isEditMode: Boolean,
     val date: LocalDate,
     val selectedWorkdayType: WorkdayType,
@@ -32,33 +31,38 @@ data class ModifyScheduleUiState(
     val showTimeBottomSheet: Boolean = false,
 )
 
-@HiltViewModel(assistedFactory = ModifyScheduleViewModel.Factory::class)
-class ModifyScheduleViewModel @AssistedInject constructor(
-    @Assisted private val args: HistoryNavigation.ModifySchedule.ModifyScheduleArgs,
+@HiltViewModel(assistedFactory = ModifyWorkdayViewModel.Factory::class)
+class ModifyWorkdayViewModel @AssistedInject constructor(
+    @Assisted private val args: HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs,
     private val moaSideEffectBus: MoaSideEffectBus,
     private val workdayRepository: WorkdayRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        ModifyScheduleUiState(
-            isEditMode = args.schedule.type != WorkdayType.NONE,
-            date = args.currentDate.toLocalDate(),
-            selectedWorkdayType = args.schedule.type,
-            time = args.schedule.workTime.toTime(),
+        ModifyWorkdayUiState(
+            isEditMode = args.workday.type != WorkdayType.NONE,
+            date = args.workday.date.toLocalDate(),
+            selectedWorkdayType = args.workday.type,
+            time = Time(
+                startHour = args.workday.startHour ?: 9,
+                startMinute = args.workday.startMinute ?: 0,
+                endHour = args.workday.endHour ?: 18,
+                endMinute = args.workday.endMinute ?: 0
+            )
         )
     )
     val uiState = _uiState.asStateFlow()
 
-    fun onIntent(intent: ModifyScheduleIntent) {
+    fun onIntent(intent: ModifyWorkdayIntent) {
         when (intent) {
-            ModifyScheduleIntent.ClickBack -> back()
-            is ModifyScheduleIntent.SetShowDateBottomSheet -> setShowDateBottomSheet(intent.show)
-            is ModifyScheduleIntent.SetDate -> setDate(intent.date)
-            is ModifyScheduleIntent.SetWorkdayType -> setWorkdayType(intent.type)
-            is ModifyScheduleIntent.SetShowTimeBottomSheet -> setShowTimeBottomSheet(intent.show)
-            is ModifyScheduleIntent.SetTime -> setTime(intent.time)
-            ModifyScheduleIntent.ClickCancel -> cancel()
-            ModifyScheduleIntent.ClickConfirm -> confirm()
+            ModifyWorkdayIntent.ClickBack -> back()
+            is ModifyWorkdayIntent.SetShowDateBottomSheet -> setShowDateBottomSheet(intent.show)
+            is ModifyWorkdayIntent.SetDate -> setDate(intent.date)
+            is ModifyWorkdayIntent.SetWorkdayType -> setWorkdayType(intent.type)
+            is ModifyWorkdayIntent.SetShowTimeBottomSheet -> setShowTimeBottomSheet(intent.show)
+            is ModifyWorkdayIntent.SetTime -> setTime(intent.time)
+            ModifyWorkdayIntent.ClickCancel -> cancel()
+            ModifyWorkdayIntent.ClickConfirm -> confirm()
         }
     }
 
@@ -100,7 +104,7 @@ class ModifyScheduleViewModel @AssistedInject constructor(
                 clockInTime = if (currentState.selectedWorkdayType == WorkdayType.WORK) {
                     makeTimeString(
                         currentState.time.startHour,
-                        currentState.time.startMinute
+                        currentState.time.startMinute,
                     )
                 } else {
                     null
@@ -108,7 +112,7 @@ class ModifyScheduleViewModel @AssistedInject constructor(
                 clockOutTime = if (currentState.selectedWorkdayType == WorkdayType.WORK) {
                     makeTimeString(
                         currentState.time.endHour,
-                        currentState.time.endMinute
+                        currentState.time.endMinute,
                     )
                 } else {
                     null
@@ -126,6 +130,6 @@ class ModifyScheduleViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: HistoryNavigation.ModifySchedule.ModifyScheduleArgs): ModifyScheduleViewModel
+        fun create(args: HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs): ModifyWorkdayViewModel
     }
 }

@@ -66,7 +66,7 @@ fun MoaDateBottomSheet(
                 joinedAt = joinedAt,
                 selectedDate = date,
                 selectedYearMonth = yearMonth,
-                schedules = persistentMapOf(),
+                workdays = persistentMapOf(),
                 outDateStyle = OutDateStyle.EndOfGrid,
                 onScrollYearMonth = { yearMonth = it },
                 onClickDate = { date = it }

@@ -13,7 +13,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.ui.history.calendar.CalendarScreen
-import com.moa.salary.app.presentation.ui.history.modify.ModifyScheduleScreen
+import com.moa.salary.app.presentation.ui.history.modify.ModifyWorkdayScreen
 
 @Composable
 fun HistoryScreen(
@@ -64,8 +64,8 @@ private fun HistoryNavHost(
                 CalendarScreen()
             }
 
-            entry<HistoryNavigation.ModifySchedule> { key ->
-                ModifyScheduleScreen(args = key.args)
+            entry<HistoryNavigation.ModifyWorkday> { key ->
+                ModifyWorkdayScreen(args = key.args)
             }
         },
     )

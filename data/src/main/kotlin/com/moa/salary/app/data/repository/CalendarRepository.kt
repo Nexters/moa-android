@@ -1,6 +1,6 @@
 package com.moa.salary.app.data.repository
 
-import com.moa.salary.app.core.model.calendar.Calendar
+import com.moa.salary.app.core.model.work.Calendar
 
 interface CalendarRepository {
     suspend fun getCalendar(

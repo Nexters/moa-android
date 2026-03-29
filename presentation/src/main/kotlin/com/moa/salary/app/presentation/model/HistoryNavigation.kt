@@ -1,6 +1,6 @@
 package com.moa.salary.app.presentation.model
 
-import com.moa.salary.app.core.model.calendar.Schedule
+import com.moa.salary.app.core.model.work.Workday
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,14 +10,13 @@ sealed interface HistoryNavigation : RootNavigation {
 
     @Serializable
     @JvmInline
-    value class ModifySchedule(
-        val args: ModifyScheduleArgs,
+    value class ModifyWorkday(
+        val args: ModifyWorkdayArgs,
     ) : HistoryNavigation {
         @Serializable
-        data class ModifyScheduleArgs(
-            val currentDate: String,
+        data class ModifyWorkdayArgs(
             val joinedAt : String,
-            val schedule: Schedule,
+            val workday: Workday,
         )
     }
 

@@ -31,16 +31,15 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
-import com.moa.salary.app.core.model.calendar.CalendarStatus
-import com.moa.salary.app.core.model.calendar.Event
-import com.moa.salary.app.core.model.calendar.Schedule
+import com.moa.salary.app.core.model.work.Event
+import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.work.WorkdayStatus
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.theme.Green40Main
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.extensions.toFixedSize
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -53,10 +52,10 @@ fun MoaCalendar(
     joinedAt: LocalDate,
     selectedDate: LocalDate,
     selectedYearMonth: YearMonth,
-    schedules: ImmutableMap<LocalDate, Schedule>,
+    workdays: ImmutableMap<LocalDate, Workday>,
     outDateStyle: OutDateStyle = OutDateStyle.EndOfRow,
-    onClickDate : (LocalDate) -> Unit,
-    onScrollYearMonth : (YearMonth) -> Unit,
+    onClickDate: (LocalDate) -> Unit,
+    onScrollYearMonth: (YearMonth) -> Unit,
 ) {
     val startMonth = remember(joinedAt) { YearMonth.from(joinedAt) }
     val endMonth = remember(startMonth) { selectedYearMonth.plusMonths(12) }
@@ -102,9 +101,9 @@ fun MoaCalendar(
                 Day(
                     isToday = it.date == LocalDate.now(),
                     isSelected = it.date == selectedDate,
-                    schedule = schedules[it.date],
+                    workday = workdays[it.date],
                     day = it,
-                    onClick = {onClickDate(it.date)},
+                    onClick = { onClickDate(it.date) },
                 )
             },
         )
@@ -115,7 +114,7 @@ fun MoaCalendar(
 private fun Day(
     isToday: Boolean,
     isSelected: Boolean,
-    schedule: Schedule?,
+    workday: Workday?,
     day: CalendarDay,
     onClick: (CalendarDay) -> Unit
 ) {
@@ -153,16 +152,16 @@ private fun Day(
         }
 
         DayBottomContent(
-            status = schedule?.status ?: CalendarStatus.NONE,
-            isPayday = schedule?.events?.contains(Event.PAYDAY) ?: false,
-            isVacation = schedule?.type == WorkdayType.VACATION
+            status = workday?.status ?: WorkdayStatus.NONE,
+            isPayday = workday?.events?.contains(Event.PAYDAY) ?: false,
+            isVacation = workday?.type == WorkdayType.VACATION
         )
     }
 }
 
 @Composable
 private fun DayBottomContent(
-    status: CalendarStatus,
+    status: WorkdayStatus,
     isPayday: Boolean,
     isVacation: Boolean,
 ) {
@@ -202,7 +201,7 @@ private fun DayBottomContent(
     } else {
         Spacer(Modifier.height(4.dp))
         when (status) {
-            CalendarStatus.SCHEDULED -> {
+            WorkdayStatus.SCHEDULED -> {
                 Box(
                     modifier = Modifier
                         .size(6.dp)
@@ -211,7 +210,7 @@ private fun DayBottomContent(
                 )
             }
 
-            CalendarStatus.COMPLETED -> {
+            WorkdayStatus.COMPLETED -> {
                 Box(
                     modifier = Modifier
                         .size(6.dp)
@@ -220,7 +219,7 @@ private fun DayBottomContent(
                 )
             }
 
-            CalendarStatus.NONE -> {
+            WorkdayStatus.NONE -> {
                 Box(
                     modifier = Modifier
                         .size(6.dp)
@@ -248,15 +247,7 @@ private fun MoaCalendarPreview() {
                 joinedAt = LocalDate.now(),
                 selectedDate = LocalDate.now().minusDays(1),
                 selectedYearMonth = YearMonth.now(),
-                schedules = persistentMapOf(
-                    LocalDate.now() to Schedule(
-                        type = WorkdayType.VACATION,
-                        status = CalendarStatus.COMPLETED,
-                        events = persistentListOf(),
-                        dailyPay = 0,
-                        workTime = "00:00"
-                    )
-                ),
+                workdays = persistentMapOf(),
                 onScrollYearMonth = {},
                 onClickDate = {},
             )

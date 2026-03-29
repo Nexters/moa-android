@@ -47,17 +47,17 @@ import com.moa.salary.app.presentation.model.HistoryNavigation
 import java.time.LocalDate
 
 @Composable
-fun ModifyScheduleScreen(
-    args: HistoryNavigation.ModifySchedule.ModifyScheduleArgs,
-    viewModel: ModifyScheduleViewModel = hiltViewModel(
-        creationCallback = { factory: ModifyScheduleViewModel.Factory ->
+fun ModifyWorkdayScreen(
+    args: HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs,
+    viewModel: ModifyWorkdayViewModel = hiltViewModel(
+        creationCallback = { factory: ModifyWorkdayViewModel.Factory ->
             factory.create(args)
         }
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ModifyScheduleScreen(
+    ModifyWorkdayScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
     )
@@ -66,8 +66,8 @@ fun ModifyScheduleScreen(
         MoaDateBottomSheet(
             joinedAt = args.joinedAt.toLocalDate(),
             initialDate = uiState.date,
-            onConfirm = { viewModel.onIntent(ModifyScheduleIntent.SetDate(it)) },
-            onDismissRequest ={viewModel.onIntent(ModifyScheduleIntent.SetShowDateBottomSheet(false))}
+            onConfirm = { viewModel.onIntent(ModifyWorkdayIntent.SetDate(it)) },
+            onDismissRequest = { viewModel.onIntent(ModifyWorkdayIntent.SetShowDateBottomSheet(false)) }
         )
     }
 
@@ -75,10 +75,10 @@ fun ModifyScheduleScreen(
         MoaTimeBottomSheet(
             time = uiState.time,
             title = stringResource(R.string.schedule_form_work_time_title),
-            onPositive = { viewModel.onIntent(ModifyScheduleIntent.SetTime(it)) },
+            onPositive = { viewModel.onIntent(ModifyWorkdayIntent.SetTime(it)) },
             onDismissRequest = {
                 viewModel.onIntent(
-                    ModifyScheduleIntent.SetShowTimeBottomSheet(
+                    ModifyWorkdayIntent.SetShowTimeBottomSheet(
                         false
                     )
                 )
@@ -88,15 +88,15 @@ fun ModifyScheduleScreen(
 }
 
 @Composable
-private fun ModifyScheduleScreen(
-    uiState: ModifyScheduleUiState,
-    onIntent: (ModifyScheduleIntent) -> Unit,
+private fun ModifyWorkdayScreen(
+    uiState: ModifyWorkdayUiState,
+    onIntent: (ModifyWorkdayIntent) -> Unit,
 ) {
     Scaffold(
         topBar = {
             MoaTopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(ModifyScheduleIntent.ClickBack) }) {
+                    IconButton(onClick = { onIntent(ModifyWorkdayIntent.ClickBack) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_24_arrow_left),
                             contentDescription = stringResource(R.string.history_back_description),
@@ -141,7 +141,7 @@ private fun ModifyScheduleScreen(
             MoaRow(
                 modifier = Modifier.clickable {
                     onIntent(
-                        ModifyScheduleIntent.SetShowDateBottomSheet(
+                        ModifyWorkdayIntent.SetShowDateBottomSheet(
                             true
                         )
                     )
@@ -174,7 +174,7 @@ private fun ModifyScheduleScreen(
                         modifier = Modifier.weight(1f),
                         text = it.value,
                         isSelected = uiState.selectedWorkdayType == it,
-                        onClick = { onIntent(ModifyScheduleIntent.SetWorkdayType(it)) },
+                        onClick = { onIntent(ModifyWorkdayIntent.SetWorkdayType(it)) },
                     )
                 }
             }
@@ -195,7 +195,7 @@ private fun ModifyScheduleScreen(
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .clip(RoundedCornerShape(MoaTheme.radius.radius12))
-                        .clickable { onIntent(ModifyScheduleIntent.SetShowTimeBottomSheet(true)) }
+                        .clickable { onIntent(ModifyWorkdayIntent.SetShowTimeBottomSheet(true)) }
                         .background(color = MoaTheme.colors.containerPrimary)
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -232,7 +232,7 @@ private fun ModifyScheduleScreen(
             ) {
                 MoaTertiaryButton(
                     modifier = Modifier.weight(1f),
-                    onClick = { onIntent(ModifyScheduleIntent.ClickCancel) },
+                    onClick = { onIntent(ModifyWorkdayIntent.ClickCancel) },
                 ) {
                     Text(
                         text = stringResource(R.string.schedule_form_cancel),
@@ -244,7 +244,7 @@ private fun ModifyScheduleScreen(
 
                 MoaPrimaryButton(
                     modifier = Modifier.weight(1f),
-                    onClick = { onIntent(ModifyScheduleIntent.ClickConfirm) },
+                    onClick = { onIntent(ModifyWorkdayIntent.ClickConfirm) },
                 ) {
                     Text(
                         text = stringResource(R.string.schedule_form_confirm),
@@ -292,34 +292,34 @@ private fun WorkdayTypeButton(
     }
 }
 
-sealed interface ModifyScheduleIntent {
-    data object ClickBack : ModifyScheduleIntent
+sealed interface ModifyWorkdayIntent {
+    data object ClickBack : ModifyWorkdayIntent
 
     @JvmInline
-    value class SetShowDateBottomSheet(val show: Boolean) : ModifyScheduleIntent
+    value class SetShowDateBottomSheet(val show: Boolean) : ModifyWorkdayIntent
 
     @JvmInline
-    value class SetDate(val date: LocalDate) : ModifyScheduleIntent
+    value class SetDate(val date: LocalDate) : ModifyWorkdayIntent
 
     @JvmInline
-    value class SetWorkdayType(val type: WorkdayType) : ModifyScheduleIntent
+    value class SetWorkdayType(val type: WorkdayType) : ModifyWorkdayIntent
 
     @JvmInline
-    value class SetShowTimeBottomSheet(val show: Boolean) : ModifyScheduleIntent
+    value class SetShowTimeBottomSheet(val show: Boolean) : ModifyWorkdayIntent
 
     @JvmInline
-    value class SetTime(val time: Time) : ModifyScheduleIntent
+    value class SetTime(val time: Time) : ModifyWorkdayIntent
 
-    data object ClickCancel : ModifyScheduleIntent
-    data object ClickConfirm : ModifyScheduleIntent
+    data object ClickCancel : ModifyWorkdayIntent
+    data object ClickConfirm : ModifyWorkdayIntent
 }
 
 @Preview
 @Composable
 private fun ModifyScheduleScreenPreview() {
     MoaTheme {
-        ModifyScheduleScreen(
-            uiState = ModifyScheduleUiState(
+        ModifyWorkdayScreen(
+            uiState = ModifyWorkdayUiState(
                 isEditMode = true,
                 date = LocalDate.now(),
                 selectedWorkdayType = WorkdayType.WORK,
