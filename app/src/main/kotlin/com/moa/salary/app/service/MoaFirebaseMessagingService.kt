@@ -7,6 +7,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.moa.salary.app.R
+import com.moa.salary.app.data.repository.AuthRepository
 import com.moa.salary.app.presentation.ui.MainActivity
 import com.moa.salary.app.presentation.ui.widget.util.WidgetUpdateManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,12 +23,17 @@ class MoaFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var widgetUpdateManager: WidgetUpdateManager
 
+    @Inject
+    lateinit var authRepository: AuthRepository
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
-        // TODO 추후 토큰 갱신 하기
+        serviceScope.launch {
+            authRepository.updateToken(token)
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
