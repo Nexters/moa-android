@@ -4,11 +4,15 @@ import com.moa.salary.app.data.remote.model.request.ClockOutRequest
 import com.moa.salary.app.data.remote.model.request.WorkdayRequest
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface WorkdayService {
+    @GET("/api/v1/workdays/{date}")
+    suspend fun getWorkday(@Path("date") date: String): WorkdayResponse
+
     @PUT("/api/v1/workdays/{date}")
     suspend fun updateWorkday(
         @Path("date") date: String,

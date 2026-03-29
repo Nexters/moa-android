@@ -11,6 +11,9 @@ import javax.inject.Inject
 class WorkdayRepositoryImpl @Inject constructor(
     private val workdayService: WorkdayService,
 ) : WorkdayRepository {
+    override suspend fun getWorkday(date: String): Workday {
+        return workdayService.getWorkday(date).toDomain()
+    }
 
     override suspend fun updateWorkday(
         date: String,

@@ -77,7 +77,25 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
     }
 
     private fun setDate(date: LocalDate) {
-        _uiState.value = _uiState.value.copy(date = date)
+        suspend {
+            workdayRepository.getWorkday(date.toString())
+        }.execute(
+            bus = moaSideEffectBus,
+            scope = viewModelScope,
+            onRetry = { setDate(date) }
+        ) { workday ->
+            _uiState.value = _uiState.value.copy(
+                isEditMode = workday.type != WorkdayType.NONE,
+                date = workday.date.toLocalDate(),
+                selectedWorkdayType = if (workday.type == WorkdayType.NONE) WorkdayType.WORK else workday.type,
+                time = Time(
+                    startHour = workday.startHour ?: 9,
+                    startMinute = workday.startMinute ?: 0,
+                    endHour = workday.endHour ?: 18,
+                    endMinute = workday.endMinute ?: 0,
+                )
+            )
+        }
     }
 
     private fun setWorkdayType(type: WorkdayType) {

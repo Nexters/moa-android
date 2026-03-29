@@ -4,6 +4,8 @@ import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.core.model.work.WorkdayType
 
 interface WorkdayRepository {
+    suspend fun getWorkday(date: String): Workday
+
     suspend fun updateWorkday(
         date: String,
         clockInTime: String?,
