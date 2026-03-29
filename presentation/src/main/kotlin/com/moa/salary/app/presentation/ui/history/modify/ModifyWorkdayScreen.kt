@@ -170,12 +170,14 @@ private fun ModifyWorkdayScreen(
                 horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing12)
             ) {
                 WorkdayType.entries.forEach {
-                    WorkdayTypeButton(
-                        modifier = Modifier.weight(1f),
-                        text = it.value,
-                        isSelected = uiState.selectedWorkdayType == it,
-                        onClick = { onIntent(ModifyWorkdayIntent.SetWorkdayType(it)) },
-                    )
+                    if (uiState.isEditMode || it == WorkdayType.WORK) {
+                        WorkdayTypeButton(
+                            modifier = Modifier.weight(1f),
+                            text = it.value,
+                            isSelected = uiState.selectedWorkdayType == it,
+                            onClick = { onIntent(ModifyWorkdayIntent.SetWorkdayType(it)) },
+                        )
+                    }
                 }
             }
 

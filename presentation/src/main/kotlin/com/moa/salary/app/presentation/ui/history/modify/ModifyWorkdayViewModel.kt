@@ -42,7 +42,7 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
         ModifyWorkdayUiState(
             isEditMode = args.workday.type != WorkdayType.NONE,
             date = args.workday.date.toLocalDate(),
-            selectedWorkdayType = args.workday.type,
+            selectedWorkdayType = if (args.workday.type == WorkdayType.NONE) WorkdayType.WORK else args.workday.type,
             time = Time(
                 startHour = args.workday.startHour ?: 9,
                 startMinute = args.workday.startMinute ?: 0,
