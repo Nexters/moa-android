@@ -3,6 +3,7 @@ package com.moa.salary.app.data.repository
 import com.moa.salary.app.core.model.setting.WithdrawalReason
 import com.moa.salary.app.data.local.PreferencesDataStore
 import com.moa.salary.app.data.remote.api.AuthService
+import com.moa.salary.app.data.remote.model.request.FcmRequest
 import com.moa.salary.app.data.remote.model.request.LogoutRequest
 import com.moa.salary.app.data.remote.model.request.TokenRequest
 import com.moa.salary.app.data.remote.model.request.WithDrawRequest
@@ -32,5 +33,9 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun withdraw(reasons: ImmutableList<WithdrawalReason>) {
         authService.withdraw(WithDrawRequest(reasons.map { it.title }))
         preferencesDataStore.clear()
+    }
+
+    override suspend fun updateToken(token: String) {
+        authService.updateToken(FcmRequest(token))
     }
 }
