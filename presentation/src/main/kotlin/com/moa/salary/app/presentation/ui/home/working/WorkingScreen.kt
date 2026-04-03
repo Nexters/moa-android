@@ -843,6 +843,19 @@ private fun WorkingScreenPreview() {
         ) {
             WorkingScreen(
                 uiState = WorkingUiState(
+                    args = HomeNavigation.Working(
+                        home = Home(
+                            workplace = "모아주식회사",
+                            workedEarnings = 1000000,
+                            standardSalary = 1000000,
+                            dailyPay = 100000,
+                            type = WorkdayType.WORK,
+                            startHour = 9,
+                            startMinute = 0,
+                            endHour = 18,
+                            endMinute = 0,
+                        ),
+                    ),
                     home = Home(
                         workplace = "모아주식회사",
                         workedEarnings = 1000000,
