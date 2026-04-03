@@ -32,6 +32,7 @@ import java.time.LocalTime
 
 @Stable
 data class WorkingUiState(
+    val args: HomeNavigation.Working,
     val home: Home,
     val todaySalary: Long = 0L,
     val elapsedTotalSeconds: Int = 0,
@@ -85,7 +86,13 @@ data class WorkingUiState(
         get() = formatCurrency(home.workedEarnings)
 
     val totalSalaryDisplay: String
-        get() = formatCurrency(home.workedEarnings + todaySalary)
+        get() = formatCurrency(
+            if (args.showWorkCompletionOverlay) {
+                home.workedEarnings
+            } else {
+                home.workedEarnings + todaySalary
+            }
+        )
 }
 
 @HiltViewModel(assistedFactory = WorkingViewModel.Factory::class)
@@ -98,6 +105,7 @@ class WorkingViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(
         WorkingUiState(
+            args = args,
             home = args.home,
             showWorkCompletionOverlay = args.showWorkCompletionOverlay,
             todaySalary = if (args.showWorkCompletionOverlay) args.home.dailyPay else 0L,
