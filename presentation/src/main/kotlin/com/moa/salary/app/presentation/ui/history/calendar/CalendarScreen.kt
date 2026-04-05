@@ -110,28 +110,24 @@ private fun CalendarScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     MoaMonthNavigator(
-                        month = uiState.selectedYearMonth.monthValue,
+                        month = uiState.selectedDate.yearMonth.monthValue,
                         previousEnabled = uiState.calendar?.joinedAt?.yearMonth?.let { joinedAtMonth ->
-                            uiState.selectedYearMonth.isAfter(joinedAtMonth)
+                            uiState.selectedDate.yearMonth.isAfter(joinedAtMonth)
                         } ?: false,
-                        nextEnabled = uiState.selectedYearMonth.isBefore(
+                        nextEnabled = uiState.selectedDate.yearMonth.isBefore(
                             YearMonth.now().plusMonths(12)
                         ),
                         onPreviousClick = {
                             onIntent(
-                                CalendarIntent.SetYearMonth(
-                                    uiState.selectedYearMonth.minusMonths(
-                                        1
-                                    )
+                                CalendarIntent.SetDate(
+                                    uiState.selectedDate.minusMonths(1)
                                 )
                             )
                         },
                         onNextClick = {
                             onIntent(
-                                CalendarIntent.SetYearMonth(
-                                    uiState.selectedYearMonth.plusMonths(
-                                        1
-                                    )
+                                CalendarIntent.SetDate(
+                                    uiState.selectedDate.plusMonths(1)
                                 )
                             )
                         },
@@ -159,15 +155,26 @@ private fun CalendarScreen(
                     CalendarMonthlyInfoCard(monthlyInfo = uiState.calendar.monthlyInfo)
 
                     Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
                     MoaCalendar(
                         joinedAt = uiState.calendar.joinedAt,
                         selectedDate = uiState.selectedDate,
-                        selectedYearMonth = uiState.selectedYearMonth,
+                        selectedYearMonth = uiState.selectedDate.yearMonth,
                         workdays = uiState.calendar.workdays,
-                        onScrollYearMonth = { onIntent(CalendarIntent.SetYearMonth(it)) },
-                        onClickDate = { onIntent(CalendarIntent.ClickDate(it)) }
+                        onScrollYearMonth = { newYearMonth ->
+                            val currentYearMonth = uiState.selectedDate.yearMonth
+
+                            if (newYearMonth != currentYearMonth) {
+                                val newDate = if (newYearMonth.isAfter(currentYearMonth)) {
+                                    uiState.selectedDate.plusMonths(1)
+                                } else {
+                                    uiState.selectedDate.minusMonths(1)
+                                }
+                                onIntent(CalendarIntent.SetDate(newDate))
+                            }
+                        },
+                        onClickDate = { onIntent(CalendarIntent.SetDate(it)) }
                     )
+
                 }
             }
 
@@ -395,10 +402,7 @@ sealed interface CalendarIntent {
     data object ClickBack : CalendarIntent
 
     @JvmInline
-    value class SetYearMonth(val yearMonth: YearMonth) : CalendarIntent
-
-    @JvmInline
-    value class ClickDate(val date: LocalDate) : CalendarIntent
+    value class SetDate(val date: LocalDate) : CalendarIntent
 
     @JvmInline
     value class ClickWorkday(val workday: Workday) : CalendarIntent
@@ -424,7 +428,6 @@ private fun CalendarScreenPreview() {
                     joinedAt = LocalDate.now().minusDays(100),
                 ),
                 selectedDate = LocalDate.now(),
-                selectedYearMonth = YearMonth.now(),
             ),
             onIntent = {},
         )
