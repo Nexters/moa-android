@@ -3,6 +3,7 @@ package com.moa.salary.app.presentation.ui.history.calendar
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kizitonwose.calendar.core.yearMonth
 import com.moa.salary.app.core.model.work.Calendar
 import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.data.repository.CalendarRepository
@@ -23,7 +24,6 @@ import javax.inject.Inject
 @Stable
 data class CalendarUiState(
     val calendar: Calendar? = null,
-    val selectedYearMonth: YearMonth = YearMonth.now(),
     val selectedDate: LocalDate = LocalDate.now(),
 )
 
@@ -40,8 +40,7 @@ class CalendarViewModel @Inject constructor(
         when (intent) {
             CalendarIntent.GetCalendar -> getCalendar(YearMonth.now())
             CalendarIntent.ClickBack -> clickBack()
-            is CalendarIntent.SetYearMonth -> setYearMonth(intent.yearMonth)
-            is CalendarIntent.ClickDate -> clickDate(intent.date)
+            is CalendarIntent.SetDate -> clickDate(intent.date)
             is CalendarIntent.ClickWorkday -> clickWorkday(intent.workday)
             is CalendarIntent.ClickPayday -> clickPayday(intent.day)
         }
@@ -68,12 +67,10 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    private fun setYearMonth(yearMonth: YearMonth) {
-        _uiState.value = _uiState.value.copy(selectedYearMonth = yearMonth)
-        getCalendar(yearMonth)
-    }
-
     private fun clickDate(date: LocalDate) {
+        if (_uiState.value.selectedDate.yearMonth != date.yearMonth) {
+            getCalendar(date.yearMonth)
+        }
         _uiState.value = _uiState.value.copy(selectedDate = date)
     }
 
