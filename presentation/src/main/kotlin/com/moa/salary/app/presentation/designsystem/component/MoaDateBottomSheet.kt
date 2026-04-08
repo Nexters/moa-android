@@ -30,8 +30,7 @@ fun MoaDateBottomSheet(
     onConfirm: (LocalDate) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var date by remember(initialDate) { mutableStateOf(initialDate) }
-    var yearMonth by remember(initialDate) { mutableStateOf(initialDate.yearMonth) }
+    var currentDate by remember(initialDate) { mutableStateOf(initialDate) }
 
     MoaBottomSheet(onDismissRequest = onDismissRequest) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -49,11 +48,11 @@ fun MoaDateBottomSheet(
                 contentAlignment = Alignment.Center,
             ) {
                 MoaMonthNavigator(
-                    month = yearMonth.monthValue,
-                    previousEnabled = yearMonth.isAfter(joinedAt.yearMonth),
-                    nextEnabled = yearMonth.isBefore(YearMonth.now().plusMonths(12)),
-                    onPreviousClick = { yearMonth = yearMonth.minusMonths(1) },
-                    onNextClick = { yearMonth = yearMonth.plusMonths(1) },
+                    month = currentDate.monthValue,
+                    previousEnabled = currentDate.yearMonth.isAfter(joinedAt.yearMonth),
+                    nextEnabled = currentDate.yearMonth.isBefore(YearMonth.now().plusMonths(12)),
+                    onPreviousClick = { currentDate = currentDate.minusMonths(1) },
+                    onNextClick = { currentDate = currentDate.plusMonths(1) },
                 )
             }
 
@@ -61,12 +60,23 @@ fun MoaDateBottomSheet(
 
             MoaCalendar(
                 joinedAt = joinedAt,
-                selectedDate = date,
-                selectedYearMonth = yearMonth,
+                selectedDate = currentDate,
+                selectedYearMonth = currentDate.yearMonth,
                 workdays = persistentMapOf(),
                 outDateStyle = OutDateStyle.EndOfGrid,
-                onScrollYearMonth = { yearMonth = it },
-                onClickDate = { date = it }
+                onScrollYearMonth = { newYearMonth ->
+                    val currentYearMonth = currentDate.yearMonth
+
+                    if (newYearMonth != currentYearMonth) {
+                        val newDate = if (newYearMonth.isAfter(currentYearMonth)) {
+                            currentDate.plusMonths(1)
+                        } else {
+                            currentDate.minusMonths(1)
+                        }
+                        currentDate = newDate
+                    }
+                },
+                onClickDate = { currentDate = it }
             )
 
             MoaPrimaryButton(
@@ -80,7 +90,7 @@ fun MoaDateBottomSheet(
                     ),
                 onClick = {
                     onDismissRequest()
-                    onConfirm(date)
+                    onConfirm(currentDate)
                 },
             ) {
                 Text(
