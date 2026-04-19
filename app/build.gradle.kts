@@ -34,6 +34,16 @@ android {
             "KAKAO_NATIVE_APP_KEY",
             "\"${localProperties.getProperty("KAKAO_NATIVE_APP_KEY")}\""
         )
+        buildConfigField(
+            "String",
+            "POSTHOG_KEY",
+            "\"${localProperties.getProperty("POSTHOG_KEY")}\""
+        )
+        buildConfigField(
+            "String",
+            "POSTHOG_URL",
+            "\"${localProperties.getProperty("POSTHOG_URL")}\""
+        )
 
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] =
             localProperties.getProperty("KAKAO_NATIVE_APP_KEY") ?: ""
@@ -73,6 +83,9 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // Posthog
+    implementation(libs.posthog)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
