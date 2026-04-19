@@ -11,6 +11,7 @@ import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -84,6 +85,8 @@ class SalaryViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { nextIfIsOnboarding() },
         ) {
+            sendEvent(SalaryEvent.ClickNext(isModified = false))
+
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.WorkSchedule()))
             }
@@ -103,10 +106,16 @@ class SalaryViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { nextIfIsNotOnboarding() },
         ) {
+            sendEvent(SalaryEvent.ClickNext(isModified = true))
+
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
             }
         }
+    }
+
+    private fun sendEvent(event: PosthogEvent) {
+        event.sendEvent()
     }
 
     @AssistedFactory
