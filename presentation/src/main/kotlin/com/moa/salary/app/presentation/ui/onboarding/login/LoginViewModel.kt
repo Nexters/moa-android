@@ -4,6 +4,7 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moa.salary.app.core.model.setting.OAuthType
 import com.moa.salary.app.data.repository.AuthRepository
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.OnboardingRepository
@@ -15,6 +16,7 @@ import com.moa.salary.app.presentation.manager.FcmTokenManager
 import com.moa.salary.app.presentation.manager.KakaoLoginManager
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -93,6 +95,8 @@ class LoginViewModel @Inject constructor(
                     return@launch
                 }
 
+                sendEvent(LoginEvent.ClickLogin(OAuthType.KAKAO))
+
                 val nickName = onboardingStatus.profile?.nickname
                 if (nickName == null) {
                     navigate(RootNavigation.Onboarding(OnboardingNavigation.Nickname()))
@@ -153,6 +157,8 @@ class LoginViewModel @Inject constructor(
             runCatching {
                 homeRepository.getHome()
             }.onSuccess {
+                sendEvent(LoginEvent.ClickLogin(OAuthType.KAKAO))
+
                 val completedWorkDay = homeRepository.getCompletedWorkDay()
                 val homeNavigation = it.determineHomeNavigation(completedWorkDay)
                 navigate(RootNavigation.Home(homeNavigation))
@@ -172,5 +178,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
         }
+    }
+
+    private fun sendEvent(event: PosthogEvent) {
+        event.sendEvent()
     }
 }

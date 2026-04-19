@@ -38,9 +38,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.moa.salary.app.core.model.setting.OAuthType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPageIndicator
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -170,6 +172,16 @@ private fun ColumnScope.LoginScreenContent(pagerState: PagerState) {
             )
         }
     }
+}
+
+sealed class LoginEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ClickLogin(val oauthType: OAuthType) : LoginEvent(
+        event = "login_button_clicked",
+        properties = mapOf("oauth_type" to oauthType.name)
+    )
 }
 
 @Preview
