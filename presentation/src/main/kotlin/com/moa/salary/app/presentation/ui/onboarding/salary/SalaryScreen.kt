@@ -58,7 +58,6 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.PosthogEvent
-import com.moa.salary.app.presentation.ui.onboarding.nickname.NicknameEvent
 import kotlinx.coroutines.delay
 
 @Composable
