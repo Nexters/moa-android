@@ -24,9 +24,14 @@ object SalaryUtils {
         endHour: Int,
         endMinute: Int,
         dailyPay: Long,
-    ): Long{
+    ): Long {
         val now = LocalTime.now()
-        val totalSeconds = now.hour * 3600 + now.minute * 60 + now.second
+        val endTime = LocalTime.of(endHour, endMinute)
+        val totalSeconds = if (now.isBefore(endTime)) {
+            now.hour * 3600 + now.minute * 60 + now.second
+        } else {
+            endHour * 3600 + endMinute * 60
+        }
         val startTimeSeconds = startHour * 3600 + startMinute * 60
         val workedSeconds = totalSeconds - startTimeSeconds
 
