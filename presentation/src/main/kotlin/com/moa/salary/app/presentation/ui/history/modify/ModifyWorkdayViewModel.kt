@@ -23,8 +23,9 @@ import java.time.LocalDate
 
 @Stable
 data class ModifyWorkdayUiState(
-    val isEditMode: Boolean,
     val date: LocalDate,
+    val isFromCalendar: Boolean,
+    val joinedAt: LocalDate,
     val selectedWorkdayType: WorkdayType,
     val time: Time,
     val showDateBottomSheet: Boolean = false,
@@ -40,15 +41,11 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(
         ModifyWorkdayUiState(
-            isEditMode = args.workday.type != WorkdayType.NONE,
-            date = args.workday.date.toLocalDate(),
-            selectedWorkdayType = if (args.workday.type == WorkdayType.NONE) WorkdayType.WORK else args.workday.type,
-            time = Time(
-                startHour = args.workday.startHour ?: 9,
-                startMinute = args.workday.startMinute ?: 0,
-                endHour = args.workday.endHour ?: 18,
-                endMinute = args.workday.endMinute ?: 0
-            )
+            date = args.date.toLocalDate(),
+            isFromCalendar = args.joinedAt != null,
+            joinedAt = args.joinedAt?.toLocalDate() ?: LocalDate.now(),
+            selectedWorkdayType = args.workdayType,
+            time = args.time,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -85,7 +82,6 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
             onRetry = { setDate(date) }
         ) { workday ->
             _uiState.value = _uiState.value.copy(
-                isEditMode = workday.type != WorkdayType.NONE,
                 date = workday.date.toLocalDate(),
                 selectedWorkdayType = if (workday.type == WorkdayType.NONE) WorkdayType.WORK else workday.type,
                 time = Time(
