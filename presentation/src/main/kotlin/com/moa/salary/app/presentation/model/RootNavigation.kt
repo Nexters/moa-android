@@ -20,7 +20,10 @@ sealed interface RootNavigation : NavKey {
     ) : RootNavigation
 
     @Serializable
-    data object History : RootNavigation
+    @JvmInline
+    value class History(
+        val startDestination: HistoryNavigation = HistoryNavigation.Calendar,
+    ) : RootNavigation
 
     @Serializable
     @JvmInline

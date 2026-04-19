@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
 
     private fun navigateToHistory() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History()))
         }
     }
 

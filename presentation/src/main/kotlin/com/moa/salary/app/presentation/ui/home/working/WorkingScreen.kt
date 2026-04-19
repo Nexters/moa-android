@@ -61,6 +61,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.component.ScheduleAdjustOption
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WorkingScreen(
@@ -810,6 +811,7 @@ private fun WorkingScreenPreview() {
                             standardSalary = 1000000,
                             dailyPay = 100000,
                             type = WorkdayType.WORK,
+                            events = persistentListOf(),
                             startHour = 9,
                             startMinute = 0,
                             endHour = 18,
@@ -822,6 +824,7 @@ private fun WorkingScreenPreview() {
                         standardSalary = 1000000,
                         dailyPay = 100000,
                         type = WorkdayType.WORK,
+                        events = persistentListOf(),
                         startHour = 9,
                         startMinute = 0,
                         endHour = 18,
