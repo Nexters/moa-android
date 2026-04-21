@@ -52,6 +52,7 @@ import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
+import com.moa.salary.app.presentation.designsystem.component.MoaBlueButton
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
@@ -89,7 +90,6 @@ fun WorkingScreen(
 
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
-            type = uiState.home.type,
             onDismissRequest = {
                 viewModel.onIntent(
                     WorkingIntent.ShowScheduleAdjustBottomSheet(
@@ -99,51 +99,10 @@ fun WorkingScreen(
             },
             onConfirm = { option ->
                 when (option) {
-                    ScheduleAdjustOption.Vacation -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.VACATION
-                        )
-                    )
-
-                    ScheduleAdjustOption.EndWork -> viewModel.onIntent(WorkingIntent.SelectEndWork)
-                    ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.SelectAdjustTime)
-                    ScheduleAdjustOption.Work -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.WORK
-                        )
-                    )
-
-                    ScheduleAdjustOption.None -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.NONE
-                        )
-                    )
+                    ScheduleAdjustOption.Finish -> viewModel.onIntent(WorkingIntent.SelectEndWork)
+                    ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.NavigateToModifyWorkday)
                 }
             },
-        )
-    }
-
-    if (uiState.showTimeBottomSheet) {
-        MoaTimeBottomSheet(
-            time = Time(
-                startHour = uiState.home.startHour,
-                startMinute = uiState.home.startMinute,
-                endHour = uiState.home.endHour,
-                endMinute = uiState.home.endMinute,
-            ),
-            title = stringResource(R.string.working_time_bottom_sheet_title),
-            onPositive = { time ->
-                viewModel.onIntent(
-                    WorkingIntent.UpdateWorkTime(
-                        startHour = time.startHour,
-                        startMinute = time.startMinute,
-                        endHour = time.endHour,
-                        endMinute = time.endMinute,
-                        type = uiState.home.type,
-                    )
-                )
-            },
-            onDismissRequest = { viewModel.onIntent(WorkingIntent.DismissTimeBottomSheet) },
         )
     }
 
@@ -163,32 +122,6 @@ fun WorkingScreen(
                 viewModel.onIntent(WorkingIntent.ConfirmMoreWork(time.endHour, time.endMinute))
             },
             onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
-        )
-    }
-
-    if (uiState.showWorkTimeEditBottomSheet) {
-        MoaTimeBottomSheet(
-            time = Time(
-                startHour = uiState.home.startHour,
-                startMinute = uiState.home.startMinute,
-                endHour = uiState.home.endHour,
-                endMinute = uiState.home.endMinute,
-            ),
-            title = stringResource(R.string.working_work_time_edit_title),
-            negativeText = stringResource(R.string.working_today_vacation),
-            onNegative = { viewModel.onIntent(WorkingIntent.ClickTodayVacation) },
-            onPositive = { time ->
-                viewModel.onIntent(
-                    WorkingIntent.UpdateWorkTime(
-                        startHour = time.startHour,
-                        startMinute = time.startMinute,
-                        endHour = time.endHour,
-                        endMinute = time.endMinute,
-                        type = uiState.home.type,
-                    )
-                )
-            },
-            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
         )
     }
 }
@@ -250,11 +183,12 @@ private fun WorkingScreen(
 
             if (uiState.showWorkCompletionOverlay) {
                 WorkCompletionSection(
+                    workdayType = uiState.home.type,
                     accumulatedSalary = uiState.totalSalaryDisplay,
                     workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
                     onContinueWorking = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true)) },
                     onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
-                    onWorkTimeClick = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(true)) },
+                    onWorkTimeClick = { onIntent(WorkingIntent.NavigateToModifyWorkday) },
                 )
             } else {
                 WorkingStatusSection(
@@ -264,11 +198,11 @@ private fun WorkingScreen(
                     endTime = uiState.endTimeDisplay,
                     type = uiState.home.type,
                     onAdjustScheduleClick = {
-                        onIntent(
-                            WorkingIntent.ShowScheduleAdjustBottomSheet(
-                                true
-                            )
-                        )
+                        if (uiState.home.type == WorkdayType.WORK) {
+                            onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true))
+                        } else {
+                            onIntent(WorkingIntent.NavigateToModifyWorkday)
+                        }
                     },
                 )
             }
@@ -630,6 +564,7 @@ private fun WorkProgressBar(
 
 @Composable
 private fun WorkCompletionSection(
+    workdayType: WorkdayType,
     accumulatedSalary: String,
     workTimeDisplay: String,
     onContinueWorking: () -> Unit,
@@ -663,16 +598,30 @@ private fun WorkCompletionSection(
                 )
             }
 
-            MoaPrimaryButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                onClick = onComplete,
-            ) {
-                Text(
-                    text = stringResource(R.string.working_completion_complete),
-                    style = MoaTheme.typography.t3_700,
-                )
+            if (workdayType == WorkdayType.WORK) {
+                MoaPrimaryButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    onClick = onComplete,
+                ) {
+                    Text(
+                        text = stringResource(R.string.working_completion_complete),
+                        style = MoaTheme.typography.t3_700,
+                    )
+                }
+            } else {
+                MoaBlueButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    onClick = onComplete,
+                ) {
+                    Text(
+                        text = stringResource(R.string.working_completion_complete),
+                        style = MoaTheme.typography.t3_700,
+                    )
+                }
             }
         }
     }
@@ -764,33 +713,16 @@ sealed interface WorkingIntent {
     value class ShowScheduleAdjustBottomSheet(val show: Boolean) : WorkingIntent
 
     @JvmInline
-    value class ShowWorkTimeEditBottomSheet(val show: Boolean) : WorkingIntent
-
-    @JvmInline
     value class ShowMoreWorkBottomSheet(val show: Boolean) : WorkingIntent
 
     @JvmInline
     value class ShowConfetti(val show: Boolean) : WorkingIntent
 
-    data object DismissTimeBottomSheet : WorkingIntent
-
-    @JvmInline
-    value class SelectChangeType(val type: WorkdayType) : WorkingIntent
     data object SelectEndWork : WorkingIntent
-    data object SelectAdjustTime : WorkingIntent
-
-    data class UpdateWorkTime(
-        val startHour: Int,
-        val startMinute: Int,
-        val endHour: Int,
-        val endMinute: Int,
-        val type: WorkdayType,
-    ) : WorkingIntent
 
     data object ClickCompleteWork : WorkingIntent
-
-    data object ClickTodayVacation : WorkingIntent
     data class ConfirmMoreWork(val endHour: Int, val endMinute: Int) : WorkingIntent
+    data object NavigateToModifyWorkday : WorkingIntent
 }
 
 @Preview
@@ -810,7 +742,7 @@ private fun WorkingScreenPreview() {
                             workedEarnings = 1000000,
                             standardSalary = 1000000,
                             dailyPay = 100000,
-                            type = WorkdayType.WORK,
+                            type = WorkdayType.VACATION,
                             events = persistentListOf(),
                             startHour = 9,
                             startMinute = 0,
@@ -823,14 +755,14 @@ private fun WorkingScreenPreview() {
                         workedEarnings = 1000000,
                         standardSalary = 1000000,
                         dailyPay = 100000,
-                        type = WorkdayType.WORK,
+                        type = WorkdayType.VACATION,
                         events = persistentListOf(),
                         startHour = 9,
                         startMinute = 0,
                         endHour = 18,
                         endMinute = 0,
                     ),
-                    showWorkCompletionOverlay = false,
+                    showWorkCompletionOverlay = true,
                 ),
                 onIntent = {},
             )
