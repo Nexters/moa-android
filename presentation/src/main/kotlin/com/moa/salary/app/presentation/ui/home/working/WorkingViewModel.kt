@@ -21,7 +21,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -114,17 +113,13 @@ class WorkingViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    private var timerJob: Job? = null
-    private var tooltipJob: Job? = null
-
     init {
         startTimer()
         startTooltipRotation()
     }
 
     private fun startTimer() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
+        viewModelScope.launch {
             while (true) {
                 delay(TIMER_INTERVAL_MS)
                 checkTime()
@@ -133,8 +128,7 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun startTooltipRotation() {
-        tooltipJob?.cancel()
-        tooltipJob = viewModelScope.launch {
+        viewModelScope.launch {
             while (true) {
                 delay(TOOLTIP_ROTATION_INTERVAL_MS)
                 _uiState.update { state ->
@@ -365,6 +359,18 @@ class WorkingViewModel @AssistedInject constructor(
         when {
             now.isBefore(startTime) -> navigateToBeforeWork()
 
+            now.isBefore(endTime) -> {
+                updateElapsedTime(
+                    startTime = startTime,
+                    endTime = endTime,
+                    now = now,
+                )
+
+                _uiState.update {
+                    it.copy(showWorkCompletionOverlay = false)
+                }
+            }
+
             else -> afterWork(
                 startTime = startTime,
                 endTime = endTime,
@@ -411,17 +417,10 @@ class WorkingViewModel @AssistedInject constructor(
                 now = endTime,
             )
 
-            cancelJobs()
-
             _uiState.update {
                 it.copy(showWorkCompletionOverlay = true)
             }
         }
-    }
-
-    private fun cancelJobs() {
-        timerJob?.cancel()
-        tooltipJob?.cancel()
     }
 
     private fun navigateToBeforeWork() {
