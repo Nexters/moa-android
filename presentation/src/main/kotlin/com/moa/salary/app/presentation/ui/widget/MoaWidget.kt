@@ -78,7 +78,8 @@ class MoaWidget : GlanceAppWidget() {
                     val homeResponse = homeRepository.getHome()
                     val now = LocalTime.now()
                     val currentTimeStr = makeTimeString(now.hour, now.minute)
-                    val homeNavigation = homeResponse.determineHomeNavigation()
+                    val completedWorkDay = homeRepository.getCompletedWorkDay()
+                    val homeNavigation = homeResponse.determineHomeNavigation(completedWorkDay)
 
                     val widget = when (homeNavigation) {
                         is HomeNavigation.BeforeWork,
