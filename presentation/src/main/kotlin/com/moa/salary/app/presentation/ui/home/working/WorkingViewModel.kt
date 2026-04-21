@@ -21,6 +21,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -113,13 +114,17 @@ class WorkingViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    private var timerJob: Job? = null
+    private var tooltipJob: Job? = null
+
     init {
         startTimer()
         startTooltipRotation()
     }
 
     private fun startTimer() {
-        viewModelScope.launch {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
             while (true) {
                 delay(TIMER_INTERVAL_MS)
                 checkTime()
@@ -128,7 +133,8 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun startTooltipRotation() {
-        viewModelScope.launch {
+        tooltipJob?.cancel()
+        tooltipJob = viewModelScope.launch {
             while (true) {
                 delay(TOOLTIP_ROTATION_INTERVAL_MS)
                 _uiState.update { state ->
@@ -357,18 +363,11 @@ class WorkingViewModel @AssistedInject constructor(
         val endTime = LocalTime.of(state.home.endHour, state.home.endMinute)
 
         when {
-            now.isAfter(endTime) -> afterWork(
-                startTime = startTime,
-                endTime = endTime,
-                now = now,
-            )
-
             now.isBefore(startTime) -> navigateToBeforeWork()
 
-            else -> updateElapsedTime(
+            else -> afterWork(
                 startTime = startTime,
                 endTime = endTime,
-                now = now,
             )
         }
     }
@@ -404,19 +403,25 @@ class WorkingViewModel @AssistedInject constructor(
     private fun afterWork(
         startTime: LocalTime,
         endTime: LocalTime,
-        now: LocalTime,
     ) {
         if (!_uiState.value.showWorkCompletionOverlay) {
             updateElapsedTime(
                 startTime = startTime,
                 endTime = endTime,
-                now = now,
+                now = endTime,
             )
+
+            cancelJobs()
 
             _uiState.update {
                 it.copy(showWorkCompletionOverlay = true)
             }
         }
+    }
+
+    private fun cancelJobs() {
+        timerJob?.cancel()
+        tooltipJob?.cancel()
     }
 
     private fun navigateToBeforeWork() {
