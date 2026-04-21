@@ -109,7 +109,7 @@ class AfterWorkViewModel @AssistedInject constructor(
 
     private fun clickHistory() {
         viewModelScope.launch {
-            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History))
+            moaSideEffectBus.emit(MoaSideEffect.Navigate(RootNavigation.History()))
         }
     }
 

@@ -252,8 +252,8 @@ private fun MainNavHost(
                 HomeScreen(startDestination = key.startDestination)
             }
 
-            entry<RootNavigation.History> {
-                HistoryScreen()
+            entry<RootNavigation.History> { key ->
+                HistoryScreen(startDestination = key.startDestination)
             }
 
             entry<RootNavigation.Setting> { key ->

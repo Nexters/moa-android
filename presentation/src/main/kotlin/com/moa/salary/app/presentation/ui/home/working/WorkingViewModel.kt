@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
+import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.Home
-import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
 import com.moa.salary.app.core.util.Constants.TOOLTIP_COUNT
 import com.moa.salary.app.core.util.Constants.TOOLTIP_ROTATION_INTERVAL_MS
@@ -15,8 +15,10 @@ import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
+import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
+import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -39,9 +41,7 @@ data class WorkingUiState(
     val currentTooltipIndex: Int = 0,
     val remainingHours: Int = 3,
     val showScheduleAdjustBottomSheet: Boolean = false,
-    val showTimeBottomSheet: Boolean = false,
     val showMoreWorkBottomSheet: Boolean = false,
-    val showWorkTimeEditBottomSheet: Boolean = false,
     val showWorkCompletionOverlay: Boolean,
     val showConfetti: Boolean = false,
 ) {
@@ -144,28 +144,15 @@ class WorkingViewModel @AssistedInject constructor(
             WorkingIntent.GetHome -> getHome()
             is WorkingIntent.ShowConfetti -> showConfetti(intent.show)
             is WorkingIntent.ShowScheduleAdjustBottomSheet -> showScheduleAdjustBottomSheet(intent.show)
-            WorkingIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
-            is WorkingIntent.SelectChangeType -> selectChangeType(intent.type)
             WorkingIntent.SelectEndWork -> selectEndWork()
-            WorkingIntent.SelectAdjustTime -> selectAdjustTime()
-
-            is WorkingIntent.UpdateWorkTime -> updateWorkday(
-                clockInTime = makeTimeString(intent.startHour, intent.startMinute),
-                clockOutTime = makeTimeString(intent.endHour, intent.endMinute),
-                type = intent.type
-            )
-
-            is WorkingIntent.ShowWorkTimeEditBottomSheet -> showWorkTimeEditBottomSheet(intent.show)
-
             is WorkingIntent.ShowMoreWorkBottomSheet -> showMoreWorkBottomSheet(intent.show)
-
             WorkingIntent.ClickCompleteWork -> clickCompleteWork()
-
-            WorkingIntent.ClickTodayVacation -> clickTodayVacation()
             is WorkingIntent.ConfirmMoreWork -> confirmMoreWork(
                 endHour = intent.endHour,
                 endMinute = intent.endMinute,
             )
+
+            WorkingIntent.NavigateToModifyWorkday -> navigateToModifyWorkday()
         }
     }
 
@@ -197,34 +184,6 @@ class WorkingViewModel @AssistedInject constructor(
         _uiState.update { it.copy(showMoreWorkBottomSheet = show) }
     }
 
-    private fun showWorkTimeEditBottomSheet(show: Boolean) {
-        _uiState.update { it.copy(showWorkTimeEditBottomSheet = show) }
-    }
-
-    private fun dismissTimeBottomSheet() {
-        _uiState.update { it.copy(showTimeBottomSheet = false) }
-    }
-
-    private fun selectChangeType(type: WorkdayType) {
-        val state = _uiState.value
-        val clockInTime = if (type == WorkdayType.WORK) {
-            makeTimeString(state.home.startHour, state.home.startMinute)
-        } else {
-            null
-        }
-        val clockOutTime = if (type == WorkdayType.WORK) {
-            makeTimeString(state.home.endHour, state.home.endMinute)
-        } else {
-            null
-        }
-
-        updateWorkday(
-            clockInTime = clockInTime,
-            clockOutTime = clockOutTime,
-            type = type,
-        )
-    }
-
     private fun selectEndWork() {
         val now = LocalTime.now()
 
@@ -232,15 +191,6 @@ class WorkingViewModel @AssistedInject constructor(
             endHour = now.hour,
             endMinute = now.minute
         )
-    }
-
-    private fun selectAdjustTime() {
-        _uiState.update { state ->
-            state.copy(
-                showScheduleAdjustBottomSheet = false,
-                showTimeBottomSheet = true,
-            )
-        }
     }
 
     private fun clickCompleteWork() {
@@ -251,14 +201,6 @@ class WorkingViewModel @AssistedInject constructor(
         }
     }
 
-    private fun clickTodayVacation() {
-        updateWorkday(
-            clockInTime = null,
-            clockOutTime = null,
-            type = WorkdayType.VACATION,
-        )
-    }
-
     private fun confirmMoreWork(
         endHour: Int,
         endMinute: Int,
@@ -267,52 +209,6 @@ class WorkingViewModel @AssistedInject constructor(
             endHour = endHour,
             endMinute = endMinute,
         )
-    }
-
-    private fun updateWorkday(
-        clockInTime: String?,
-        clockOutTime: String?,
-        type: WorkdayType,
-    ) {
-        suspend {
-            val today = LocalDate.now().toString()
-            workdayRepository.updateWorkday(
-                date = today,
-                clockInTime = clockInTime,
-                clockOutTime = clockOutTime,
-                type = type
-            )
-        }.execute(
-            scope = viewModelScope,
-            bus = moaSideEffectBus,
-            onRetry = {
-                updateWorkday(
-                    clockInTime = clockInTime,
-                    clockOutTime = clockOutTime,
-                    type = type
-                )
-            },
-        ) { workday ->
-            _uiState.update {
-                it.copy(
-                    home = it.home.copy(
-                        dailyPay = workday.dailyPay,
-                        type = workday.type,
-                        startHour = workday.startHour ?: it.home.startHour,
-                        startMinute = workday.startMinute ?: it.home.startMinute,
-                        endHour = workday.endHour ?: it.home.endHour,
-                        endMinute = workday.endMinute ?: it.home.endMinute,
-                    ),
-                    showScheduleAdjustBottomSheet = false,
-                    showTimeBottomSheet = false,
-                    showMoreWorkBottomSheet = false,
-                    showWorkTimeEditBottomSheet = false,
-                    showWorkCompletionOverlay = false,
-                )
-            }
-
-            checkTime()
-        }
     }
 
     private fun patchClockOut(
@@ -339,9 +235,7 @@ class WorkingViewModel @AssistedInject constructor(
                         endMinute = workday.endMinute ?: it.home.endMinute,
                     ),
                     showScheduleAdjustBottomSheet = false,
-                    showTimeBottomSheet = false,
                     showMoreWorkBottomSheet = false,
-                    showWorkTimeEditBottomSheet = false,
                     showWorkCompletionOverlay = false,
                 )
             }
@@ -440,6 +334,32 @@ class WorkingViewModel @AssistedInject constructor(
             moaSideEffectBus.emit(
                 MoaSideEffect.Navigate(
                     HomeNavigation.AfterWork(home = state.home)
+                )
+            )
+        }
+    }
+
+    private fun navigateToModifyWorkday() {
+        val home = _uiState.value.home
+
+        viewModelScope.launch {
+            moaSideEffectBus.emit(
+                MoaSideEffect.Navigate(
+                    RootNavigation.History(
+                        startDestination = HistoryNavigation.ModifyWorkday(
+                            args = HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs(
+                                joinedAt = null,
+                                workdayType = home.type,
+                                date = LocalDate.now().toString(),
+                                time = Time(
+                                    startHour = home.startHour,
+                                    startMinute = home.startMinute,
+                                    endHour = home.endHour,
+                                    endMinute = home.endMinute,
+                                ),
+                            )
+                        )
+                    )
                 )
             )
         }

@@ -9,6 +9,7 @@ data class HomeResponse(
     val standardSalary: Long,
     val dailyPay: Long,
     val type: String,
+    val events: List<String>,
     val clockInTime: String?,
     val clockOutTime: String?,
 )

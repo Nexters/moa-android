@@ -136,6 +136,7 @@ fun HomeResponse.toDomain(): Home {
         standardSalary = standardSalary,
         dailyPay = dailyPay,
         type = type.toWorkdayType(),
+        events = events.map { it.toEvent() }.toImmutableList(),
         startHour = clockIn?.first ?: 9,
         startMinute = clockIn?.second ?: 0,
         endHour = clockOut?.first ?: 18,
@@ -188,6 +189,7 @@ fun String.toWorkdayStatus(): WorkdayStatus = when (this) {
 }
 
 fun String.toEvent(): Event = when (this) {
+    "PUBLIC_HOLIDAY" -> Event.PUBLIC_HOLIDAY
     "PAYDAY" -> Event.PAYDAY
     else -> Event.NONE
 }

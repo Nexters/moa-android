@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kizitonwose.calendar.core.yearMonth
+import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.Calendar
 import com.moa.salary.app.core.model.work.Workday
 import com.moa.salary.app.data.repository.CalendarRepository
@@ -82,7 +83,14 @@ class CalendarViewModel @Inject constructor(
                         args = HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs(
                             joinedAt = (uiState.value.calendar?.joinedAt
                                 ?: LocalDate.now()).toString(),
-                            workday = workday,
+                            workdayType = workday.type,
+                            date = workday.date,
+                            time = Time(
+                                startHour = workday.startHour ?: 9,
+                                startMinute = workday.startMinute ?: 0,
+                                endHour = workday.endHour ?: 18,
+                                endMinute = workday.endMinute ?: 0,
+                            )
                         )
                     )
                 )
