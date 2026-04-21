@@ -35,6 +35,7 @@ import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
 
@@ -94,13 +95,11 @@ private fun AfterWorkScreen(
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-            Row(
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
+            Row(verticalAlignment = Alignment.Bottom) {
+                MoaRollingText(
                     text = uiState.accumulatedSalary,
-                    style = MoaTheme.typography.h1_700,
-                    color = MoaTheme.colors.textGreen,
+                    textColor = MoaTheme.colors.textGreen,
+                    animateOnAppear = true,
                 )
 
                 Spacer(Modifier.width(4.dp))

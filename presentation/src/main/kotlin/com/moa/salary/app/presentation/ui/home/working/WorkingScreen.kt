@@ -1,14 +1,8 @@
 package com.moa.salary.app.presentation.ui.home.working
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +53,7 @@ import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
@@ -385,11 +380,10 @@ private fun TodaySalarySection(todaySalaryDisplay: String) {
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-        Row(
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            RollingDigitsText(
+        Row(verticalAlignment = Alignment.Bottom) {
+            MoaRollingText(
                 text = todaySalaryDisplay,
+                textColor = MoaTheme.colors.textHighEmphasis,
             )
 
             Spacer(Modifier.width(4.dp))
@@ -397,43 +391,9 @@ private fun TodaySalarySection(todaySalaryDisplay: String) {
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
                 text = stringResource(R.string.working_currency_won),
-                style = MoaTheme.typography.t2_700,
-                color = MoaTheme.colors.textHighEmphasis,
+                style = MoaTheme.typography.h3_500,
+                color = MoaTheme.colors.textMediumEmphasis,
             )
-        }
-    }
-}
-
-@Composable
-private fun RollingDigitsText(
-    text: String,
-) {
-    Row {
-        text.forEach { char ->
-            if (char.isDigit()) {
-                AnimatedContent(
-                    targetState = char,
-                    transitionSpec = {
-                        (slideInVertically { height -> height } + fadeIn(animationSpec = tween(150)))
-                            .togetherWith(slideOutVertically { height -> -height } + fadeOut(
-                                animationSpec = tween(150)
-                            ))
-                    },
-                    label = "digitAnimation",
-                ) { digit ->
-                    Text(
-                        text = digit.toString(),
-                        style = MoaTheme.typography.h1_700.copy(fontFeatureSettings = "tnum"),
-                        color = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-            } else {
-                Text(
-                    text = char.toString(),
-                    style = MoaTheme.typography.h1_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-            }
         }
     }
 }
