@@ -12,6 +12,7 @@ import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
+import com.moa.salary.app.presentation.model.PosthogEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -138,8 +139,13 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { confirm() }
         ) {
+            sendEvent(ModifyWorkdayEvent.CompleteModify(currentState.selectedWorkdayType.name))
             back()
         }
+    }
+
+    private fun sendEvent(event : PosthogEvent) {
+        event.sendEvent()
     }
 
     @AssistedFactory
