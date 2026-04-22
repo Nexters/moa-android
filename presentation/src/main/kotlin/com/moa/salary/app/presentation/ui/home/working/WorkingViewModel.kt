@@ -36,6 +36,7 @@ import java.time.LocalTime
 data class WorkingUiState(
     val args: HomeNavigation.Working,
     val home: Home,
+    val initialTime: Long = 0L,
     val todaySalary: Long = 0L,
     val elapsedTotalSeconds: Int = 0,
     val currentTooltipIndex: Int = 0,
@@ -141,6 +142,9 @@ class WorkingViewModel @AssistedInject constructor(
 
     fun onIntent(intent: WorkingIntent) {
         when (intent) {
+            is WorkingIntent.SendEvent -> intent.event.sendEvent()
+            is WorkingIntent.SetStartTime -> setStartTime(intent.time)
+
             WorkingIntent.GetHome -> getHome()
             is WorkingIntent.ShowConfetti -> showConfetti(intent.show)
             is WorkingIntent.ShowScheduleAdjustBottomSheet -> showScheduleAdjustBottomSheet(intent.show)
@@ -154,6 +158,10 @@ class WorkingViewModel @AssistedInject constructor(
 
             WorkingIntent.NavigateToModifyWorkday -> navigateToModifyWorkday()
         }
+    }
+
+    private fun setStartTime(time: Long) {
+        _uiState.value = _uiState.value.copy(initialTime = time)
     }
 
     private fun getHome() {
