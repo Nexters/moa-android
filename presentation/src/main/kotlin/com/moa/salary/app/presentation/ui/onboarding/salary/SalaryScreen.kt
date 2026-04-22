@@ -57,6 +57,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.coroutines.delay
 
 @Composable
@@ -308,6 +309,16 @@ sealed interface SalaryIntent {
     @JvmInline
     value class SelectSalaryType(val type: Payroll.SalaryType) : SalaryIntent
     data object ClickNext : SalaryIntent
+}
+
+sealed class SalaryEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ClickNext(val isModified: Boolean) : SalaryEvent(
+        event = "salary_next_clicked",
+        properties = mapOf("is_modified" to isModified)
+    )
 }
 
 @Preview

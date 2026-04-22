@@ -82,6 +82,9 @@ dependencies {
     // Calendar
     implementation(libs.calendar.compose)
 
+    // Posthog
+    implementation(libs.posthog)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
 

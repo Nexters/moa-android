@@ -24,6 +24,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,6 +44,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -62,6 +66,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.component.ScheduleAdjustOption
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -72,6 +77,7 @@ fun WorkingScreen(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(WorkingIntent.GetHome)
@@ -80,6 +86,28 @@ fun WorkingScreen(
     LaunchedEffect(uiState.confettiProgress) {
         if (uiState.confettiProgress == 1f) {
             viewModel.onIntent(WorkingIntent.ShowConfetti(true))
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.onIntent(WorkingIntent.SetStartTime(System.currentTimeMillis()))
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    val currentTime = System.currentTimeMillis()
+                    val diffTime = (currentTime - uiState.initialTime) / 1000L
+                    viewModel.onIntent(WorkingIntent.SendEvent(WorkingEvent.ScreenTime(diffTime)))
+                }
+
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -186,9 +214,18 @@ private fun WorkingScreen(
                     workdayType = uiState.home.type,
                     accumulatedSalary = uiState.totalSalaryDisplay,
                     workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
-                    onContinueWorking = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true)) },
-                    onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
-                    onWorkTimeClick = { onIntent(WorkingIntent.NavigateToModifyWorkday) },
+                    onContinueWorking = {
+                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickMoreWork))
+                        onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true))
+                    },
+                    onComplete = {
+                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkCompleted))
+                        onIntent(WorkingIntent.ClickCompleteWork)
+                    },
+                    onWorkTimeClick = {
+                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkTime))
+                        onIntent(WorkingIntent.NavigateToModifyWorkday)
+                    },
                 )
             } else {
                 WorkingStatusSection(
@@ -198,6 +235,7 @@ private fun WorkingScreen(
                     endTime = uiState.endTimeDisplay,
                     type = uiState.home.type,
                     onAdjustScheduleClick = {
+                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkEdit))
                         if (uiState.home.type == WorkdayType.WORK) {
                             onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true))
                         } else {
@@ -707,6 +745,12 @@ private fun WorkCompletionInfoCard(
 }
 
 sealed interface WorkingIntent {
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : WorkingIntent
+
+    @JvmInline
+    value class SetStartTime(val time: Long) : WorkingIntent
+
     data object GetHome : WorkingIntent
 
     @JvmInline
@@ -723,6 +767,21 @@ sealed interface WorkingIntent {
     data object ClickCompleteWork : WorkingIntent
     data class ConfirmMoreWork(val endHour: Int, val endMinute: Int) : WorkingIntent
     data object NavigateToModifyWorkday : WorkingIntent
+}
+
+sealed class WorkingEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ScreenTime(val time: Long) : WorkingEvent(
+        event = "working_screen_time",
+        properties = mapOf("time" to time)
+    )
+
+    data object ClickWorkEdit : WorkingEvent(event = "working_work_edit_clicked")
+    data object ClickWorkTime : WorkingEvent(event = "working_work_time_clicked")
+    data object ClickMoreWork : WorkingEvent(event = "working_more_work_clicked")
+    data object ClickWorkCompleted : WorkingEvent(event = "working_work_completed_clicked")
 }
 
 @Preview

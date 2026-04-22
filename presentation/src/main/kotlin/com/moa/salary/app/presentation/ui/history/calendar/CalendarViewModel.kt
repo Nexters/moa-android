@@ -39,6 +39,8 @@ class CalendarViewModel @Inject constructor(
 
     fun onIntent(intent: CalendarIntent) {
         when (intent) {
+            is CalendarIntent.SendEvent -> intent.event.sendEvent()
+
             CalendarIntent.GetCalendar -> getCalendar(YearMonth.now())
             CalendarIntent.ClickBack -> clickBack()
             is CalendarIntent.SetDate -> clickDate(intent.date)

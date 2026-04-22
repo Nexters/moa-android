@@ -44,6 +44,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HistoryNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import java.time.LocalDate
 
 @Composable
@@ -327,6 +328,16 @@ sealed interface ModifyWorkdayIntent {
 
     data object ClickCancel : ModifyWorkdayIntent
     data object ClickConfirm : ModifyWorkdayIntent
+}
+
+sealed class ModifyWorkdayEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class CompleteModify(val type: String) : ModifyWorkdayEvent(
+        event = "modify_workday_complete",
+        properties = mapOf("type" to type)
+    )
 }
 
 @Preview

@@ -50,6 +50,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaMonthNavigator
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.Gray40
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDate
 import java.time.YearMonth
@@ -146,6 +147,7 @@ private fun CalendarScreen(
                             .clickable {
                                 val workday = uiState.calendar?.workdays[uiState.selectedDate]
                                 if (workday != null) {
+                                    onIntent(CalendarIntent.SendEvent(CalendarEvent.ClickEdit))
                                     onIntent(CalendarIntent.ClickWorkday(workday))
                                 }
                             },
@@ -322,7 +324,10 @@ private fun ScheduleItems(
                 imgRes = info.first,
                 title = info.second,
                 content = info.third,
-                onClick = { onIntent(CalendarIntent.ClickWorkday(workday)) },
+                onClick = {
+                    onIntent(CalendarIntent.SendEvent(CalendarEvent.ClickList))
+                    onIntent(CalendarIntent.ClickWorkday(workday))
+                },
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
@@ -407,6 +412,9 @@ private fun WorkdayItem(
 }
 
 sealed interface CalendarIntent {
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : CalendarIntent
+
     data object GetCalendar : CalendarIntent
     data object ClickBack : CalendarIntent
 
@@ -418,6 +426,13 @@ sealed interface CalendarIntent {
 
     @JvmInline
     value class ClickPayday(val day: Int) : CalendarIntent
+}
+
+sealed class CalendarEvent(
+    override val event: String
+) : PosthogEvent {
+    data object ClickEdit : CalendarEvent(event = "calendar_edit_clicked")
+    data object ClickList : CalendarEvent(event = "calendar_list_clicked")
 }
 
 @Preview
