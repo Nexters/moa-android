@@ -40,6 +40,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -105,7 +106,7 @@ private fun WorkDayContent(
         TodayInfoCard(
             todaySalary = uiState.todaySalary,
             workTime = uiState.workTimeDisplay,
-            onWorkTimeClick = { onIntent(BeforeWorkIntent.ClickWorkTime) },
+            onIntent = onIntent,
         )
 
         Spacer(Modifier.weight(1f))
@@ -118,7 +119,10 @@ private fun WorkDayContent(
 
         MoaPrimaryButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { onIntent(BeforeWorkIntent.ClickEarlyClockIn) },
+            onClick = {
+                onIntent(BeforeWorkIntent.SendEvent(BeforeWorkEvent.ClickNowWork))
+                onIntent(BeforeWorkIntent.ClickEarlyClockIn)
+            },
         ) {
             Text(
                 text = stringResource(R.string.before_work_early_clock_in),
@@ -162,7 +166,7 @@ private fun VacationContent(
         TodayInfoCard(
             todaySalary = uiState.todaySalary,
             workTime = uiState.workTimeDisplay,
-            onWorkTimeClick = { onIntent(BeforeWorkIntent.ClickWorkTime) },
+            onIntent = onIntent,
         )
 
         Spacer(Modifier.weight(1f))
@@ -213,7 +217,7 @@ private fun DayOffContent(
         TodayInfoCard(
             todaySalary = uiState.todaySalary,
             workTime = uiState.workTimeDisplay,
-            onWorkTimeClick = { onIntent(BeforeWorkIntent.ClickWorkTime) },
+            onIntent = onIntent,
         )
 
         Spacer(Modifier.weight(1f))
@@ -314,7 +318,7 @@ private fun AccumulatedSalarySection(
 private fun TodayInfoCard(
     todaySalary: String,
     workTime: String,
-    onWorkTimeClick: () -> Unit,
+    onIntent: (BeforeWorkIntent) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -362,7 +366,10 @@ private fun TodayInfoCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onWorkTimeClick() }
+                .clickable {
+                    onIntent(BeforeWorkIntent.SendEvent(BeforeWorkEvent.ClickWorkTime))
+                    onIntent(BeforeWorkIntent.ClickWorkTime)
+                }
                 .padding(
                     start = MoaTheme.spacing.spacing16,
                     end = MoaTheme.spacing.spacing12,
@@ -397,10 +404,20 @@ private fun TodayInfoCard(
 }
 
 sealed interface BeforeWorkIntent {
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : BeforeWorkIntent
+
     data object GetHome : BeforeWorkIntent
     data object ClickWorkTime : BeforeWorkIntent
     data object ClickEarlyClockIn : BeforeWorkIntent
     data object ClickHistory : BeforeWorkIntent
+}
+
+sealed class BeforeWorkEvent(
+    override val event: String,
+) : PosthogEvent {
+    data object ClickNowWork : BeforeWorkEvent(event = "before_work_now_work_clicked")
+    data object ClickWorkTime : BeforeWorkEvent(event = "before_work_work_time_clicked")
 }
 
 @Preview

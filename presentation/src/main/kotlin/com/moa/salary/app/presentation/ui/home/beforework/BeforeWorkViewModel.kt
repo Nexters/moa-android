@@ -105,6 +105,8 @@ class BeforeWorkViewModel @AssistedInject constructor(
 
     fun onIntent(intent: BeforeWorkIntent) {
         when (intent) {
+            is BeforeWorkIntent.SendEvent -> intent.event.sendEvent()
+
             BeforeWorkIntent.GetHome -> getHome()
             BeforeWorkIntent.ClickWorkTime -> clickWorkTime()
             BeforeWorkIntent.ClickEarlyClockIn -> clickEarlyClockIn()
