@@ -31,7 +31,20 @@ data class ModifyWorkdayUiState(
     val time: Time,
     val showDateBottomSheet: Boolean = false,
     val showTimeBottomSheet: Boolean = false,
-)
+){
+    val diffTimeString = buildString {
+        val diffTimePair = time.calculateTimeDiff()
+        val hours = diffTimePair.first
+        val minutes = diffTimePair.second
+
+        if(hours > 0) {
+            append("${hours}시간 ")
+        }
+        if(minutes > 0){
+            append("${minutes}분 ")
+        }
+    }
+}
 
 @HiltViewModel(assistedFactory = ModifyWorkdayViewModel.Factory::class)
 class ModifyWorkdayViewModel @AssistedInject constructor(

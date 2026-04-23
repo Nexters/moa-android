@@ -232,7 +232,7 @@ private fun ModifyWorkdayScreen(
                     Spacer(Modifier.width(4.dp))
 
                     Text(
-                        text = "총 ${uiState.time.endHour - uiState.time.startHour}시간 근무해요.",
+                        text = "총 ${uiState.diffTimeString}근무해요.",
                         style = MoaTheme.typography.b2_500,
                         color = MoaTheme.colors.textGreen,
                     )
