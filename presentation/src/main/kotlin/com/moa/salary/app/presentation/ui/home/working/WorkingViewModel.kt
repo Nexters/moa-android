@@ -76,7 +76,7 @@ data class WorkingUiState(
     val coinHeightFraction: Float
         get() {
             val minHeight = 0.3f
-            val maxHeight = 0.7f
+            val maxHeight = 1f
             return minHeight + (maxHeight - minHeight) * confettiProgress
         }
 

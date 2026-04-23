@@ -141,7 +141,7 @@ private fun AfterWorkScreen(
 
         if (uiState.showConfetti) {
             val composition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(R.raw.confeti)
+                LottieCompositionSpec.RawRes(R.raw.confetti_work)
             )
             val progress by animateLottieCompositionAsState(
                 composition = composition,

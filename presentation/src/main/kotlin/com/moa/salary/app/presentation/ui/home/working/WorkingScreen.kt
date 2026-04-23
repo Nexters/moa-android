@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -159,118 +158,118 @@ private fun WorkingScreen(
     uiState: WorkingUiState,
     onIntent: (WorkingIntent) -> Unit,
 ) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        val animatedHeightFraction by animateFloatAsState(
+            targetValue = uiState.coinHeightFraction,
+            animationSpec = tween(durationMillis = 500),
+            label = "coinHeightAnimation",
+        )
 
+        Spacer(Modifier.height(24.dp))
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            val animatedHeightFraction by animateFloatAsState(
-                targetValue = uiState.coinHeightFraction,
-                animationSpec = tween(durationMillis = 500),
-                label = "coinHeightAnimation",
-            )
+            val totalHeight = maxHeight
+            val coinGraphHeight = totalHeight * animatedHeightFraction
 
-            BoxWithConstraints(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                val totalHeight = maxHeight
-                val coinGraphHeight = totalHeight * animatedHeightFraction
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    if (!uiState.showWorkCompletionOverlay) {
-                        TooltipBanner(
-                            monthSalaryDisplay = uiState.monthSalaryDisplay,
-                            todaySalary = uiState.todaySalary,
-                            remainingHours = uiState.remainingHours,
-                            currentIndex = uiState.currentTooltipIndex,
-                            type = uiState.home.type,
-                        )
-
-                        Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-                    }
-
-                    TodaySalarySection(todaySalaryDisplay = uiState.todaySalaryDisplay)
-
-                    Spacer(Modifier.height(22.dp))
-
-                    CoinGraph(
-                        modifier = Modifier.height(coinGraphHeight),
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (!uiState.showWorkCompletionOverlay) {
+                    TooltipBanner(
+                        monthSalaryDisplay = uiState.monthSalaryDisplay,
+                        todaySalary = uiState.todaySalary,
+                        remainingHours = uiState.remainingHours,
+                        currentIndex = uiState.currentTooltipIndex,
                         type = uiState.home.type,
                     )
-                }
-            }
 
-            if (uiState.showWorkCompletionOverlay) {
-                WorkCompletionSection(
-                    workdayType = uiState.home.type,
-                    accumulatedSalary = uiState.totalSalaryDisplay,
-                    workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
-                    onContinueWorking = {
-                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickMoreWork))
-                        onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true))
-                    },
-                    onComplete = {
-                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkCompleted))
-                        onIntent(WorkingIntent.ClickCompleteWork)
-                    },
-                    onWorkTimeClick = {
-                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkTime))
-                        onIntent(WorkingIntent.NavigateToModifyWorkday)
-                    },
-                )
-            } else {
-                WorkingStatusSection(
-                    elapsedTotalSeconds = uiState.elapsedTotalSeconds,
-                    progress = uiState.progress,
-                    startTime = uiState.startTimeDisplay,
-                    endTime = uiState.endTimeDisplay,
+                    Spacer(Modifier.height(MoaTheme.spacing.spacing20))
+                }
+
+                TodaySalarySection(todaySalaryDisplay = uiState.todaySalaryDisplay)
+
+                Spacer(Modifier.height(22.dp))
+
+                CoinGraph(
+                    modifier = Modifier.height(coinGraphHeight),
                     type = uiState.home.type,
-                    onAdjustScheduleClick = {
-                        onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkEdit))
-                        if (uiState.home.type == WorkdayType.WORK) {
-                            onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true))
-                        } else {
-                            onIntent(WorkingIntent.NavigateToModifyWorkday)
-                        }
-                    },
                 )
             }
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-        }
+            if (uiState.showConfetti) {
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(
+                        if (uiState.home.type == WorkdayType.WORK) {
+                            R.raw.confetti_work
+                        } else {
+                            R.raw.confeti_vacation
+                        }
+                    )
+                )
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = 1,
+                )
 
-        if (uiState.showConfetti) {
-            val composition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(R.raw.confeti)
-            )
-            val progress by animateLottieCompositionAsState(
-                composition = composition,
-                iterations = 1,
-            )
-
-            LaunchedEffect(progress) {
-                if (progress == 1f) {
-                    onIntent(WorkingIntent.ShowConfetti(false))
+                LaunchedEffect(progress) {
+                    if (progress == 1f) {
+                        onIntent(WorkingIntent.ShowConfetti(false))
+                    }
                 }
-            }
 
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
-                modifier = Modifier.fillMaxSize(),
-                alignment = Alignment.TopStart,
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    modifier = Modifier.fillMaxSize(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                )
+            }
+        }
+
+        if (uiState.showWorkCompletionOverlay) {
+            WorkCompletionSection(
+                workdayType = uiState.home.type,
+                accumulatedSalary = uiState.totalSalaryDisplay,
+                workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
+                onContinueWorking = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickMoreWork))
+                    onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true))
+                },
+                onComplete = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkCompleted))
+                    onIntent(WorkingIntent.ClickCompleteWork)
+                },
+                onWorkTimeClick = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkTime))
+                    onIntent(WorkingIntent.NavigateToModifyWorkday)
+                },
+            )
+        } else {
+            WorkingStatusSection(
+                elapsedTotalSeconds = uiState.elapsedTotalSeconds,
+                progress = uiState.progress,
+                startTime = uiState.startTimeDisplay,
+                endTime = uiState.endTimeDisplay,
+                type = uiState.home.type,
+                onAdjustScheduleClick = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkEdit))
+                    if (uiState.home.type == WorkdayType.WORK) {
+                        onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true))
+                    } else {
+                        onIntent(WorkingIntent.NavigateToModifyWorkday)
+                    }
+                },
             )
         }
 
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
     }
 }
 
@@ -381,32 +380,25 @@ private fun CoinGraph(
         contentAlignment = Alignment.BottomCenter,
     ) {
         val imageWidth = maxWidth * (112f / 375f)
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clipToBounds(),
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            val coinImage = if (type == WorkdayType.VACATION) {
-                R.drawable.img_blue_coin_progress
-            } else {
-                R.drawable.img_coin_progress
-            }
-            Image(
-                modifier = Modifier.width(imageWidth),
-                painter = painterResource(coinImage),
-                contentDescription = stringResource(R.string.working_coin_icon_description),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter,
-            )
+        val coinImage = if (type == WorkdayType.VACATION) {
+            R.drawable.img_blue_coin_progress
+        } else {
+            R.drawable.img_coin_progress
         }
+
+        Image(
+            modifier = Modifier
+                .width(imageWidth),
+            painter = painterResource(coinImage),
+            contentDescription = stringResource(R.string.working_coin_icon_description),
+            contentScale = ContentScale.FillWidth,
+            alignment = Alignment.TopCenter,
+        )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .align(Alignment.BottomCenter)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -429,7 +421,9 @@ private fun WorkingStatusSection(
     onAdjustScheduleClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -610,7 +604,9 @@ private fun WorkCompletionSection(
     onWorkTimeClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
     ) {
         WorkCompletionInfoCard(
             accumulatedSalary = accumulatedSalary,
