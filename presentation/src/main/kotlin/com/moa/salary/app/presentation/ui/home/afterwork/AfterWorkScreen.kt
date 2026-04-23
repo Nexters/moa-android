@@ -26,13 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
+import com.moa.salary.app.presentation.designsystem.component.MoaBlueButton
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
@@ -64,68 +61,74 @@ private fun AfterWorkScreen(
     uiState: AfterWorkUiState,
     onIntent: (AfterWorkIntent) -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
 
-            MoaDateLocationBar(
-                date = uiState.dateDisplay,
-                workplace = uiState.home.workplace,
+        MoaDateLocationBar(
+            date = uiState.dateDisplay,
+            workplace = uiState.home.workplace,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing28))
+
+        Image(
+            modifier = Modifier.size(80.dp),
+            painter = painterResource(
+                if (uiState.home.type == WorkdayType.WORK) {
+                    R.drawable.ic_full_coin
+                } else {
+                    R.drawable.ic_vacation_coin
+                }
+            ),
+            contentDescription = stringResource(R.string.after_work_coin_description),
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+
+        Text(
+            text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
+            style = MoaTheme.typography.t3_500,
+            color = MoaTheme.colors.textHighEmphasis,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+
+        Row(verticalAlignment = Alignment.Bottom) {
+            MoaRollingText(
+                text = uiState.accumulatedSalary,
+                textColor = if (uiState.home.type == WorkdayType.WORK) {
+                    MoaTheme.colors.textGreen
+                } else {
+                    MoaTheme.colors.textBlue
+                },
+                animateOnAppear = true,
             )
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-            Image(
-                modifier = Modifier.size(80.dp),
-                painter = painterResource(R.drawable.ic_full_coin),
-                contentDescription = stringResource(R.string.after_work_coin_description),
-            )
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing16))
+            Spacer(Modifier.width(4.dp))
 
             Text(
-                text = stringResource(R.string.after_work_accumulated_salary_title, uiState.month),
-                style = MoaTheme.typography.t3_500,
-                color = MoaTheme.colors.textHighEmphasis,
+                modifier = Modifier.padding(bottom = 4.dp),
+                text = stringResource(R.string.after_work_currency_won),
+                style = MoaTheme.typography.h3_500,
+                color = MoaTheme.colors.textMediumEmphasis,
             )
+        }
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+        Spacer(Modifier.height(42.dp))
 
-            Row(verticalAlignment = Alignment.Bottom) {
-                MoaRollingText(
-                    text = uiState.accumulatedSalary,
-                    textColor = MoaTheme.colors.textGreen,
-                    animateOnAppear = true,
-                )
+        InfoCard(
+            todaySalary = uiState.todaySalary,
+            workTimeOrVacation = uiState.workTimeDisplay,
+        )
 
-                Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.weight(1f))
 
-                Text(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    text = stringResource(R.string.after_work_currency_won),
-                    style = MoaTheme.typography.h3_500,
-                    color = MoaTheme.colors.textMediumEmphasis,
-                )
-            }
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing32))
-
-            InfoCard(
-                todaySalary = uiState.todaySalary,
-                workTimeOrVacation = if (uiState.home.type == WorkdayType.VACATION) {
-                    stringResource(R.string.after_work_vacation)
-                } else {
-                    uiState.workTimeDisplay
-                },
-            )
-
-            Spacer(Modifier.weight(1f))
-
+        if (uiState.home.type == WorkdayType.WORK) {
             MoaPrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onIntent(AfterWorkIntent.ClickHistory) },
@@ -135,32 +138,19 @@ private fun AfterWorkScreen(
                     style = MoaTheme.typography.t3_700,
                 )
             }
-
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-        }
-
-        if (uiState.showConfetti) {
-            val composition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(R.raw.confetti_work)
-            )
-            val progress by animateLottieCompositionAsState(
-                composition = composition,
-                iterations = 1,
-            )
-
-            LaunchedEffect(progress) {
-                if (progress == 1f) {
-                    onIntent(AfterWorkIntent.DismissConfetti)
-                }
+        } else {
+            MoaBlueButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onIntent(AfterWorkIntent.ClickHistory) },
+            ) {
+                Text(
+                    text = "이번달 일정 확인하기",
+                    style = MoaTheme.typography.t3_700,
+                )
             }
-
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
-                modifier = Modifier.fillMaxSize(),
-                alignment = Alignment.TopStart,
-            )
         }
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
     }
 }
 
@@ -238,7 +228,6 @@ sealed interface AfterWorkIntent {
     data object ClickHistory : AfterWorkIntent
     data object ClickMoreWork : AfterWorkIntent
     data object DismissMoreWorkBottomSheet : AfterWorkIntent
-    data object DismissConfetti : AfterWorkIntent
     data class ConfirmMoreWork(
         val endHour: Int,
         val endMinute: Int,
@@ -268,7 +257,6 @@ private fun AfterWorkScreenPreview() {
                         endHour = 18,
                         endMinute = 0,
                     ),
-                    showConfetti = false
                 ),
                 onIntent = {},
             )

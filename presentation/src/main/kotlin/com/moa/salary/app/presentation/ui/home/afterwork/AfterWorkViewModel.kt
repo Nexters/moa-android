@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.model.work.Home
+import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIME_CHECK_INTERVAL_MS
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
@@ -34,7 +35,6 @@ data class AfterWorkUiState(
     val today: LocalDate = LocalDate.now(),
     val home: Home,
     val showMoreWorkBottomSheet: Boolean = false,
-    val showConfetti: Boolean = true,
 ) {
     val accumulatedSalary: String
         get() = formatCurrency(home.workedEarnings)
@@ -49,12 +49,16 @@ data class AfterWorkUiState(
         get() = today.monthValue
 
     val workTimeDisplay: String
-        get() = "${makeTimeString(home.startHour, home.startMinute)} - ${
-            makeTimeString(
-                home.endHour,
-                home.endMinute
-            )
-        }"
+        get() = if (home.type == WorkdayType.WORK) {
+            "${makeTimeString(home.startHour, home.startMinute)} - ${
+                makeTimeString(
+                    home.endHour,
+                    home.endMinute
+                )
+            }"
+        } else {
+            "연차"
+        }
 }
 
 @HiltViewModel(assistedFactory = AfterWorkViewModel.Factory::class)
@@ -83,7 +87,6 @@ class AfterWorkViewModel @AssistedInject constructor(
             AfterWorkIntent.ClickHistory -> clickHistory()
             AfterWorkIntent.ClickMoreWork -> clickMoreWork()
             AfterWorkIntent.DismissMoreWorkBottomSheet -> dismissMoreWorkBottomSheet()
-            AfterWorkIntent.DismissConfetti -> dismissConfetti()
             is AfterWorkIntent.ConfirmMoreWork -> confirmMoreWork(
                 endHour = intent.endHour,
                 endMinute = intent.endMinute
@@ -119,10 +122,6 @@ class AfterWorkViewModel @AssistedInject constructor(
 
     private fun dismissMoreWorkBottomSheet() {
         _uiState.update { it.copy(showMoreWorkBottomSheet = false) }
-    }
-
-    private fun dismissConfetti() {
-        _uiState.update { it.copy(showConfetti = false) }
     }
 
     private fun confirmMoreWork(
