@@ -27,6 +27,7 @@ import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.ui.home.afterwork.AfterWorkScreen
 import com.moa.salary.app.presentation.ui.home.beforework.BeforeWorkScreen
 import com.moa.salary.app.presentation.ui.home.working.WorkingScreen
+import com.posthog.PostHog
 
 @Composable
 fun HomeScreen(
@@ -47,6 +48,12 @@ fun HomeScreen(
     fun launchPostNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permissionStatus = ContextCompat.checkSelfPermission(context, POST_NOTIFICATIONS)
+            PostHog.setPersonProperties(
+                mapOf(
+                    "notification_permission" to (permissionStatus == PackageManager.PERMISSION_GRANTED)
+                )
+            )
+
             if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
                 permissionLauncher.launch(POST_NOTIFICATIONS)
             }

@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.extensions.formatCurrency
 import com.moa.salary.app.core.extensions.makeTimeString
+import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.core.model.work.Event
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.core.util.Constants.TIMER_INTERVAL_MS
@@ -13,6 +15,7 @@ import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.extensions.execute
+import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.RootNavigation
@@ -35,13 +38,16 @@ import java.util.Locale
 data class BeforeWorkUiState(
     val today: LocalDate = LocalDate.now(),
     val home: Home,
-    val showTimeBottomSheet: Boolean = false,
 ) {
     val accumulatedSalary: String
         get() = formatCurrency(home.workedEarnings)
 
     val todaySalary: String
-        get() = "${formatCurrency(home.dailyPay)}원"
+        get() = if (home.type == WorkdayType.NONE) {
+            ""
+        } else {
+            "${formatCurrency(home.dailyPay)}원"
+        }
 
     val dateDisplay: String
         get() = today.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN))
@@ -50,15 +56,21 @@ data class BeforeWorkUiState(
         get() = today.monthValue
 
     val workTimeDisplay: String
-        get() = if (home.type == WorkdayType.VACATION) {
-            "휴가"
-        } else {
-            "${makeTimeString(home.startHour, home.startMinute)} - ${
+        get() = when (home.type) {
+            WorkdayType.WORK -> "${makeTimeString(home.startHour, home.startMinute)} - ${
                 makeTimeString(
                     home.endHour,
                     home.endMinute
                 )
             }"
+
+            WorkdayType.VACATION -> "연차"
+
+            WorkdayType.NONE -> if (home.events.contains(Event.PUBLIC_HOLIDAY)) {
+                "공휴일"
+            } else {
+                "근무 없음"
+            }
         }
 
     val autoClockInTime: String
@@ -93,17 +105,12 @@ class BeforeWorkViewModel @AssistedInject constructor(
 
     fun onIntent(intent: BeforeWorkIntent) {
         when (intent) {
+            is BeforeWorkIntent.SendEvent -> intent.event.sendEvent()
+
             BeforeWorkIntent.GetHome -> getHome()
-            BeforeWorkIntent.ClickWorkTime -> clockWorkTime()
+            BeforeWorkIntent.ClickWorkTime -> clickWorkTime()
             BeforeWorkIntent.ClickEarlyClockIn -> clickEarlyClockIn()
-            BeforeWorkIntent.ClickVacation -> clickVacation()
-            BeforeWorkIntent.NavigateToHistory -> navigateToHistory()
-            BeforeWorkIntent.DismissTimeBottomSheet -> dismissTimeBottomSheet()
-            is BeforeWorkIntent.UpdateWorkTime -> updateWorkday(
-                clockInTime = makeTimeString(intent.startHour, intent.startMinute),
-                clockOutTime = makeTimeString(intent.endHour, intent.endMinute),
-                type = intent.type
-            )
+            BeforeWorkIntent.ClickHistory -> clickHistory()
         }
     }
 
@@ -123,12 +130,26 @@ class BeforeWorkViewModel @AssistedInject constructor(
         }
     }
 
-    private fun clockWorkTime() {
-        _uiState.update { it.copy(showTimeBottomSheet = true) }
-    }
+    private fun clickWorkTime() {
+        val home = _uiState.value.home
 
-    private fun dismissTimeBottomSheet() {
-        _uiState.update { it.copy(showTimeBottomSheet = false) }
+        navigate(
+            RootNavigation.History(
+                startDestination = HistoryNavigation.ModifyWorkday(
+                    args = HistoryNavigation.ModifyWorkday.ModifyWorkdayArgs(
+                        joinedAt = null,
+                        workdayType = home.type,
+                        date = LocalDate.now().toString(),
+                        time = Time(
+                            startHour = home.startHour,
+                            startMinute = home.startMinute,
+                            endHour = home.endHour,
+                            endMinute = home.endMinute,
+                        ),
+                    )
+                )
+            )
+        )
     }
 
     private fun clickEarlyClockIn() {
@@ -147,16 +168,8 @@ class BeforeWorkViewModel @AssistedInject constructor(
         )
     }
 
-    private fun clickVacation() {
-        updateWorkday(
-            clockInTime = null,
-            clockOutTime = null,
-            type = WorkdayType.VACATION,
-        )
-    }
-
-    private fun navigateToHistory() {
-        navigate(RootNavigation.History)
+    private fun clickHistory() {
+        navigate(RootNavigation.History())
     }
 
     private fun updateWorkday(

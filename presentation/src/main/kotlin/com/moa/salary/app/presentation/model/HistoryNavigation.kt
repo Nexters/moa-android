@@ -1,6 +1,7 @@
 package com.moa.salary.app.presentation.model
 
-import com.moa.salary.app.core.model.work.Workday
+import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.core.model.work.WorkdayType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,8 +16,10 @@ sealed interface HistoryNavigation : RootNavigation {
     ) : HistoryNavigation {
         @Serializable
         data class ModifyWorkdayArgs(
-            val joinedAt : String,
-            val workday: Workday,
+            val joinedAt: String?,
+            val workdayType: WorkdayType,
+            val date: String,
+            val time: Time,
         )
     }
 

@@ -1,5 +1,6 @@
 package com.moa.salary.app.presentation.ui.history.modify
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +33,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.extensions.toKoreanDateString
-import com.moa.salary.app.core.extensions.toLocalDate
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
@@ -44,6 +44,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HistoryNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import java.time.LocalDate
 
 @Composable
@@ -64,7 +65,7 @@ fun ModifyWorkdayScreen(
 
     if (uiState.showDateBottomSheet) {
         MoaDateBottomSheet(
-            joinedAt = args.joinedAt.toLocalDate(),
+            joinedAt = uiState.joinedAt,
             initialDate = uiState.date,
             onConfirm = { viewModel.onIntent(ModifyWorkdayIntent.SetDate(it)) },
             onDismissRequest = { viewModel.onIntent(ModifyWorkdayIntent.SetShowDateBottomSheet(false)) }
@@ -117,13 +118,7 @@ private fun ModifyWorkdayScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
 
             Text(
-                text = stringResource(
-                    if (uiState.isEditMode) {
-                        R.string.schedule_form_title_edit
-                    } else {
-                        R.string.schedule_form_title_add
-                    }
-                ),
+                text = "일정을 변경할까요?",
                 style = MoaTheme.typography.t1_700,
                 color = MoaTheme.colors.textHighEmphasis,
             )
@@ -139,20 +134,24 @@ private fun ModifyWorkdayScreen(
             Spacer(Modifier.height(MoaTheme.spacing.spacing8))
 
             MoaRow(
-                modifier = Modifier.clickable {
-                    onIntent(
-                        ModifyWorkdayIntent.SetShowDateBottomSheet(
-                            true
-                        )
-                    )
+                modifier = Modifier.clickable(enabled = uiState.isFromCalendar) {
+                    onIntent(ModifyWorkdayIntent.SetShowDateBottomSheet(true))
                 },
                 leadingContent = {
                     Text(
                         text = uiState.date.toKoreanDateString(),
                         style = MoaTheme.typography.t2_700,
-                        color = MoaTheme.colors.textHighEmphasis,
+                        color = if (uiState.isFromCalendar) MoaTheme.colors.textHighEmphasis else MoaTheme.colors.textMediumEmphasis,
                     )
                 },
+                trailingContent = {
+                    if (uiState.isFromCalendar) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_24_chevron_down),
+                            contentDescription = null,
+                        )
+                    }
+                }
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing24))
@@ -170,14 +169,12 @@ private fun ModifyWorkdayScreen(
                 horizontalArrangement = Arrangement.spacedBy(MoaTheme.spacing.spacing12)
             ) {
                 WorkdayType.entries.forEach {
-                    if (uiState.isEditMode || it == WorkdayType.WORK) {
-                        WorkdayTypeButton(
-                            modifier = Modifier.weight(1f),
-                            text = it.value,
-                            isSelected = uiState.selectedWorkdayType == it,
-                            onClick = { onIntent(ModifyWorkdayIntent.SetWorkdayType(it)) },
-                        )
-                    }
+                    WorkdayTypeButton(
+                        modifier = Modifier.weight(1f),
+                        text = it.value,
+                        isSelected = uiState.selectedWorkdayType == it,
+                        onClick = { onIntent(ModifyWorkdayIntent.SetWorkdayType(it)) },
+                    )
                 }
             }
 
@@ -221,6 +218,23 @@ private fun ModifyWorkdayScreen(
                         style = MoaTheme.typography.t2_700,
                         color = MoaTheme.colors.textHighEmphasis,
                         textAlign = TextAlign.Center,
+                    )
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_16_time),
+                        contentDescription = null,
+                    )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    Text(
+                        text = "총 ${uiState.diffTimeString}근무해요.",
+                        style = MoaTheme.typography.b2_500,
+                        color = MoaTheme.colors.textGreen,
                     )
                 }
             }
@@ -316,14 +330,25 @@ sealed interface ModifyWorkdayIntent {
     data object ClickConfirm : ModifyWorkdayIntent
 }
 
+sealed class ModifyWorkdayEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class CompleteModify(val type: String) : ModifyWorkdayEvent(
+        event = "modify_workday_complete",
+        properties = mapOf("type" to type)
+    )
+}
+
 @Preview
 @Composable
 private fun ModifyScheduleScreenPreview() {
     MoaTheme {
         ModifyWorkdayScreen(
             uiState = ModifyWorkdayUiState(
-                isEditMode = true,
                 date = LocalDate.now(),
+                isFromCalendar = true,
+                joinedAt = LocalDate.now(),
                 selectedWorkdayType = WorkdayType.WORK,
                 time = Time(9, 0, 18, 0),
             ),

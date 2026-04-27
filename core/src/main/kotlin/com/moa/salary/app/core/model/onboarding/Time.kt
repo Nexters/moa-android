@@ -15,4 +15,21 @@ data class Time(
     fun getFormattedTimeRange(): String {
         return "${makeTimeString(startHour, startMinute)}~${makeTimeString(endHour, endMinute)}"
     }
+
+    fun calculateTimeDiff(): Pair<Int, Int> {
+        val totalStartMinutes = startHour * 60 + startMinute
+        var totalEndMinutes = endHour * 60 + endMinute
+
+        if (totalEndMinutes < totalStartMinutes) {
+            totalEndMinutes += 24 * 60
+        }
+
+        val diffInMinutes = totalEndMinutes - totalStartMinutes
+
+        val hours = diffInMinutes / 60
+        val minutes = diffInMinutes % 60
+
+
+        return Pair(hours, minutes)
+    }
 }

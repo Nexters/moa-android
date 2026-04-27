@@ -36,7 +36,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.extensions.openPlayStore
-import com.moa.salary.app.presentation.extensions.sendEmail
+import com.moa.salary.app.presentation.extensions.openWebBrowser
 
 @Composable
 fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
@@ -289,9 +289,7 @@ private fun SettingMenuAppInfoContent(
     Spacer(Modifier.height(10.dp))
 
     MoaRow(
-        modifier = Modifier.clickable {
-            context.sendEmail(currentAppVersion)
-        },
+        modifier = Modifier.clickable { context.openWebBrowser("https://forms.gle/cvjVQuNpctzs1p2QA") },
         leadingContent = {
             Text(
                 text = "문의하기",

@@ -7,6 +7,7 @@ import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ class WidgetGuideViewModel @Inject constructor(
         when (intent) {
             WidgetGuideIntent.ClickBack -> back()
             WidgetGuideIntent.ClickNext -> next()
+            is WidgetGuideIntent.SendEvent -> sendEvent(intent.event)
         }
     }
 
@@ -59,5 +61,9 @@ class WidgetGuideViewModel @Inject constructor(
         viewModelScope.launch {
             moaSideEffectBus.emit(MoaSideEffect.Toast("일시적인 오류가 발생했어요"))
         }
+    }
+
+    private fun sendEvent(event: PosthogEvent) {
+        event.sendEvent()
     }
 }

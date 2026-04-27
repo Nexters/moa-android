@@ -38,6 +38,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -310,6 +311,20 @@ sealed interface WorkScheduleIntent {
 
     data object ClickNext : WorkScheduleIntent
     data object ClickTermsNext : WorkScheduleIntent
+}
+
+sealed class WorkPolicyEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ClickNext(val isModified: Boolean) : WorkPolicyEvent(
+        event = "work_policy_next_clicked",
+        properties = mapOf("is_modified" to isModified)
+    )
+
+    data object ClickTermsNext : WorkPolicyEvent(
+        event = "work_policy_terms_next_clicked",
+    )
 }
 
 @Preview

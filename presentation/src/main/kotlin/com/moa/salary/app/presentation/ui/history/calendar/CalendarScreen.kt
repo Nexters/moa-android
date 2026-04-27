@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -26,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +50,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaMonthNavigator
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.Gray40
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.PosthogEvent
 import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDate
 import java.time.YearMonth
@@ -133,18 +136,26 @@ private fun CalendarScreen(
                         },
                     )
 
-                    IconButton(
-                        onClick = {
-                            val workday = uiState.calendar?.workdays[uiState.selectedDate]
-                            if (workday != null) {
-                                onIntent(CalendarIntent.ClickWorkday(workday))
-                            }
-                        }
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(
+                                color = MoaTheme.colors.containerSecondary,
+                                shape = CircleShape,
+                            )
+                            .clickable {
+                                val workday = uiState.calendar?.workdays[uiState.selectedDate]
+                                if (workday != null) {
+                                    onIntent(CalendarIntent.SendEvent(CalendarEvent.ClickEdit))
+                                    onIntent(CalendarIntent.ClickWorkday(workday))
+                                }
+                            },
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_plus),
-                            contentDescription = stringResource(R.string.history_add_schedule_description),
-                            tint = Color.Unspecified,
+                        Image(
+                            painter = painterResource(R.drawable.ic_20_edit),
+                            contentDescription = null,
                         )
                     }
                 }
@@ -313,7 +324,10 @@ private fun ScheduleItems(
                 imgRes = info.first,
                 title = info.second,
                 content = info.third,
-                onClick = { onIntent(CalendarIntent.ClickWorkday(workday)) },
+                onClick = {
+                    onIntent(CalendarIntent.SendEvent(CalendarEvent.ClickList))
+                    onIntent(CalendarIntent.ClickWorkday(workday))
+                },
             )
 
             Spacer(Modifier.height(MoaTheme.spacing.spacing12))
@@ -398,6 +412,9 @@ private fun WorkdayItem(
 }
 
 sealed interface CalendarIntent {
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : CalendarIntent
+
     data object GetCalendar : CalendarIntent
     data object ClickBack : CalendarIntent
 
@@ -409,6 +426,13 @@ sealed interface CalendarIntent {
 
     @JvmInline
     value class ClickPayday(val day: Int) : CalendarIntent
+}
+
+sealed class CalendarEvent(
+    override val event: String
+) : PosthogEvent {
+    data object ClickEdit : CalendarEvent(event = "calendar_edit_clicked")
+    data object ClickList : CalendarEvent(event = "calendar_list_clicked")
 }
 
 @Preview

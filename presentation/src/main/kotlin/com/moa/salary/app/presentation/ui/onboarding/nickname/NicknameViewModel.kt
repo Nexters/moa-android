@@ -12,6 +12,7 @@ import com.moa.salary.app.presentation.manager.RandomNickManager
 import com.moa.salary.app.presentation.model.MoaDialogProperties
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -86,6 +87,8 @@ class NicknameViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { nextIfIsOnboarding() }
         ) {
+            sendEvent(NicknameEvent.ClickNext(isModified = false))
+
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Salary()))
             }
@@ -100,10 +103,16 @@ class NicknameViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { nextIfIsNotOnboarding() }
         ) {
+            sendEvent(NicknameEvent.ClickNext(isModified = true))
+
             viewModelScope.launch {
                 moaSideEffectBus.emit(MoaSideEffect.Navigate(OnboardingNavigation.Back))
             }
         }
+    }
+
+    private fun sendEvent(event: PosthogEvent) {
+        event.sendEvent()
     }
 
     @AssistedFactory

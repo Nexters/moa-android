@@ -30,6 +30,7 @@ import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
+import com.moa.salary.app.presentation.model.PosthogEvent
 import com.moa.salary.app.presentation.ui.widget.MoaWidgetReceiver
 
 @Composable
@@ -109,6 +110,7 @@ private fun WidgetGuideScreen(
                     .fillMaxWidth()
                     .padding(horizontal = MoaTheme.spacing.spacing20),
                 onClick = {
+                    onIntent(WidgetGuideIntent.SendEvent(WidgetGuideEvent.ClickAddWidget))
                     onIntent(WidgetGuideIntent.ClickNext)
 
                     if (appWidgetManager.isRequestPinAppWidgetSupported) {
@@ -145,6 +147,19 @@ private fun WidgetGuideScreen(
 sealed interface WidgetGuideIntent {
     data object ClickBack : WidgetGuideIntent
     data object ClickNext : WidgetGuideIntent
+
+
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : WidgetGuideIntent
+}
+
+sealed class WidgetGuideEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data object ClickAddWidget : WidgetGuideEvent(
+        event = "widget_add_clicked",
+    )
 }
 
 @Preview

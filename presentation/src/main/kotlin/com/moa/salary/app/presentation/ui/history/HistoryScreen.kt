@@ -17,9 +17,10 @@ import com.moa.salary.app.presentation.ui.history.modify.ModifyWorkdayScreen
 
 @Composable
 fun HistoryScreen(
+    startDestination: HistoryNavigation,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
-    val backStack = rememberNavBackStack(HistoryNavigation.Calendar)
+    val backStack = rememberNavBackStack(startDestination)
 
     LaunchedEffect(Unit) {
         viewModel.moaSideEffects.collect {

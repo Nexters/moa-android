@@ -77,3 +77,5 @@ fun String.toTime(): Time {
         endMinute = endTimeString?.second ?: 0,
     )
 }
+
+fun String.toZeroString(): String = this.map { if (it.isDigit()) '0' else it }.joinToString("")

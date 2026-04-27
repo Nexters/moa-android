@@ -39,6 +39,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTextFieldWithDe
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.OnboardingNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
 import com.moa.salary.app.presentation.util.rememberIsKeyboardOpen
 
 @Composable
@@ -189,6 +190,16 @@ sealed interface NicknameIntent {
     data object ClickBack : NicknameIntent
     data object ClickRandom : NicknameIntent
     data object ClickNext : NicknameIntent
+}
+
+sealed class NicknameEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ClickNext(val isModified: Boolean) : NicknameEvent(
+        event = "nickname_next_clicked",
+        properties = mapOf("is_modified" to isModified)
+    )
 }
 
 @Preview

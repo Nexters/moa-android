@@ -1,14 +1,8 @@
 package com.moa.salary.app.presentation.ui.home.working
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +24,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -49,6 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -58,7 +55,9 @@ import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.Home
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
+import com.moa.salary.app.presentation.designsystem.component.MoaBlueButton
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.component.MoaScheduleAdjustBottomSheet
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
@@ -66,6 +65,8 @@ import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.component.ScheduleAdjustOption
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HomeNavigation
+import com.moa.salary.app.presentation.model.PosthogEvent
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WorkingScreen(
@@ -75,6 +76,7 @@ fun WorkingScreen(
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(WorkingIntent.GetHome)
@@ -86,6 +88,28 @@ fun WorkingScreen(
         }
     }
 
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.onIntent(WorkingIntent.SetStartTime(System.currentTimeMillis()))
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    val currentTime = System.currentTimeMillis()
+                    val diffTime = (currentTime - uiState.initialTime) / 1000L
+                    viewModel.onIntent(WorkingIntent.SendEvent(WorkingEvent.ScreenTime(diffTime)))
+                }
+
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     WorkingScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
@@ -93,7 +117,6 @@ fun WorkingScreen(
 
     if (uiState.showScheduleAdjustBottomSheet) {
         MoaScheduleAdjustBottomSheet(
-            type = uiState.home.type,
             onDismissRequest = {
                 viewModel.onIntent(
                     WorkingIntent.ShowScheduleAdjustBottomSheet(
@@ -103,51 +126,10 @@ fun WorkingScreen(
             },
             onConfirm = { option ->
                 when (option) {
-                    ScheduleAdjustOption.Vacation -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.VACATION
-                        )
-                    )
-
-                    ScheduleAdjustOption.EndWork -> viewModel.onIntent(WorkingIntent.SelectEndWork)
-                    ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.SelectAdjustTime)
-                    ScheduleAdjustOption.Work -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.WORK
-                        )
-                    )
-
-                    ScheduleAdjustOption.None -> viewModel.onIntent(
-                        WorkingIntent.SelectChangeType(
-                            WorkdayType.NONE
-                        )
-                    )
+                    ScheduleAdjustOption.Finish -> viewModel.onIntent(WorkingIntent.SelectEndWork)
+                    ScheduleAdjustOption.AdjustTime -> viewModel.onIntent(WorkingIntent.NavigateToModifyWorkday)
                 }
             },
-        )
-    }
-
-    if (uiState.showTimeBottomSheet) {
-        MoaTimeBottomSheet(
-            time = Time(
-                startHour = uiState.home.startHour,
-                startMinute = uiState.home.startMinute,
-                endHour = uiState.home.endHour,
-                endMinute = uiState.home.endMinute,
-            ),
-            title = stringResource(R.string.working_time_bottom_sheet_title),
-            onPositive = { time ->
-                viewModel.onIntent(
-                    WorkingIntent.UpdateWorkTime(
-                        startHour = time.startHour,
-                        startMinute = time.startMinute,
-                        endHour = time.endHour,
-                        endMinute = time.endMinute,
-                        type = uiState.home.type,
-                    )
-                )
-            },
-            onDismissRequest = { viewModel.onIntent(WorkingIntent.DismissTimeBottomSheet) },
         )
     }
 
@@ -169,32 +151,6 @@ fun WorkingScreen(
             onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowMoreWorkBottomSheet(false)) },
         )
     }
-
-    if (uiState.showWorkTimeEditBottomSheet) {
-        MoaTimeBottomSheet(
-            time = Time(
-                startHour = uiState.home.startHour,
-                startMinute = uiState.home.startMinute,
-                endHour = uiState.home.endHour,
-                endMinute = uiState.home.endMinute,
-            ),
-            title = stringResource(R.string.working_work_time_edit_title),
-            negativeText = stringResource(R.string.working_today_vacation),
-            onNegative = { viewModel.onIntent(WorkingIntent.ClickTodayVacation) },
-            onPositive = { time ->
-                viewModel.onIntent(
-                    WorkingIntent.UpdateWorkTime(
-                        startHour = time.startHour,
-                        startMinute = time.startMinute,
-                        endHour = time.endHour,
-                        endMinute = time.endMinute,
-                        type = uiState.home.type,
-                    )
-                )
-            },
-            onDismissRequest = { viewModel.onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(false)) },
-        )
-    }
 }
 
 @Composable
@@ -202,107 +158,118 @@ private fun WorkingScreen(
     uiState: WorkingUiState,
     onIntent: (WorkingIntent) -> Unit,
 ) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        val animatedHeightFraction by animateFloatAsState(
+            targetValue = uiState.coinHeightFraction,
+            animationSpec = tween(durationMillis = 500),
+            label = "coinHeightAnimation",
+        )
 
+        Spacer(Modifier.height(24.dp))
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = MoaTheme.spacing.spacing20),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            val animatedHeightFraction by animateFloatAsState(
-                targetValue = uiState.coinHeightFraction,
-                animationSpec = tween(durationMillis = 500),
-                label = "coinHeightAnimation",
-            )
+            val totalHeight = maxHeight
+            val coinGraphHeight = totalHeight * animatedHeightFraction
 
-            BoxWithConstraints(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                val totalHeight = maxHeight
-                val coinGraphHeight = totalHeight * animatedHeightFraction
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    if (!uiState.showWorkCompletionOverlay) {
-                        TooltipBanner(
-                            monthSalaryDisplay = uiState.monthSalaryDisplay,
-                            todaySalary = uiState.todaySalary,
-                            remainingHours = uiState.remainingHours,
-                            currentIndex = uiState.currentTooltipIndex,
-                            type = uiState.home.type,
-                        )
-
-                        Spacer(Modifier.height(MoaTheme.spacing.spacing20))
-                    }
-
-                    TodaySalarySection(todaySalaryDisplay = uiState.todaySalaryDisplay)
-
-                    Spacer(Modifier.height(22.dp))
-
-                    CoinGraph(
-                        modifier = Modifier.height(coinGraphHeight),
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (!uiState.showWorkCompletionOverlay) {
+                    TooltipBanner(
+                        monthSalaryDisplay = uiState.monthSalaryDisplay,
+                        todaySalary = uiState.todaySalary,
+                        remainingHours = uiState.remainingHours,
+                        currentIndex = uiState.currentTooltipIndex,
                         type = uiState.home.type,
                     )
-                }
-            }
 
-            if (uiState.showWorkCompletionOverlay) {
-                WorkCompletionSection(
-                    accumulatedSalary = uiState.totalSalaryDisplay,
-                    workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
-                    onContinueWorking = { onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true)) },
-                    onComplete = { onIntent(WorkingIntent.ClickCompleteWork) },
-                    onWorkTimeClick = { onIntent(WorkingIntent.ShowWorkTimeEditBottomSheet(true)) },
-                )
-            } else {
-                WorkingStatusSection(
-                    elapsedTotalSeconds = uiState.elapsedTotalSeconds,
-                    progress = uiState.progress,
-                    startTime = uiState.startTimeDisplay,
-                    endTime = uiState.endTimeDisplay,
+                    Spacer(Modifier.height(MoaTheme.spacing.spacing20))
+                }
+
+                TodaySalarySection(todaySalaryDisplay = uiState.todaySalaryDisplay)
+
+                Spacer(Modifier.height(22.dp))
+
+                CoinGraph(
+                    modifier = Modifier.height(coinGraphHeight),
                     type = uiState.home.type,
-                    onAdjustScheduleClick = {
-                        onIntent(
-                            WorkingIntent.ShowScheduleAdjustBottomSheet(
-                                true
-                            )
-                        )
-                    },
                 )
             }
 
-            Spacer(Modifier.height(MoaTheme.spacing.spacing24))
-        }
+            if (uiState.showConfetti) {
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(
+                        if (uiState.home.type == WorkdayType.WORK) {
+                            R.raw.confetti_work
+                        } else {
+                            R.raw.confeti_vacation
+                        }
+                    )
+                )
+                val progress by animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = 1,
+                )
 
-        if (uiState.showConfetti) {
-            val composition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(R.raw.confeti)
-            )
-            val progress by animateLottieCompositionAsState(
-                composition = composition,
-                iterations = 1,
-            )
-
-            LaunchedEffect(progress) {
-                if (progress == 1f) {
-                    onIntent(WorkingIntent.ShowConfetti(false))
+                LaunchedEffect(progress) {
+                    if (progress == 1f) {
+                        onIntent(WorkingIntent.ShowConfetti(false))
+                    }
                 }
-            }
 
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
-                modifier = Modifier.fillMaxSize(),
-                alignment = Alignment.TopStart,
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    modifier = Modifier.fillMaxSize(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                )
+            }
+        }
+
+        if (uiState.showWorkCompletionOverlay) {
+            WorkCompletionSection(
+                workdayType = uiState.home.type,
+                accumulatedSalary = uiState.totalSalaryDisplay,
+                workTimeDisplay = "${uiState.startTimeDisplay} - ${uiState.endTimeDisplay}",
+                onContinueWorking = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickMoreWork))
+                    onIntent(WorkingIntent.ShowMoreWorkBottomSheet(true))
+                },
+                onComplete = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkCompleted))
+                    onIntent(WorkingIntent.ClickCompleteWork)
+                },
+                onWorkTimeClick = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkTime))
+                    onIntent(WorkingIntent.NavigateToModifyWorkday)
+                },
+            )
+        } else {
+            WorkingStatusSection(
+                elapsedTotalSeconds = uiState.elapsedTotalSeconds,
+                progress = uiState.progress,
+                startTime = uiState.startTimeDisplay,
+                endTime = uiState.endTimeDisplay,
+                type = uiState.home.type,
+                onAdjustScheduleClick = {
+                    onIntent(WorkingIntent.SendEvent(WorkingEvent.ClickWorkEdit))
+                    if (uiState.home.type == WorkdayType.WORK) {
+                        onIntent(WorkingIntent.ShowScheduleAdjustBottomSheet(true))
+                    } else {
+                        onIntent(WorkingIntent.NavigateToModifyWorkday)
+                    }
+                },
             )
         }
 
+        Spacer(Modifier.height(MoaTheme.spacing.spacing24))
     }
 }
 
@@ -385,11 +352,10 @@ private fun TodaySalarySection(todaySalaryDisplay: String) {
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-        Row(
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            RollingDigitsText(
+        Row(verticalAlignment = Alignment.Bottom) {
+            MoaRollingText(
                 text = todaySalaryDisplay,
+                textColor = MoaTheme.colors.textHighEmphasis,
             )
 
             Spacer(Modifier.width(4.dp))
@@ -397,43 +363,9 @@ private fun TodaySalarySection(todaySalaryDisplay: String) {
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
                 text = stringResource(R.string.working_currency_won),
-                style = MoaTheme.typography.t2_700,
-                color = MoaTheme.colors.textHighEmphasis,
+                style = MoaTheme.typography.h3_500,
+                color = MoaTheme.colors.textMediumEmphasis,
             )
-        }
-    }
-}
-
-@Composable
-private fun RollingDigitsText(
-    text: String,
-) {
-    Row {
-        text.forEach { char ->
-            if (char.isDigit()) {
-                AnimatedContent(
-                    targetState = char,
-                    transitionSpec = {
-                        (slideInVertically { height -> height } + fadeIn(animationSpec = tween(150)))
-                            .togetherWith(slideOutVertically { height -> -height } + fadeOut(
-                                animationSpec = tween(150)
-                            ))
-                    },
-                    label = "digitAnimation",
-                ) { digit ->
-                    Text(
-                        text = digit.toString(),
-                        style = MoaTheme.typography.h1_700.copy(fontFeatureSettings = "tnum"),
-                        color = MoaTheme.colors.textHighEmphasis,
-                    )
-                }
-            } else {
-                Text(
-                    text = char.toString(),
-                    style = MoaTheme.typography.h1_700,
-                    color = MoaTheme.colors.textHighEmphasis,
-                )
-            }
         }
     }
 }
@@ -448,32 +380,25 @@ private fun CoinGraph(
         contentAlignment = Alignment.BottomCenter,
     ) {
         val imageWidth = maxWidth * (112f / 375f)
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clipToBounds(),
-            contentAlignment = Alignment.TopCenter,
-        ) {
-            val coinImage = if (type == WorkdayType.VACATION) {
-                R.drawable.img_blue_coin_progress
-            } else {
-                R.drawable.img_coin_progress
-            }
-            Image(
-                modifier = Modifier.width(imageWidth),
-                painter = painterResource(coinImage),
-                contentDescription = stringResource(R.string.working_coin_icon_description),
-                contentScale = ContentScale.FillWidth,
-                alignment = Alignment.TopCenter,
-            )
+        val coinImage = if (type == WorkdayType.VACATION) {
+            R.drawable.img_blue_coin_progress
+        } else {
+            R.drawable.img_coin_progress
         }
+
+        Image(
+            modifier = Modifier
+                .width(imageWidth),
+            painter = painterResource(coinImage),
+            contentDescription = stringResource(R.string.working_coin_icon_description),
+            contentScale = ContentScale.FillWidth,
+            alignment = Alignment.TopCenter,
+        )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
-                .align(Alignment.BottomCenter)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -496,7 +421,9 @@ private fun WorkingStatusSection(
     onAdjustScheduleClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -669,6 +596,7 @@ private fun WorkProgressBar(
 
 @Composable
 private fun WorkCompletionSection(
+    workdayType: WorkdayType,
     accumulatedSalary: String,
     workTimeDisplay: String,
     onContinueWorking: () -> Unit,
@@ -676,7 +604,9 @@ private fun WorkCompletionSection(
     onWorkTimeClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MoaTheme.spacing.spacing20),
     ) {
         WorkCompletionInfoCard(
             accumulatedSalary = accumulatedSalary,
@@ -702,16 +632,30 @@ private fun WorkCompletionSection(
                 )
             }
 
-            MoaPrimaryButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                onClick = onComplete,
-            ) {
-                Text(
-                    text = stringResource(R.string.working_completion_complete),
-                    style = MoaTheme.typography.t3_700,
-                )
+            if (workdayType == WorkdayType.WORK) {
+                MoaPrimaryButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    onClick = onComplete,
+                ) {
+                    Text(
+                        text = stringResource(R.string.working_completion_complete),
+                        style = MoaTheme.typography.t3_700,
+                    )
+                }
+            } else {
+                MoaBlueButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    onClick = onComplete,
+                ) {
+                    Text(
+                        text = stringResource(R.string.working_completion_complete),
+                        style = MoaTheme.typography.t3_700,
+                    )
+                }
             }
         }
     }
@@ -797,13 +741,16 @@ private fun WorkCompletionInfoCard(
 }
 
 sealed interface WorkingIntent {
+    @JvmInline
+    value class SendEvent(val event: PosthogEvent) : WorkingIntent
+
+    @JvmInline
+    value class SetStartTime(val time: Long) : WorkingIntent
+
     data object GetHome : WorkingIntent
 
     @JvmInline
     value class ShowScheduleAdjustBottomSheet(val show: Boolean) : WorkingIntent
-
-    @JvmInline
-    value class ShowWorkTimeEditBottomSheet(val show: Boolean) : WorkingIntent
 
     @JvmInline
     value class ShowMoreWorkBottomSheet(val show: Boolean) : WorkingIntent
@@ -811,25 +758,26 @@ sealed interface WorkingIntent {
     @JvmInline
     value class ShowConfetti(val show: Boolean) : WorkingIntent
 
-    data object DismissTimeBottomSheet : WorkingIntent
-
-    @JvmInline
-    value class SelectChangeType(val type: WorkdayType) : WorkingIntent
     data object SelectEndWork : WorkingIntent
-    data object SelectAdjustTime : WorkingIntent
-
-    data class UpdateWorkTime(
-        val startHour: Int,
-        val startMinute: Int,
-        val endHour: Int,
-        val endMinute: Int,
-        val type: WorkdayType,
-    ) : WorkingIntent
 
     data object ClickCompleteWork : WorkingIntent
-
-    data object ClickTodayVacation : WorkingIntent
     data class ConfirmMoreWork(val endHour: Int, val endMinute: Int) : WorkingIntent
+    data object NavigateToModifyWorkday : WorkingIntent
+}
+
+sealed class WorkingEvent(
+    override val event: String,
+    override val properties: Map<String, Any>? = null,
+) : PosthogEvent {
+    data class ScreenTime(val time: Long) : WorkingEvent(
+        event = "working_screen_time",
+        properties = mapOf("time" to time)
+    )
+
+    data object ClickWorkEdit : WorkingEvent(event = "working_work_edit_clicked")
+    data object ClickWorkTime : WorkingEvent(event = "working_work_time_clicked")
+    data object ClickMoreWork : WorkingEvent(event = "working_more_work_clicked")
+    data object ClickWorkCompleted : WorkingEvent(event = "working_work_completed_clicked")
 }
 
 @Preview
@@ -849,7 +797,8 @@ private fun WorkingScreenPreview() {
                             workedEarnings = 1000000,
                             standardSalary = 1000000,
                             dailyPay = 100000,
-                            type = WorkdayType.WORK,
+                            type = WorkdayType.VACATION,
+                            events = persistentListOf(),
                             startHour = 9,
                             startMinute = 0,
                             endHour = 18,
@@ -861,13 +810,14 @@ private fun WorkingScreenPreview() {
                         workedEarnings = 1000000,
                         standardSalary = 1000000,
                         dailyPay = 100000,
-                        type = WorkdayType.WORK,
+                        type = WorkdayType.VACATION,
+                        events = persistentListOf(),
                         startHour = 9,
                         startMinute = 0,
                         endHour = 18,
                         endMinute = 0,
                     ),
-                    showWorkCompletionOverlay = false,
+                    showWorkCompletionOverlay = true,
                 ),
                 onIntent = {},
             )

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class WorkdayType(val value : String) {
-    VACATION("휴가"),
-    NONE("휴무"),
     WORK("근무"),
+    VACATION("연차"),
+    NONE("휴무"),
 }

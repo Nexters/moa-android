@@ -3,6 +3,7 @@ package com.moa.salary.app.presentation.model
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface RootNavigation : NavKey {
     @Serializable
     data object Splash : RootNavigation
@@ -20,7 +21,10 @@ sealed interface RootNavigation : NavKey {
     ) : RootNavigation
 
     @Serializable
-    data object History : RootNavigation
+    @JvmInline
+    value class History(
+        val startDestination: HistoryNavigation = HistoryNavigation.Calendar,
+    ) : RootNavigation
 
     @Serializable
     @JvmInline
