@@ -3,6 +3,7 @@ package com.moa.salary.app.presentation.model
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface RootNavigation : NavKey {
     @Serializable
     data object Splash : RootNavigation

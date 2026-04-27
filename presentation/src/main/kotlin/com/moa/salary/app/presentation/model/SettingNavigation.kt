@@ -2,6 +2,7 @@ package com.moa.salary.app.presentation.model
 
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface SettingNavigation : RootNavigation {
     @Serializable
     data object SettingMenu : SettingNavigation
