@@ -34,7 +34,7 @@ import java.time.LocalTime
 
 @Stable
 data class WorkingUiState(
-    val args: HomeNavigation.Working,
+    val completed: Boolean,
     val home: Home,
     val initialTime: Long = 0L,
     val todaySalary: Long = 0L,
@@ -88,7 +88,7 @@ data class WorkingUiState(
 
     val totalSalaryDisplay: String
         get() = formatCurrency(
-            if (args.showWorkCompletionOverlay) {
+            if (completed) {
                 home.workedEarnings
             } else {
                 home.workedEarnings + todaySalary
@@ -106,7 +106,7 @@ class WorkingViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(
         WorkingUiState(
-            args = args,
+            completed = args.showWorkCompletionOverlay,
             home = args.home,
             showWorkCompletionOverlay = args.showWorkCompletionOverlay,
             todaySalary = if (args.showWorkCompletionOverlay) args.home.dailyPay else 0L,
@@ -165,6 +165,7 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun getHome() {
+        val callTime = LocalTime.now()
         suspend {
             homeRepository.getHome()
         }.execute(
@@ -172,8 +173,12 @@ class WorkingViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { getHome() },
         ) { home ->
+            val endTime = LocalTime.of(home.endHour, home.endMinute)
             _uiState.update { state ->
-                state.copy(home = home)
+                state.copy(
+                    home = home,
+                    completed = callTime.isAfter(endTime) || callTime == endTime,
+                )
             }
 
             checkTime()
