@@ -20,7 +20,7 @@ class PreferencesDataStore @Inject constructor(
         name = DATASTORE_NAME
     )
 
-    suspend fun getBoolean(key: String): Boolean? {
+    private suspend fun getBoolean(key: String): Boolean? {
         return try {
             val preferences = context.dataStore.data.first()
             preferences[booleanPreferencesKey(key)]
@@ -29,7 +29,7 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun putBoolean(key: String, value: Boolean) {
+    private suspend fun putBoolean(key: String, value: Boolean) {
         try {
             context.dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(key)] = value
@@ -39,7 +39,7 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun getString(key: String): String? {
+    private suspend fun getString(key: String): String? {
         return try {
             val preferences = context.dataStore.data.first()
             preferences[stringPreferencesKey(key)]
@@ -48,7 +48,7 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun putString(key: String, value: String) {
+    private suspend fun putString(key: String, value: String) {
         try {
             context.dataStore.edit { preferences ->
                 preferences[stringPreferencesKey(key)] = value
@@ -94,9 +94,18 @@ class PreferencesDataStore @Inject constructor(
         putString(KEY_WORK_COMPLETED_DAY, completedWorkDay)
     }
 
+    suspend fun getShownPayday(): String? {
+        return getString(KEY_SHOWN_PAY_DAY)
+    }
+
+    suspend fun putShownPayday(shownPayday: String) {
+        putString(KEY_SHOWN_PAY_DAY, shownPayday)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
         private const val KEY_WORK_COMPLETED_DAY = "work_completed_day"
+        private const val KEY_SHOWN_PAY_DAY = "shown_pay_day"
     }
 }

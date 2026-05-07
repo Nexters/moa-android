@@ -9,6 +9,7 @@ import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.RootNavigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,13 +19,16 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     val moaSideEffects = moaSideEffectBus.sideEffects
     var shownNotificationBottomSheet = mutableStateOf<Boolean?>(null)
+    var shownPayday = mutableStateOf(true)
 
     fun onIntent(intent: HomeIntent) {
         when (intent) {
-            is HomeIntent.NavigateToHistory -> navigateToHistory()
-            is HomeIntent.NavigateToSetting -> navigateToSetting()
-            is HomeIntent.GetShownNotificationBottomSheet -> getShownNotificationBottomSheet()
-            is HomeIntent.SetShownNotificationBottomSheet -> setShownNotificationBottomSheet()
+            HomeIntent.NavigateToHistory -> navigateToHistory()
+            HomeIntent.NavigateToSetting -> navigateToSetting()
+            HomeIntent.GetShownNotificationBottomSheet -> getShownNotificationBottomSheet()
+            HomeIntent.SetShownNotificationBottomSheet -> setShownNotificationBottomSheet()
+            HomeIntent.GetShownPayday -> getShownPayday()
+            HomeIntent.SetShownPayday -> setShownPayday()
         }
     }
 
@@ -50,6 +54,19 @@ class HomeViewModel @Inject constructor(
         shownNotificationBottomSheet.value = true
         viewModelScope.launch {
             homeRepository.putShownNotificationBottomSheet(true)
+        }
+    }
+
+    private fun getShownPayday() {
+        viewModelScope.launch {
+            shownPayday.value = homeRepository.getShownPayday() == LocalDate.now()
+        }
+    }
+
+    private fun setShownPayday() {
+        shownPayday.value = true
+        viewModelScope.launch {
+            homeRepository.putShownPayday(LocalDate.now())
         }
     }
 }
