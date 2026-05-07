@@ -2,6 +2,7 @@ package com.moa.salary.app.presentation.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,10 @@ import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import java.time.LocalDate
 
 @Composable
-fun PaydayScreen(salary: String) {
+fun PaydayScreen(
+    salary: String,
+    onClick: () -> Unit,
+) {
     val month = LocalDate.now().monthValue
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.salary))
     val progress by animateLottieCompositionAsState(
@@ -44,7 +48,8 @@ fun PaydayScreen(salary: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MoaTheme.colors.dimPrimary),
+            .background(MoaTheme.colors.dimPrimary)
+            .clickable { onClick() },
     ) {
         Image(
             painter = painterResource(R.drawable.blur),
@@ -117,6 +122,9 @@ fun PaydayScreen(salary: String) {
 @Composable
 private fun PaydayScreenPreview() {
     MoaTheme {
-        PaydayScreen(salary = "3,000,000")
+        PaydayScreen(
+            salary = "3,000,000",
+            onClick = {},
+        )
     }
 }

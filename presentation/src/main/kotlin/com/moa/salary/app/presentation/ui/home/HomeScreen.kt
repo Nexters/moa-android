@@ -18,6 +18,8 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.moa.salary.app.core.extensions.formatCurrency
+import com.moa.salary.app.core.model.work.Event
 import com.moa.salary.app.presentation.designsystem.component.MoaHomeTopBar
 import com.moa.salary.app.presentation.designsystem.component.MoaNavDisplay
 import com.moa.salary.app.presentation.designsystem.component.MoaNotificationBottomSheet
@@ -62,6 +64,8 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         launchPostNotificationPermission()
+
+        viewModel.onIntent(HomeIntent.GetShownPayday)
 
         viewModel.moaSideEffects.collect {
             when (it) {
@@ -109,6 +113,16 @@ fun HomeScreen(
             }
         )
     }
+
+    if (
+        startDestination.home.events.contains(Event.PAYDAY) &&
+        !viewModel.shownPayday.value
+    ) {
+        PaydayScreen(
+            salary = formatCurrency(startDestination.home.standardSalary),
+            onClick = { viewModel.onIntent(HomeIntent.SetShownPayday) },
+        )
+    }
 }
 
 @Composable
@@ -140,4 +154,7 @@ sealed interface HomeIntent {
     data object NavigateToSetting : HomeIntent
     data object GetShownNotificationBottomSheet : HomeIntent
     data object SetShownNotificationBottomSheet : HomeIntent
+    data object GetShownPayday : HomeIntent
+
+    data object SetShownPayday : HomeIntent
 }

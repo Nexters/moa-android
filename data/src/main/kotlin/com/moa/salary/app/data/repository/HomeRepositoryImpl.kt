@@ -31,4 +31,12 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun putCompletedWorkDay(completedWorkDay: LocalDate) {
         preferencesDataStore.putCompletedWorkDay(completedWorkDay.toString())
     }
+
+    override suspend fun getShownPayday(): LocalDate? {
+        return preferencesDataStore.getShownPayday().toLocalDateOrNull()
+    }
+
+    override suspend fun putShownPayday(shownPayday: LocalDate) {
+        preferencesDataStore.putShownPayday(shownPayday.toString())
+    }
 }

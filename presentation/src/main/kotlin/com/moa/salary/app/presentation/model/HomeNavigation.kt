@@ -5,19 +5,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface HomeNavigation : RootNavigation {
+    val home : Home
+
     @Serializable
     data class BeforeWork(
-        val home: Home,
+        override val home: Home,
     ) : HomeNavigation
 
     @Serializable
     data class Working(
-        val home: Home,
+        override val home: Home,
         val showWorkCompletionOverlay: Boolean = false,
     ) : HomeNavigation
 
     @Serializable
     data class AfterWork(
-        val home: Home,
+        override val home: Home,
     ) : HomeNavigation
 }
