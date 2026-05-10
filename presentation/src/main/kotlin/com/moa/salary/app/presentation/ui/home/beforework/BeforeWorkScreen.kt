@@ -36,6 +36,7 @@ import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
@@ -268,17 +269,15 @@ private fun AccumulatedSalarySection(
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-        val salaryColor = if (isWorkDay) {
-            MoaTheme.colors.textGreen
-        } else {
-            MoaTheme.colors.textBlue
-        }
-
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
+            MoaRollingText(
                 text = accumulatedSalary,
-                style = MoaTheme.typography.h1_700,
-                color = salaryColor,
+                textColor = if (isWorkDay) {
+                    MoaTheme.colors.textGreen
+                } else {
+                    MoaTheme.colors.textBlue
+                },
+                animateOnAppear = true,
             )
 
             Spacer(Modifier.width(4.dp))
