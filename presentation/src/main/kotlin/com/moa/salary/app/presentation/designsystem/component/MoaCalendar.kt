@@ -154,7 +154,8 @@ private fun Day(
         DayBottomContent(
             status = workday?.status ?: WorkdayStatus.NONE,
             isPayday = workday?.events?.contains(Event.PAYDAY) ?: false,
-            isVacation = workday?.type == WorkdayType.VACATION
+            isVacation = workday?.type == WorkdayType.VACATION,
+            isHoliday = workday?.events?.contains(Event.PUBLIC_HOLIDAY) ?: false,
         )
     }
 }
@@ -164,71 +165,89 @@ private fun DayBottomContent(
     status: WorkdayStatus,
     isPayday: Boolean,
     isVacation: Boolean,
+    isHoliday: Boolean,
 ) {
-    if (isPayday && isVacation) {
-        Row {
+    when {
+        isPayday && isVacation -> {
+            Row {
+                Text(
+                    text = stringResource(R.string.history_calendar_payday),
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
+                    color = MoaTheme.colors.textGreen,
+                )
+                Spacer(Modifier.width(2.dp))
+                Text(
+                    text = stringResource(R.string.history_calendar_separator),
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
+                    color = MoaTheme.colors.textLowEmphasis,
+                )
+                Spacer(Modifier.width(2.dp))
+                Text(
+                    text = "연차",
+                    style = MoaTheme.typography.c1_400.toFixedSize(),
+                    color = MoaTheme.colors.textMediumEmphasis,
+                )
+            }
+        }
+
+        isPayday -> {
             Text(
-                text = stringResource(R.string.history_calendar_payday),
+                text = "월급",
                 style = MoaTheme.typography.c1_400.toFixedSize(),
                 color = MoaTheme.colors.textGreen,
             )
-            Spacer(Modifier.width(2.dp))
+        }
+
+        isHoliday -> {
             Text(
-                text = stringResource(R.string.history_calendar_separator),
-                style = MoaTheme.typography.c1_400.toFixedSize(),
-                color = MoaTheme.colors.textLowEmphasis,
-            )
-            Spacer(Modifier.width(2.dp))
-            Text(
-                text = stringResource(R.string.history_schedule_vacation),
+                text = "공휴일",
                 style = MoaTheme.typography.c1_400.toFixedSize(),
                 color = MoaTheme.colors.textMediumEmphasis,
+                maxLines = 1,
             )
         }
-    } else if (isPayday) {
-        Text(
-            text = stringResource(R.string.history_calendar_payday),
-            style = MoaTheme.typography.c1_400.toFixedSize(),
-            color = MoaTheme.colors.textGreen,
-        )
-    } else if (isVacation) {
-        Text(
-            text = stringResource(R.string.history_schedule_vacation),
-            style = MoaTheme.typography.c1_400.toFixedSize(),
-            color = MoaTheme.colors.textMediumEmphasis,
-            maxLines = 1,
-        )
-    } else {
-        Spacer(Modifier.height(4.dp))
-        when (status) {
-            WorkdayStatus.SCHEDULED -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(MoaTheme.colors.textLowEmphasis),
-                )
-            }
 
-            WorkdayStatus.COMPLETED -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Green40Main),
-                )
-            }
-
-            WorkdayStatus.NONE -> {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(Color.Transparent),
-                )
-            }
+        isVacation -> {
+            Text(
+                text = "연차",
+                style = MoaTheme.typography.c1_400.toFixedSize(),
+                color = MoaTheme.colors.textMediumEmphasis,
+                maxLines = 1,
+            )
         }
-        Spacer(Modifier.height(8.dp))
+
+        else -> {
+            Spacer(Modifier.height(4.dp))
+            when (status) {
+                WorkdayStatus.SCHEDULED -> {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(MoaTheme.colors.textLowEmphasis),
+                    )
+                }
+
+                WorkdayStatus.COMPLETED -> {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Green40Main),
+                    )
+                }
+
+                WorkdayStatus.NONE -> {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Color.Transparent),
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
     }
 
     Spacer(Modifier.height(16.dp))
