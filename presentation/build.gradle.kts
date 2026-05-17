@@ -85,6 +85,9 @@ dependencies {
     // Posthog
     implementation(libs.posthog)
 
+    // Play In-App Review
+    implementation(libs.play.review.ktx)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
 

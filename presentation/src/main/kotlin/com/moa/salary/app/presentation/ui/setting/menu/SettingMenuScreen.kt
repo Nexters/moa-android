@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -43,7 +45,7 @@ fun SettingMenuScreen(viewModel: SettingMenuViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.onIntent(SettingMenuIntent.GetSettingMenu)
+        viewModel.onIntent(SettingMenuIntent.Init)
     }
 
     SettingMenuScreen(
@@ -84,6 +86,7 @@ private fun SettingMenuScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = MoaTheme.spacing.spacing20),
         ) {
             Spacer(Modifier.height(MoaTheme.spacing.spacing20))
@@ -102,6 +105,7 @@ private fun SettingMenuScreen(
 
             SettingMenuAppInfoContent(
                 latestAppVersion = uiState.settingMenu?.latestVersion ?: "",
+                clickedReview = uiState.clickedReview,
                 onIntent = onIntent,
             )
 
@@ -207,6 +211,7 @@ private fun SettingMenuAppSettingContent(onIntent: (SettingMenuIntent) -> Unit) 
 @Composable
 private fun SettingMenuAppInfoContent(
     latestAppVersion: String,
+    clickedReview: Boolean,
     onIntent: (SettingMenuIntent) -> Unit,
 ) {
     val context = LocalContext.current
@@ -305,6 +310,28 @@ private fun SettingMenuAppInfoContent(
             )
         }
     )
+
+    if (!clickedReview) {
+        Spacer(Modifier.height(10.dp))
+
+        MoaRow(
+            modifier = Modifier.clickable { onIntent(SettingMenuIntent.ClickReview) },
+            leadingContent = {
+                Text(
+                    text = "서비스 의견 남기기",
+                    style = MoaTheme.typography.b1_500,
+                    color = MoaTheme.colors.textHighEmphasis,
+                )
+            },
+            trailingContent = {
+                Image(
+                    painter = painterResource(R.drawable.ic_24_chevron_right),
+                    contentDescription = "Chevron Right",
+                    colorFilter = ColorFilter.tint(MoaTheme.colors.textLowEmphasis)
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -338,7 +365,7 @@ private fun SettingMenuButtonContent(onIntent: (SettingMenuIntent) -> Unit) {
 }
 
 sealed interface SettingMenuIntent {
-    data object GetSettingMenu : SettingMenuIntent
+    data object Init : SettingMenuIntent
     data object ClickBack : SettingMenuIntent
     data object ClickNickName : SettingMenuIntent
     data object ClickWorkInfo : SettingMenuIntent
@@ -346,6 +373,7 @@ sealed interface SettingMenuIntent {
     data object ClickTerms : SettingMenuIntent
     data object ClickLogout : SettingMenuIntent
     data object ClickWithdraw : SettingMenuIntent
+    data object ClickReview : SettingMenuIntent
 }
 
 @Preview

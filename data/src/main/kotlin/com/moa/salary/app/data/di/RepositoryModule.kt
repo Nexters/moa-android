@@ -8,6 +8,8 @@ import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.HomeRepositoryImpl
 import com.moa.salary.app.data.repository.OnboardingRepository
 import com.moa.salary.app.data.repository.OnboardingRepositoryImpl
+import com.moa.salary.app.data.repository.ReviewRepository
+import com.moa.salary.app.data.repository.ReviewRepositoryImpl
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.SettingRepositoryImpl
 import com.moa.salary.app.data.repository.TokenRepository
@@ -64,4 +66,10 @@ interface RepositoryModule {
     fun bindsCalendarRepository(
         impl: CalendarRepositoryImpl,
     ): CalendarRepository
+
+    @Binds
+    @Singleton
+    fun bindsReviewRepository(
+        impl: ReviewRepositoryImpl,
+    ): ReviewRepository
 }

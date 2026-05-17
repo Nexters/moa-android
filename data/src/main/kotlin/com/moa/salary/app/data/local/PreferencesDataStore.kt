@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,6 +34,25 @@ class PreferencesDataStore @Inject constructor(
         try {
             context.dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(key)] = value
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to save preference", e)
+        }
+    }
+
+    private suspend fun getInt(key: String): Int? {
+        return try {
+            val preferences = context.dataStore.data.first()
+            preferences[intPreferencesKey(key)]
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private suspend fun putInt(key: String, value: Int) {
+        try {
+            context.dataStore.edit { preferences ->
+                preferences[intPreferencesKey(key)] = value
             }
         } catch (e: Exception) {
             throw Exception("Failed to save preference", e)
@@ -102,10 +122,28 @@ class PreferencesDataStore @Inject constructor(
         putString(KEY_SHOWN_PAY_DAY, shownPayday)
     }
 
+    suspend fun getClickedSettingReview(): Boolean {
+        return getBoolean(KEY_CLICKED_SETTING_REVIEW) ?: false
+    }
+
+    suspend fun putClickedSettingReview(value: Boolean) {
+        putBoolean(KEY_CLICKED_SETTING_REVIEW, value)
+    }
+
+    suspend fun getHomeVisitCount(): Int {
+        return getInt(KEY_HOME_VISIT_COUNT) ?: 0
+    }
+
+    suspend fun putHomeVisitCount(value: Int) {
+        putInt(KEY_HOME_VISIT_COUNT, value)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
         private const val KEY_WORK_COMPLETED_DAY = "work_completed_day"
         private const val KEY_SHOWN_PAY_DAY = "shown_pay_day"
+        private const val KEY_CLICKED_SETTING_REVIEW = "clicked_setting_review"
+        private const val KEY_HOME_VISIT_COUNT = "home_visit_count"
     }
 }

@@ -208,7 +208,14 @@ class WorkingViewModel @AssistedInject constructor(
         viewModelScope.launch {
             homeRepository.putCompletedWorkDay(LocalDate.now())
         }.invokeOnCompletion {
+            launchInAppReview()
             navigateToAfterWork()
+        }
+    }
+
+    private fun launchInAppReview() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.LaunchInAppReview)
         }
     }
 
