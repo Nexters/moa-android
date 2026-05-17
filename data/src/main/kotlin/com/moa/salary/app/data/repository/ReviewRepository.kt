@@ -3,5 +3,5 @@ package com.moa.salary.app.data.repository
 interface ReviewRepository {
     suspend fun getClickedSettingReview(): Boolean
     suspend fun setClickedSettingReview()
-    suspend fun incrementHomeVisitCount(): Int
+    suspend fun incrementHomeVisitCountIfNewDay(): Int
 }
