@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moa.salary.app.core.extensions.calculateTimeDiffString
 import com.moa.salary.app.core.extensions.makeTimeString
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.presentation.R
@@ -88,6 +89,17 @@ private fun MoaTimeBottomSheetContent(
             text = title,
             style = MoaTheme.typography.t1_700,
             color = MoaTheme.colors.textHighEmphasis,
+        )
+
+        Spacer(Modifier.height(MoaTheme.spacing.spacing4))
+
+        MoaDiffTimeRow(
+            diffTimeString = calculateTimeDiffString(
+                startHour = startHour,
+                startMinute = startMinute,
+                endHour = endHour,
+                endMinute = endMinute,
+            )
         )
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing16))
