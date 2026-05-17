@@ -138,6 +138,14 @@ class PreferencesDataStore @Inject constructor(
         putInt(KEY_HOME_VISIT_COUNT, value)
     }
 
+    suspend fun getHomeVisitLastDate(): String? {
+        return getString(KEY_HOME_VISIT_LAST_DATE)
+    }
+
+    suspend fun putHomeVisitLastDate(value: String) {
+        putString(KEY_HOME_VISIT_LAST_DATE, value)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
@@ -145,5 +153,6 @@ class PreferencesDataStore @Inject constructor(
         private const val KEY_SHOWN_PAY_DAY = "shown_pay_day"
         private const val KEY_CLICKED_SETTING_REVIEW = "clicked_setting_review"
         private const val KEY_HOME_VISIT_COUNT = "home_visit_count"
+        private const val KEY_HOME_VISIT_LAST_DATE = "home_visit_last_date"
     }
 }

@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
 
     private fun incrementHomeVisit() {
         viewModelScope.launch {
-            val count = reviewRepository.incrementHomeVisitCount()
+            val count = reviewRepository.incrementHomeVisitCountIfNewDay()
             if (count % 3 == 0) {
                 moaSideEffectBus.emit(MoaSideEffect.LaunchInAppReview)
             }

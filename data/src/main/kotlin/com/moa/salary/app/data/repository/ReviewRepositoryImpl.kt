@@ -1,6 +1,7 @@
 package com.moa.salary.app.data.repository
 
 import com.moa.salary.app.data.local.PreferencesDataStore
+import java.time.LocalDate
 import javax.inject.Inject
 
 class ReviewRepositoryImpl @Inject constructor(
@@ -14,9 +15,16 @@ class ReviewRepositoryImpl @Inject constructor(
         preferencesDataStore.putClickedSettingReview(true)
     }
 
-    override suspend fun incrementHomeVisitCount(): Int {
-        val next = preferencesDataStore.getHomeVisitCount() + 1
-        preferencesDataStore.putHomeVisitCount(next)
-        return next
+    override suspend fun incrementHomeVisitCountIfNewDay(): Int {
+        val today = LocalDate.now().toString()
+        val visitCount = preferencesDataStore.getHomeVisitCount()
+
+        return if (preferencesDataStore.getHomeVisitLastDate() == today) {
+            visitCount
+        } else {
+            preferencesDataStore.putHomeVisitLastDate(today)
+            preferencesDataStore.putHomeVisitCount(visitCount + 1)
+            visitCount + 1
+        }
     }
 }
