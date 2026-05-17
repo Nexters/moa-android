@@ -239,8 +239,8 @@ class WorkingViewModel @AssistedInject constructor(
                     home = it.home.copy(
                         dailyPay = workday.dailyPay,
                         type = workday.type,
-                        clockInDateTime = workday.clockInDateTime ?: it.home.clockInDateTime,
-                        clockOutDateTime = workday.clockOutDateTime ?: it.home.clockOutDateTime,
+                        clockInDateTime = workday.clockInDateTime,
+                        clockOutDateTime = workday.clockOutDateTime,
                     ),
                     showScheduleAdjustBottomSheet = false,
                     showMoreWorkBottomSheet = false,
