@@ -71,3 +71,32 @@ fun Char.isKoreanEnglishOrDigit(): Boolean {
 }
 
 fun String.toZeroString(): String = this.map { if (it.isDigit()) '0' else it }.joinToString("")
+
+fun calculateTimeDiffString(
+    startHour: Int,
+    startMinute: Int,
+    endHour: Int,
+    endMinute: Int,
+) : String{
+    val totalStartMinutes = startHour * 60 + startMinute
+    var totalEndMinutes = endHour * 60 + endMinute
+
+    if (totalEndMinutes < totalStartMinutes) {
+        totalEndMinutes += 24 * 60
+    }
+
+    val diffInMinutes = totalEndMinutes - totalStartMinutes
+
+    val hours = diffInMinutes / 60
+    val minutes = diffInMinutes % 60
+
+
+    return buildString {
+        if(hours > 0) {
+            append("${hours}시간 ")
+        }
+        if(minutes > 0){
+            append("${minutes}분 ")
+        }
+    }
+}
