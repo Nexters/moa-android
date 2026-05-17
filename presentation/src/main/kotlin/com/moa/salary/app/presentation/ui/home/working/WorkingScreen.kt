@@ -53,6 +53,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.model.work.Home
+import java.time.LocalDate
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaBlueButton
@@ -799,10 +800,8 @@ private fun WorkingScreenPreview() {
                         dailyPay = 100000,
                         type = WorkdayType.VACATION,
                         events = persistentListOf(),
-                        startHour = 9,
-                        startMinute = 0,
-                        endHour = 18,
-                        endMinute = 0,
+                        clockInDateTime = LocalDate.now().atTime(9, 0),
+                        clockOutDateTime = LocalDate.now().atTime(18, 0),
                     ),
                     showWorkCompletionOverlay = true,
                 ),

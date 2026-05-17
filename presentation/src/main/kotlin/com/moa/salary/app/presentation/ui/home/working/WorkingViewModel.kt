@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 @Stable
 data class WorkingUiState(
@@ -57,11 +57,9 @@ data class WorkingUiState(
             if (showWorkCompletionOverlay) return 1f
             if (elapsedTotalSeconds == 0) return 0f
 
-            val startSeconds = home.startHour * 3600 + home.startMinute * 60
-            val endSeconds = home.endHour * 3600 + home.endMinute * 60
-            val totalSeconds = endSeconds - startSeconds
+            val totalSeconds = Duration.between(home.clockInDateTime, home.clockOutDateTime).seconds
 
-            return elapsedTotalSeconds / totalSeconds.toFloat()
+            return if (totalSeconds > 0) elapsedTotalSeconds / totalSeconds.toFloat() else 0f
         }
 
     val confettiProgress: Float
@@ -165,7 +163,7 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun getHome() {
-        val callTime = LocalTime.now()
+        val callTime = LocalDateTime.now()
         suspend {
             homeRepository.getHome()
         }.execute(
@@ -173,11 +171,10 @@ class WorkingViewModel @AssistedInject constructor(
             scope = viewModelScope,
             onRetry = { getHome() },
         ) { home ->
-            val endTime = LocalTime.of(home.endHour, home.endMinute)
             _uiState.update { state ->
                 state.copy(
                     home = home,
-                    completed = callTime.isAfter(endTime) || callTime == endTime,
+                    completed = !callTime.isBefore(home.clockOutDateTime),
                 )
             }
 
@@ -198,7 +195,7 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun selectEndWork() {
-        val now = LocalTime.now()
+        val now = LocalDateTime.now()
 
         patchClockOut(
             endHour = now.hour,
@@ -242,10 +239,8 @@ class WorkingViewModel @AssistedInject constructor(
                     home = it.home.copy(
                         dailyPay = workday.dailyPay,
                         type = workday.type,
-                        startHour = workday.startHour ?: it.home.startHour,
-                        startMinute = workday.startMinute ?: it.home.startMinute,
-                        endHour = workday.endHour ?: it.home.endHour,
-                        endMinute = workday.endMinute ?: it.home.endMinute,
+                        clockInDateTime = workday.clockInDateTime ?: it.home.clockInDateTime,
+                        clockOutDateTime = workday.clockOutDateTime ?: it.home.clockOutDateTime,
                     ),
                     showScheduleAdjustBottomSheet = false,
                     showMoreWorkBottomSheet = false,
@@ -259,17 +254,17 @@ class WorkingViewModel @AssistedInject constructor(
 
     private fun checkTime() {
         val state = _uiState.value
-        val now = LocalTime.now()
-        val startTime = LocalTime.of(state.home.startHour, state.home.startMinute)
-        val endTime = LocalTime.of(state.home.endHour, state.home.endMinute)
+        val now = LocalDateTime.now()
+        val clockIn = state.home.clockInDateTime
+        val clockOut = state.home.clockOutDateTime
 
         when {
-            now.isBefore(startTime) -> navigateToBeforeWork()
+            now.isBefore(clockIn) -> navigateToBeforeWork()
 
-            now.isBefore(endTime) -> {
+            now.isBefore(clockOut) -> {
                 updateElapsedTime(
-                    startTime = startTime,
-                    endTime = endTime,
+                    clockIn = clockIn,
+                    clockOut = clockOut,
                     now = now,
                 )
 
@@ -279,30 +274,28 @@ class WorkingViewModel @AssistedInject constructor(
             }
 
             else -> afterWork(
-                startTime = startTime,
-                endTime = endTime,
+                clockIn = clockIn,
+                clockOut = clockOut,
             )
         }
     }
 
     private fun updateElapsedTime(
-        startTime: LocalTime,
-        endTime: LocalTime,
-        now: LocalTime,
+        clockIn: LocalDateTime,
+        clockOut: LocalDateTime,
+        now: LocalDateTime,
     ) {
-        val elapsedSeconds = Duration.between(startTime, now).seconds.toInt()
+        val elapsedSeconds = Duration.between(clockIn, now).seconds.coerceAtLeast(0L).toInt()
 
         _uiState.update { state ->
             val newTodaySalary = SalaryUtils.calculateSalaryForWorkedTime(
-                workedSeconds = elapsedSeconds,
-                startHour = state.home.startHour,
-                startMinute = state.home.startMinute,
-                endHour = state.home.endHour,
-                endMinute = state.home.endMinute,
+                clockInDateTime = state.home.clockInDateTime,
+                clockOutDateTime = state.home.clockOutDateTime,
                 dailyPay = state.home.dailyPay,
+                workedSeconds = elapsedSeconds,
             )
             val remainingSeconds =
-                Duration.between(now, endTime).seconds.toInt().coerceAtLeast(0)
+                Duration.between(now, clockOut).seconds.coerceAtLeast(0L).toInt()
             val remainingHours = remainingSeconds / 3600
 
             state.copy(
@@ -314,14 +307,14 @@ class WorkingViewModel @AssistedInject constructor(
     }
 
     private fun afterWork(
-        startTime: LocalTime,
-        endTime: LocalTime,
+        clockIn: LocalDateTime,
+        clockOut: LocalDateTime,
     ) {
         if (!_uiState.value.showWorkCompletionOverlay) {
             updateElapsedTime(
-                startTime = startTime,
-                endTime = endTime,
-                now = endTime,
+                clockIn = clockIn,
+                clockOut = clockOut,
+                now = clockOut,
             )
 
             _uiState.update {

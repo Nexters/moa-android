@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.model.work.Home
+import java.time.LocalDate
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaBlueButton
@@ -252,10 +253,8 @@ private fun AfterWorkScreenPreview() {
                         dailyPay = 100000,
                         type = WorkdayType.WORK,
                         events = persistentListOf(),
-                        startHour = 9,
-                        startMinute = 0,
-                        endHour = 18,
-                        endMinute = 0,
+                        clockInDateTime = LocalDate.now().atTime(9, 0),
+                        clockOutDateTime = LocalDate.now().atTime(18, 0),
                     ),
                 ),
                 onIntent = {},

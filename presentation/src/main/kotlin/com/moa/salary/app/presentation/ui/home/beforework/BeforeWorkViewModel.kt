@@ -29,8 +29,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -153,13 +154,11 @@ class BeforeWorkViewModel @AssistedInject constructor(
     }
 
     private fun clickEarlyClockIn() {
-        val now = LocalTime.now()
+        val now = LocalDateTime.now()
         val state = _uiState.value
 
-        val registeredStartMinutes = state.home.startHour * 60 + state.home.startMinute
-        val registeredEndMinutes = state.home.endHour * 60 + state.home.endMinute
-        val workDurationMinutes = registeredEndMinutes - registeredStartMinutes
-        val endTime = now.plusMinutes(workDurationMinutes.toLong())
+        val workDuration = Duration.between(state.home.clockInDateTime, state.home.clockOutDateTime)
+        val endTime = now.plus(workDuration)
 
         updateWorkday(
             clockInTime = makeTimeString(now.hour, now.minute),
@@ -201,10 +200,8 @@ class BeforeWorkViewModel @AssistedInject constructor(
                     home = it.home.copy(
                         dailyPay = workday.dailyPay,
                         type = workday.type,
-                        startHour = workday.startHour ?: it.home.startHour,
-                        startMinute = workday.startMinute ?: it.home.startMinute,
-                        endHour = workday.endHour ?: it.home.endHour,
-                        endMinute = workday.endMinute ?: it.home.endMinute,
+                        clockInDateTime = workday.clockInDateTime ?: it.home.clockInDateTime,
+                        clockOutDateTime = workday.clockOutDateTime ?: it.home.clockOutDateTime,
                     )
                 )
             }

@@ -121,7 +121,7 @@ private fun MoaTimeBottomSheetContent(
             enabled = if (selectedStartTime && !endTimeOnly) {
                 true
             } else {
-                (endHour > startHour) || (endHour == startHour && endMinute > startMinute)
+                !(endHour == startHour && endMinute == startMinute)
             },
             negativeText = negativeText,
             positiveText = positiveText,
