@@ -1,8 +1,5 @@
 package com.moa.salary.app.presentation.ui
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.Animatable
@@ -133,7 +130,7 @@ fun MainScreen(
                 }
 
                 is MoaSideEffect.LaunchInAppReview -> {
-                    if(activity != null) {
+                    if (activity != null) {
                         val manager = ReviewManagerFactory.create(activity)
                         manager.requestReviewFlow().addOnCompleteListener { task ->
                             if (task.isSuccessful) {
