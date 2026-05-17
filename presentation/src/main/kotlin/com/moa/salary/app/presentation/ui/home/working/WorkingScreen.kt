@@ -380,7 +380,7 @@ private fun CoinGraph(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.BottomCenter,
     ) {
-        val imageWidth = maxWidth * (112f / 375f)
+        val imageWidth = (maxWidth * (112f / 375f)).coerceAtMost(112.dp)
         val coinImage = if (type == WorkdayType.VACATION) {
             R.drawable.img_blue_coin_progress
         } else {
