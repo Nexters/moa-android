@@ -14,6 +14,7 @@ import com.moa.salary.app.core.util.SalaryUtils
 import com.moa.salary.app.data.repository.HomeRepository
 import com.moa.salary.app.data.repository.WorkdayRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
+import com.moa.salary.app.presentation.extensions.determineHomeNavigation
 import com.moa.salary.app.presentation.extensions.execute
 import com.moa.salary.app.presentation.model.HistoryNavigation
 import com.moa.salary.app.presentation.model.HomeNavigation
@@ -257,26 +258,33 @@ class WorkingViewModel @AssistedInject constructor(
         val now = LocalDateTime.now()
         val clockIn = state.home.clockInDateTime
         val clockOut = state.home.clockOutDateTime
+        val homeNavigation = state.home.determineHomeNavigation()
 
-        when {
-            now.isBefore(clockIn) -> navigateToBeforeWork()
+        when (homeNavigation) {
+            is HomeNavigation.BeforeWork -> navigateToBeforeWork()
+            is HomeNavigation.AfterWork -> navigateToAfterWork()
+            is HomeNavigation.Working -> {
+                when {
+                    now.isBefore(clockOut) -> {
+                        updateElapsedTime(
+                            clockIn = clockIn,
+                            clockOut = clockOut,
+                            now = now,
+                        )
 
-            now.isBefore(clockOut) -> {
-                updateElapsedTime(
-                    clockIn = clockIn,
-                    clockOut = clockOut,
-                    now = now,
-                )
+                        _uiState.update {
+                            it.copy(showWorkCompletionOverlay = false)
+                        }
+                    }
 
-                _uiState.update {
-                    it.copy(showWorkCompletionOverlay = false)
+                    else -> {
+                        afterWork(
+                            clockIn = clockIn,
+                            clockOut = clockOut,
+                        )
+                    }
                 }
             }
-
-            else -> afterWork(
-                clockIn = clockIn,
-                clockOut = clockOut,
-            )
         }
     }
 
