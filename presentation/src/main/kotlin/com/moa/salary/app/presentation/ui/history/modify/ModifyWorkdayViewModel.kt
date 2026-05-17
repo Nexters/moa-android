@@ -31,20 +31,7 @@ data class ModifyWorkdayUiState(
     val time: Time,
     val showDateBottomSheet: Boolean = false,
     val showTimeBottomSheet: Boolean = false,
-){
-    val diffTimeString = buildString {
-        val diffTimePair = time.calculateTimeDiff()
-        val hours = diffTimePair.first
-        val minutes = diffTimePair.second
-
-        if(hours > 0) {
-            append("${hours}시간 ")
-        }
-        if(minutes > 0){
-            append("${minutes}분 ")
-        }
-    }
-}
+)
 
 @HiltViewModel(assistedFactory = ModifyWorkdayViewModel.Factory::class)
 class ModifyWorkdayViewModel @AssistedInject constructor(
@@ -99,10 +86,10 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
                 date = workday.date.toLocalDate(),
                 selectedWorkdayType = if (workday.type == WorkdayType.NONE) WorkdayType.WORK else workday.type,
                 time = Time(
-                    startHour = workday.startHour ?: 9,
-                    startMinute = workday.startMinute ?: 0,
-                    endHour = workday.endHour ?: 18,
-                    endMinute = workday.endMinute ?: 0,
+                    startHour = workday.startHour,
+                    startMinute = workday.startMinute,
+                    endHour = workday.endHour,
+                    endMinute = workday.endMinute,
                 )
             )
         }
@@ -157,7 +144,7 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
         }
     }
 
-    private fun sendEvent(event : PosthogEvent) {
+    private fun sendEvent(event: PosthogEvent) {
         event.sendEvent()
     }
 

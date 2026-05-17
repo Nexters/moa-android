@@ -41,6 +41,7 @@ import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTimeBottomSheet
+import com.moa.salary.app.presentation.designsystem.component.MoaDiffTimeRow
 import com.moa.salary.app.presentation.designsystem.component.MoaTopAppBar
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
 import com.moa.salary.app.presentation.model.HistoryNavigation
@@ -223,20 +224,7 @@ private fun ModifyWorkdayScreen(
 
                 Spacer(Modifier.height(8.dp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_16_time),
-                        contentDescription = null,
-                    )
-
-                    Spacer(Modifier.width(4.dp))
-
-                    Text(
-                        text = "총 ${uiState.diffTimeString}근무해요.",
-                        style = MoaTheme.typography.b2_500,
-                        color = MoaTheme.colors.textGreen,
-                    )
-                }
+                MoaDiffTimeRow(uiState.time.diffTimeString)
             }
 
             Spacer(Modifier.weight(1f))
