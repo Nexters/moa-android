@@ -86,10 +86,10 @@ class ModifyWorkdayViewModel @AssistedInject constructor(
                 date = workday.date.toLocalDate(),
                 selectedWorkdayType = if (workday.type == WorkdayType.NONE) WorkdayType.WORK else workday.type,
                 time = Time(
-                    startHour = workday.startHour ?: 9,
-                    startMinute = workday.startMinute ?: 0,
-                    endHour = workday.endHour ?: 18,
-                    endMinute = workday.endMinute ?: 0,
+                    startHour = workday.startHour,
+                    startMinute = workday.startMinute,
+                    endHour = workday.endHour,
+                    endMinute = workday.endMinute,
                 )
             )
         }

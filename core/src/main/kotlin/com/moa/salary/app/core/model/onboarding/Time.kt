@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import com.moa.salary.app.core.extensions.calculateTimeDiffString
 import com.moa.salary.app.core.extensions.makeTimeString
 import kotlinx.serialization.Serializable
-import kotlin.compareTo
 
 @Serializable
 @Stable
@@ -14,7 +13,7 @@ data class Time(
     val endHour: Int,
     val endMinute: Int,
 ) {
-    val diffTimeString : String = calculateTimeDiffString(
+    val diffTimeString: String = calculateTimeDiffString(
         startHour = startHour,
         startMinute = startMinute,
         endHour = endHour,
