@@ -324,7 +324,7 @@ private fun ScheduleItems(
                     Triple(
                         R.drawable.ic_40_vacation,
                         "공휴일",
-                        "공휴일",
+                        "근무 일정 없음",
                     )
                 } else {
                     null
