@@ -65,6 +65,8 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         launchPostNotificationPermission()
 
+        viewModel.onIntent(HomeIntent.IncrementHomeVisit)
+
         viewModel.onIntent(HomeIntent.GetShownPayday)
 
         viewModel.moaSideEffects.collect {
@@ -118,6 +120,10 @@ fun HomeScreen(
         startDestination.home.events.contains(Event.PAYDAY) &&
         !viewModel.shownPayday.value
     ) {
+        LaunchedEffect(Unit) {
+            viewModel.onIntent(HomeIntent.RequestReviewOnPayday)
+        }
+
         PaydayScreen(
             salary = formatCurrency(startDestination.home.standardSalary),
             onClick = { viewModel.onIntent(HomeIntent.SetShownPayday) },
@@ -157,4 +163,6 @@ sealed interface HomeIntent {
     data object GetShownPayday : HomeIntent
 
     data object SetShownPayday : HomeIntent
+    data object IncrementHomeVisit : HomeIntent
+    data object RequestReviewOnPayday : HomeIntent
 }

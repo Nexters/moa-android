@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.data.repository.HomeRepository
+import com.moa.salary.app.data.repository.ReviewRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
 import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.RootNavigation
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val moaSideEffectBus: MoaSideEffectBus,
     private val homeRepository: HomeRepository,
+    private val reviewRepository: ReviewRepository,
 ) : ViewModel() {
     val moaSideEffects = moaSideEffectBus.sideEffects
     var shownNotificationBottomSheet = mutableStateOf<Boolean?>(null)
@@ -29,6 +31,23 @@ class HomeViewModel @Inject constructor(
             HomeIntent.SetShownNotificationBottomSheet -> setShownNotificationBottomSheet()
             HomeIntent.GetShownPayday -> getShownPayday()
             HomeIntent.SetShownPayday -> setShownPayday()
+            HomeIntent.IncrementHomeVisit -> incrementHomeVisit()
+            HomeIntent.RequestReviewOnPayday -> requestReviewOnPayday()
+        }
+    }
+
+    private fun incrementHomeVisit() {
+        viewModelScope.launch {
+            val count = reviewRepository.incrementHomeVisitCount()
+            if (count % 3 == 0) {
+                moaSideEffectBus.emit(MoaSideEffect.LaunchInAppReview)
+            }
+        }
+    }
+
+    private fun requestReviewOnPayday() {
+        viewModelScope.launch {
+            moaSideEffectBus.emit(MoaSideEffect.LaunchInAppReview)
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moa.salary.app.core.model.setting.SettingMenu
 import com.moa.salary.app.data.repository.AuthRepository
+import com.moa.salary.app.data.repository.ReviewRepository
 import com.moa.salary.app.data.repository.SettingRepository
 import com.moa.salary.app.data.repository.TokenRepository
 import com.moa.salary.app.presentation.bus.MoaSideEffectBus
@@ -23,7 +24,8 @@ import javax.inject.Inject
 
 @Stable
 data class SettingUiState(
-    val settingMenu: SettingMenu? = null
+    val settingMenu: SettingMenu? = null,
+    val clickedReview: Boolean = false,
 )
 
 @HiltViewModel
@@ -32,6 +34,7 @@ class SettingMenuViewModel @Inject constructor(
     private val settingRepository: SettingRepository,
     private val tokenRepository: TokenRepository,
     private val authRepository: AuthRepository,
+    private val reviewRepository: ReviewRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
@@ -39,7 +42,7 @@ class SettingMenuViewModel @Inject constructor(
 
     fun onIntent(intent: SettingMenuIntent) {
         when (intent) {
-            SettingMenuIntent.GetSettingMenu -> getSettingMenu()
+            SettingMenuIntent.Init -> init()
             SettingMenuIntent.ClickBack -> back()
             SettingMenuIntent.ClickNickName -> nickName()
             SettingMenuIntent.ClickWorkInfo -> workInfo()
@@ -47,7 +50,13 @@ class SettingMenuViewModel @Inject constructor(
             SettingMenuIntent.ClickTerms -> terms()
             SettingMenuIntent.ClickLogout -> logoutDialog()
             SettingMenuIntent.ClickWithdraw -> withdraw()
+            SettingMenuIntent.ClickReview -> clickReview()
         }
+    }
+
+    private fun init() {
+        getSettingMenu()
+        getClickedSetting()
     }
 
     private fun getSettingMenu() {
@@ -59,6 +68,22 @@ class SettingMenuViewModel @Inject constructor(
             onRetry = { getSettingMenu() }
         ) {
             _uiState.value = _uiState.value.copy(settingMenu = it)
+        }
+    }
+
+    private fun getClickedSetting() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                clickedReview = reviewRepository.getClickedSettingReview()
+            )
+        }
+    }
+
+    private fun clickReview() {
+        viewModelScope.launch {
+            reviewRepository.setClickedSettingReview()
+            _uiState.value = _uiState.value.copy(clickedReview = true)
+            moaSideEffectBus.emit(MoaSideEffect.LaunchInAppReview)
         }
     }
 

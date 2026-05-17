@@ -1,6 +1,10 @@
 package com.moa.salary.app.presentation.ui
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,6 +34,7 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.moa.salary.app.core.exception.ApiErrorException
 import com.moa.salary.app.core.exception.NetworkException
@@ -63,6 +68,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+    val activity = LocalActivity.current
     val toastAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
@@ -124,6 +130,17 @@ fun MainScreen(
 
                 is MoaSideEffect.Loading -> {
                     viewModel.onIntent(MainIntent.SetLoading(it.isLoading))
+                }
+
+                is MoaSideEffect.LaunchInAppReview -> {
+                    if(activity != null) {
+                        val manager = ReviewManagerFactory.create(activity)
+                        manager.requestReviewFlow().addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                manager.launchReviewFlow(activity, task.result)
+                            }
+                        }
+                    }
                 }
 
                 is MoaSideEffect.Failure -> {
