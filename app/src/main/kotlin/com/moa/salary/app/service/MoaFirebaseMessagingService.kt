@@ -8,9 +8,11 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.moa.salary.app.R
 import com.moa.salary.app.data.repository.AuthRepository
+import com.moa.salary.app.data.repository.TokenRepository
 import com.moa.salary.app.presentation.ui.MainActivity
 import com.moa.salary.app.presentation.ui.widget.util.WidgetUpdateManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,12 +28,21 @@ class MoaFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var authRepository: AuthRepository
 
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    @Inject
+    lateinit var tokenRepository: TokenRepository
+
+    private val serviceScope = CoroutineScope(
+        SupervisorJob() +
+                Dispatchers.IO +
+                CoroutineExceptionHandler { _, _ -> }
+    )
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
         serviceScope.launch {
+            val accessToken = tokenRepository.getAccessToken()
+            if (accessToken.isNullOrEmpty()) return@launch
             authRepository.updateToken(token)
         }
     }
