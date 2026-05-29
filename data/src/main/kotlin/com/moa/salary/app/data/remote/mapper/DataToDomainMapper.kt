@@ -2,8 +2,8 @@ package com.moa.salary.app.data.remote.mapper
 
 import com.moa.salary.app.core.extensions.convertMinutesToRoundedHours
 import com.moa.salary.app.core.extensions.toHourMinute
-import com.moa.salary.app.core.extensions.toHourMinuteOrNull
 import com.moa.salary.app.core.extensions.toLocalDate
+import com.moa.salary.app.core.extensions.toLocalTimeOrNull
 import com.moa.salary.app.core.model.onboarding.OnboardingStatus
 import com.moa.salary.app.core.model.onboarding.Payroll
 import com.moa.salary.app.core.model.onboarding.Profile
@@ -32,6 +32,9 @@ import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 fun StatusResponse.toDomain(): OnboardingStatus = OnboardingStatus(
     profile = profile?.toDomain(),
@@ -127,8 +130,10 @@ fun List<NotificationSettingResponse>.toNotificationSettingDomain(): ImmutableLi
 }
 
 fun HomeResponse.toDomain(): Home {
-    val clockIn = clockInTime?.toHourMinuteOrNull()
-    val clockOut = clockOutTime?.toHourMinuteOrNull()
+    val (clockInDateTime, clockOutDateTime) = resolveDateTimeRange(
+        clockInRaw = clockInTime,
+        clockOutRaw = clockOutTime,
+    )
 
     return Home(
         workplace = workplace,
@@ -137,16 +142,16 @@ fun HomeResponse.toDomain(): Home {
         dailyPay = dailyPay,
         type = type.toWorkdayType(),
         events = events.map { it.toEvent() }.toImmutableList(),
-        startHour = clockIn?.first ?: 9,
-        startMinute = clockIn?.second ?: 0,
-        endHour = clockOut?.first ?: 18,
-        endMinute = clockOut?.second ?: 0,
+        clockInDateTime = clockInDateTime,
+        clockOutDateTime = clockOutDateTime,
     )
 }
 
 fun WorkdayResponse.toDomain(): Workday {
-    val clockIn = clockInTime?.toHourMinuteOrNull()
-    val clockOut = clockOutTime?.toHourMinuteOrNull()
+    val (clockInDateTime, clockOutDateTime) = resolveDateTimeRange(
+        clockInRaw = clockInTime,
+        clockOutRaw = clockOutTime,
+    )
 
     return Workday(
         date = date,
@@ -154,11 +159,28 @@ fun WorkdayResponse.toDomain(): Workday {
         status = status.toWorkdayStatus(),
         events = events.map { it.toEvent() }.toImmutableList(),
         dailyPay = dailyPay,
-        startHour = clockIn?.first,
-        startMinute = clockIn?.second,
-        endHour = clockOut?.first,
-        endMinute = clockOut?.second,
+        clockInDateTime = clockInDateTime,
+        clockOutDateTime = clockOutDateTime,
     )
+}
+
+private fun resolveDateTimeRange(
+    clockInRaw: String?,
+    clockOutRaw: String?,
+): Pair<LocalDateTime, LocalDateTime> {
+    val now = LocalDate.now()
+    val clockInTimeOfDay = clockInRaw?.toLocalTimeOrNull() ?: LocalTime.of(9, 0)
+    val clockOutTimeOfDay = clockOutRaw?.toLocalTimeOrNull() ?: LocalTime.of(18, 0)
+
+    val clockInDateTime = LocalDateTime.of(now, clockInTimeOfDay)
+    val clockOutBase = LocalDateTime.of(now, clockOutTimeOfDay)
+    val clockOutDateTime = if (!clockOutBase.isAfter(clockInDateTime)) {
+        clockOutBase.plusDays(1)
+    } else {
+        clockOutBase
+    }
+
+    return clockInDateTime to clockOutDateTime
 }
 
 fun String.toWorkdayType(): WorkdayType = when (this) {

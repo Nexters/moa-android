@@ -3,6 +3,7 @@ package com.moa.salary.app.presentation.designsystem.component
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -38,14 +39,10 @@ fun MoaWheelPicker(
     itemToString: (Int) -> String = { it.toString().padStart(2, '0') },
 ) {
     val itemCount = items.size
-    val infiniteMultiplier = 10000
-    val infiniteItemCount = itemCount * infiniteMultiplier
-
     val halfVisibleCount = visibleItemCount / 2
-    val middlePosition = (infiniteMultiplier / 2) * itemCount + initialSelectedIndex
 
     val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = middlePosition - halfVisibleCount
+        initialFirstVisibleItemIndex = initialSelectedIndex.coerceIn(0, itemCount - 1)
     )
 
     val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
@@ -53,25 +50,22 @@ fun MoaWheelPicker(
     val density = LocalDensity.current
     val totalItemHeightPx = with(density) { (itemHeight + itemSpacing).toPx() }
 
-    val centerInfiniteIndex by remember {
+    val centerIndex by remember {
         derivedStateOf {
             val firstVisibleIndex = listState.firstVisibleItemIndex
             val firstVisibleOffset = listState.firstVisibleItemScrollOffset
 
-            if (firstVisibleOffset > totalItemHeightPx / 2) {
-                firstVisibleIndex + halfVisibleCount + 1
+            val raw = if (firstVisibleOffset > totalItemHeightPx / 2) {
+                firstVisibleIndex + 1
             } else {
-                firstVisibleIndex + halfVisibleCount
+                firstVisibleIndex
             }
+            raw.coerceIn(0, itemCount - 1)
         }
     }
 
-    val selectedIndex by remember {
-        derivedStateOf { centerInfiniteIndex % itemCount }
-    }
-
     LaunchedEffect(Unit) {
-        snapshotFlow { selectedIndex }
+        snapshotFlow { centerIndex }
             .distinctUntilChanged()
             .collect { index -> onItemSelected(items[index]) }
     }
@@ -81,14 +75,16 @@ fun MoaWheelPicker(
             .height(itemHeight * visibleItemCount + itemSpacing * (visibleItemCount - 1)),
         state = listState,
         flingBehavior = snapFlingBehavior,
-        verticalArrangement = Arrangement.spacedBy(itemSpacing)
+        verticalArrangement = Arrangement.spacedBy(itemSpacing),
+        contentPadding = PaddingValues(
+            vertical = (itemHeight + itemSpacing) * halfVisibleCount
+        ),
     ) {
-        items(infiniteItemCount) { infiniteIndex ->
-            val actualIndex = infiniteIndex % itemCount
-            val item = items[actualIndex]
+        items(itemCount) { index ->
+            val item = items[index]
 
             val isSelected by remember {
-                derivedStateOf { infiniteIndex == centerInfiniteIndex }
+                derivedStateOf { index == centerIndex }
             }
 
             Box(
@@ -129,4 +125,3 @@ private fun MoaWheelPickerPreview() {
         )
     }
 }
-

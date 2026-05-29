@@ -1,7 +1,7 @@
 package com.moa.salary.app.core.extensions
 
-import com.moa.salary.app.core.model.onboarding.Time
 import com.moa.salary.app.core.util.Constants
+import java.time.LocalTime
 import java.util.Locale
 
 fun makeTimeString(hour: Int, minute: Int): String {
@@ -57,6 +57,10 @@ fun String.toHourMinuteOrNull(): Pair<Int, Int>? {
     }
 }
 
+fun String.toLocalTimeOrNull(): LocalTime? {
+    return toHourMinuteOrNull()?.let { (hour, minute) -> LocalTime.of(hour, minute) }
+}
+
 fun Char.isKoreanEnglishOrDigit(): Boolean {
     return this in 'a'..'z' ||
             this in 'A'..'Z' ||
@@ -66,16 +70,33 @@ fun Char.isKoreanEnglishOrDigit(): Boolean {
             this in '\u3130'..'\u318F'          // 한글 호환 자모
 }
 
-fun String.toTime(): Time {
-    val parts = this.split("~")
-    val startTimePair = parts[0].toHourMinuteOrNull()
-    val endTimeString = parts[1].toHourMinuteOrNull()
-    return Time(
-        startHour = startTimePair?.first ?: 9,
-        startMinute = startTimePair?.second ?: 0,
-        endHour = endTimeString?.first ?: 18,
-        endMinute = endTimeString?.second ?: 0,
-    )
-}
-
 fun String.toZeroString(): String = this.map { if (it.isDigit()) '0' else it }.joinToString("")
+
+fun calculateTimeDiffString(
+    startHour: Int,
+    startMinute: Int,
+    endHour: Int,
+    endMinute: Int,
+) : String{
+    val totalStartMinutes = startHour * 60 + startMinute
+    var totalEndMinutes = endHour * 60 + endMinute
+
+    if (totalEndMinutes < totalStartMinutes) {
+        totalEndMinutes += 24 * 60
+    }
+
+    val diffInMinutes = totalEndMinutes - totalStartMinutes
+
+    val hours = diffInMinutes / 60
+    val minutes = diffInMinutes % 60
+
+
+    return buildString {
+        if(hours > 0) {
+            append("${hours}시간 ")
+        }
+        if(minutes > 0){
+            append("${minutes}분 ")
+        }
+    }
+}

@@ -154,10 +154,8 @@ class AfterWorkViewModel @AssistedInject constructor(
                     home = it.home.copy(
                         dailyPay = workday.dailyPay,
                         type = workday.type,
-                        startHour = workday.startHour ?: it.home.startHour,
-                        startMinute = workday.startMinute ?: it.home.startMinute,
-                        endHour = workday.endHour ?: it.home.endHour,
-                        endMinute = workday.endMinute ?: it.home.endMinute,
+                        clockInDateTime = workday.clockInDateTime,
+                        clockOutDateTime = workday.clockOutDateTime,
                     )
                 )
             }

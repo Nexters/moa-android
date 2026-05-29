@@ -32,10 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moa.salary.app.core.model.work.Home
+import java.time.LocalDate
 import com.moa.salary.app.core.model.work.WorkdayType
 import com.moa.salary.app.presentation.R
 import com.moa.salary.app.presentation.designsystem.component.MoaDateLocationBar
 import com.moa.salary.app.presentation.designsystem.component.MoaPrimaryButton
+import com.moa.salary.app.presentation.designsystem.component.MoaRollingText
 import com.moa.salary.app.presentation.designsystem.component.MoaTertiaryButton
 import com.moa.salary.app.presentation.designsystem.component.MoaTooltipBanner
 import com.moa.salary.app.presentation.designsystem.theme.MoaTheme
@@ -268,17 +270,15 @@ private fun AccumulatedSalarySection(
 
         Spacer(Modifier.height(MoaTheme.spacing.spacing4))
 
-        val salaryColor = if (isWorkDay) {
-            MoaTheme.colors.textGreen
-        } else {
-            MoaTheme.colors.textBlue
-        }
-
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
+            MoaRollingText(
                 text = accumulatedSalary,
-                style = MoaTheme.typography.h1_700,
-                color = salaryColor,
+                textColor = if (isWorkDay) {
+                    MoaTheme.colors.textGreen
+                } else {
+                    MoaTheme.colors.textBlue
+                },
+                animateOnAppear = true,
             )
 
             Spacer(Modifier.width(4.dp))
@@ -438,10 +438,8 @@ private fun BeforeWorkScreenPreview() {
                         dailyPay = 100000,
                         type = WorkdayType.WORK,
                         events = persistentListOf(),
-                        startHour = 9,
-                        startMinute = 0,
-                        endHour = 18,
-                        endMinute = 0,
+                        clockInDateTime = LocalDate.now().atTime(9, 0),
+                        clockOutDateTime = LocalDate.now().atTime(18, 0),
                     )
                 ),
                 onIntent = {},

@@ -34,6 +34,7 @@ firebase-bom = "34.12.0"
 google-services = "4.4.4"
 firebaseCrashlyticsGradle = "3.0.7"
 posthog = "3.41.0"
+playReview = "2.0.2"
 
 [libraries]
 androidx-annotation-experimental = { module = "androidx.annotation:annotation-experimental", version.ref = "annotationExperimental" }
@@ -120,6 +121,9 @@ calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = 
 
 # Posthog
 posthog = { module = "com.posthog:posthog-android", version.ref = "posthog" }
+
+# Play In-App Review
+play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "playReview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

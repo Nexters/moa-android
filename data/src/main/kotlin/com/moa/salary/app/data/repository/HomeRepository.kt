@@ -11,4 +11,8 @@ interface HomeRepository {
     suspend fun getCompletedWorkDay(): LocalDate?
 
     suspend fun putCompletedWorkDay(completedWorkDay: LocalDate)
+
+    suspend fun getShownPayday(): LocalDate?
+
+    suspend fun putShownPayday(shownPayday: LocalDate)
 }

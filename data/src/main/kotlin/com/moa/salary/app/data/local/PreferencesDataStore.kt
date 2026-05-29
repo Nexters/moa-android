@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +21,7 @@ class PreferencesDataStore @Inject constructor(
         name = DATASTORE_NAME
     )
 
-    suspend fun getBoolean(key: String): Boolean? {
+    private suspend fun getBoolean(key: String): Boolean? {
         return try {
             val preferences = context.dataStore.data.first()
             preferences[booleanPreferencesKey(key)]
@@ -29,7 +30,7 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun putBoolean(key: String, value: Boolean) {
+    private suspend fun putBoolean(key: String, value: Boolean) {
         try {
             context.dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(key)] = value
@@ -39,7 +40,26 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun getString(key: String): String? {
+    private suspend fun getInt(key: String): Int? {
+        return try {
+            val preferences = context.dataStore.data.first()
+            preferences[intPreferencesKey(key)]
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private suspend fun putInt(key: String, value: Int) {
+        try {
+            context.dataStore.edit { preferences ->
+                preferences[intPreferencesKey(key)] = value
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to save preference", e)
+        }
+    }
+
+    private suspend fun getString(key: String): String? {
         return try {
             val preferences = context.dataStore.data.first()
             preferences[stringPreferencesKey(key)]
@@ -48,7 +68,7 @@ class PreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun putString(key: String, value: String) {
+    private suspend fun putString(key: String, value: String) {
         try {
             context.dataStore.edit { preferences ->
                 preferences[stringPreferencesKey(key)] = value
@@ -94,9 +114,45 @@ class PreferencesDataStore @Inject constructor(
         putString(KEY_WORK_COMPLETED_DAY, completedWorkDay)
     }
 
+    suspend fun getShownPayday(): String? {
+        return getString(KEY_SHOWN_PAY_DAY)
+    }
+
+    suspend fun putShownPayday(shownPayday: String) {
+        putString(KEY_SHOWN_PAY_DAY, shownPayday)
+    }
+
+    suspend fun getClickedSettingReview(): Boolean {
+        return getBoolean(KEY_CLICKED_SETTING_REVIEW) ?: false
+    }
+
+    suspend fun putClickedSettingReview(value: Boolean) {
+        putBoolean(KEY_CLICKED_SETTING_REVIEW, value)
+    }
+
+    suspend fun getHomeVisitCount(): Int {
+        return getInt(KEY_HOME_VISIT_COUNT) ?: 0
+    }
+
+    suspend fun putHomeVisitCount(value: Int) {
+        putInt(KEY_HOME_VISIT_COUNT, value)
+    }
+
+    suspend fun getHomeVisitLastDate(): String? {
+        return getString(KEY_HOME_VISIT_LAST_DATE)
+    }
+
+    suspend fun putHomeVisitLastDate(value: String) {
+        putString(KEY_HOME_VISIT_LAST_DATE, value)
+    }
+
     companion object {
         private const val DATASTORE_NAME = "moa_preferences_datastore"
         private const val KEY_SHOWN_NOTIFICATION_BOTTOM_SHEET = "shown_notification_bottom_sheet"
         private const val KEY_WORK_COMPLETED_DAY = "work_completed_day"
+        private const val KEY_SHOWN_PAY_DAY = "shown_pay_day"
+        private const val KEY_CLICKED_SETTING_REVIEW = "clicked_setting_review"
+        private const val KEY_HOME_VISIT_COUNT = "home_visit_count"
+        private const val KEY_HOME_VISIT_LAST_DATE = "home_visit_last_date"
     }
 }

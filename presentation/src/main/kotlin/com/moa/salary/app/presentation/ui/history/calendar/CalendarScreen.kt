@@ -1,5 +1,6 @@
 package com.moa.salary.app.presentation.ui.history.calendar
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,7 +63,9 @@ fun CalendarScreen(viewModel: CalendarViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
         viewModel.onIntent(CalendarIntent.GetCalendar)
     }
-
+    LaunchedEffect(uiState.calendar?.workdays) {
+        Log.e("ABC", uiState.calendar?.workdays?.toString() ?: "ABC")
+    }
     CalendarScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
@@ -311,12 +314,22 @@ private fun ScheduleItems(
             WorkdayType.VACATION -> {
                 Triple(
                     R.drawable.ic_40_vacation,
-                    stringResource(R.string.history_schedule_vacation),
+                    "연차",
                     "${workday.clockInTime}~${workday.clockOutTime}",
                 )
             }
 
-            WorkdayType.NONE -> null
+            WorkdayType.NONE -> {
+                if (workday.events.contains(Event.PUBLIC_HOLIDAY)) {
+                    Triple(
+                        R.drawable.ic_40_vacation,
+                        "공휴일",
+                        "근무 일정 없음",
+                    )
+                } else {
+                    null
+                }
+            }
         }
 
         if (info != null) {

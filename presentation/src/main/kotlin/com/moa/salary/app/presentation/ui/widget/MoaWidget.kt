@@ -91,10 +91,8 @@ class MoaWidget : GlanceAppWidget() {
 
                         is HomeNavigation.Working -> {
                             val todaySalary = SalaryUtils.calculateSalaryForWorkedTime(
-                                startHour = homeNavigation.home.startHour,
-                                startMinute = homeNavigation.home.startMinute,
-                                endHour = homeNavigation.home.endHour,
-                                endMinute = homeNavigation.home.endMinute,
+                                clockInDateTime = homeNavigation.home.clockInDateTime,
+                                clockOutDateTime = homeNavigation.home.clockOutDateTime,
                                 dailyPay = homeNavigation.home.dailyPay,
                             )
 
