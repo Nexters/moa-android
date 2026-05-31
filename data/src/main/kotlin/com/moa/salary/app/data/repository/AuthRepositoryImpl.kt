@@ -1,8 +1,10 @@
 package com.moa.salary.app.data.repository
 
+import com.moa.salary.app.core.model.onboarding.Token
 import com.moa.salary.app.core.model.setting.WithdrawalReason
 import com.moa.salary.app.data.local.PreferencesDataStore
 import com.moa.salary.app.data.remote.api.AuthService
+import com.moa.salary.app.data.remote.mapper.toDomain
 import com.moa.salary.app.data.remote.model.request.FcmRequest
 import com.moa.salary.app.data.remote.model.request.LogoutRequest
 import com.moa.salary.app.data.remote.model.request.TokenRequest
@@ -17,13 +19,13 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun postToken(
         idToken: String,
         fcmDeviceToken: String
-    ): String {
+    ): Token {
         return authService.postToken(
             TokenRequest(
                 idToken = idToken,
                 fcmDeviceToken = fcmDeviceToken,
             )
-        ).accessToken
+        ).toDomain()
     }
 
     override suspend fun logout(fcmDeviceToken: String) {

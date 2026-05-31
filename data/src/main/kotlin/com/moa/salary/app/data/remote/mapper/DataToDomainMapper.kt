@@ -9,6 +9,7 @@ import com.moa.salary.app.core.model.onboarding.Payroll
 import com.moa.salary.app.core.model.onboarding.Profile
 import com.moa.salary.app.core.model.onboarding.Term
 import com.moa.salary.app.core.model.onboarding.Time
+import com.moa.salary.app.core.model.onboarding.Token
 import com.moa.salary.app.core.model.onboarding.WorkPolicy
 import com.moa.salary.app.core.model.setting.NotificationSetting
 import com.moa.salary.app.core.model.setting.SettingTerm
@@ -27,6 +28,7 @@ import com.moa.salary.app.data.remote.model.response.PayrollResponse
 import com.moa.salary.app.data.remote.model.response.ProfileResponse
 import com.moa.salary.app.data.remote.model.response.StatusResponse
 import com.moa.salary.app.data.remote.model.response.TermResponse
+import com.moa.salary.app.data.remote.model.response.TokenResponse
 import com.moa.salary.app.data.remote.model.response.WorkPolicyResponse
 import com.moa.salary.app.data.remote.model.response.WorkdayResponse
 import kotlinx.collections.immutable.ImmutableList
@@ -191,13 +193,13 @@ fun String.toWorkdayType(): WorkdayType = when (this) {
 
 fun CalendarResponse.toDomain(): Calendar {
     return Calendar(
-        monthlyInfo = earnings.toADomain(),
+        monthlyInfo = earnings.toDomain(),
         workdays = schedules.associate { it.date.toLocalDate() to it.toDomain() }.toImmutableMap(),
         joinedAt = joinedAt.toLocalDate(),
     )
 }
 
-fun EarningsResponse.toADomain(): MonthlyInfo = MonthlyInfo(
+fun EarningsResponse.toDomain(): MonthlyInfo = MonthlyInfo(
     accumulatedWorkTime = workedMinutes.convertMinutesToRoundedHours().toString(),
     totalWorkTime = standardMinutes.convertMinutesToRoundedHours().toString(),
     accumulatedPay = (workedEarnings / 10000).toString(),
@@ -215,3 +217,8 @@ fun String.toEvent(): Event = when (this) {
     "PAYDAY" -> Event.PAYDAY
     else -> Event.NONE
 }
+
+fun TokenResponse.toDomain(): Token = Token(
+    userId = userId,
+    accessToken = accessToken,
+)
