@@ -18,6 +18,7 @@ import com.moa.salary.app.presentation.model.MoaSideEffect
 import com.moa.salary.app.presentation.model.OnboardingNavigation
 import com.moa.salary.app.presentation.model.PosthogEvent
 import com.moa.salary.app.presentation.model.RootNavigation
+import com.posthog.PostHog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -73,7 +74,8 @@ class LoginViewModel @Inject constructor(
             scope = viewModelScope,
             onRetry = { postToken(idToken, fcmDeviceToken) }
         ) {
-            saveToken(it)
+            identify(it.userId)
+            saveToken(it.accessToken)
         }
     }
 
@@ -83,6 +85,10 @@ class LoginViewModel @Inject constructor(
         }.execute(scope = viewModelScope) {
             getOnboardingStatus()
         }
+    }
+
+    private fun identify(userId: Int) {
+        PostHog.identify(distinctId = userId.toString())
     }
 
     private fun getOnboardingStatus() {
