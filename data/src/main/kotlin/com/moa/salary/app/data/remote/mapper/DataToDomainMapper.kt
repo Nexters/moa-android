@@ -221,4 +221,5 @@ fun String.toEvent(): Event = when (this) {
 fun TokenResponse.toDomain(): Token = Token(
     userId = userId,
     accessToken = accessToken,
+    refreshToken = refreshToken,
 )

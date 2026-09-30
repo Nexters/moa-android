@@ -75,13 +75,13 @@ class LoginViewModel @Inject constructor(
             onRetry = { postToken(idToken, fcmDeviceToken) }
         ) {
             identify(it.userId)
-            saveToken(it.accessToken)
+            saveToken(it.accessToken, it.refreshToken)
         }
     }
 
-    private fun saveToken(accessToken: String) {
+    private fun saveToken(accessToken: String, refreshToken: String?) {
         suspend {
-            tokenRepository.saveAccessToken(accessToken)
+            tokenRepository.saveTokens(accessToken, refreshToken)
         }.execute(scope = viewModelScope) {
             getOnboardingStatus()
         }

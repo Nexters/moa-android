@@ -161,8 +161,10 @@ fun MainScreen(
                         }
 
                         is ApiErrorException -> {
-                            val message = it.exception.message
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            if (it.exception.code != EXPIRED_TOKEN_CODE) {
+                                val message = it.exception.message
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            }
                         }
 
                         else -> {
@@ -294,3 +296,5 @@ sealed interface MainIntent {
     @JvmInline
     value class SetToast(val message: String?) : MainIntent
 }
+
+private const val EXPIRED_TOKEN_CODE = "EXPIRED_TOKEN"

@@ -1,5 +1,6 @@
 package com.moa.salary.app.data.remote.interceptor
 
+import com.moa.salary.app.data.remote.api.AuthService
 import com.moa.salary.app.data.repository.TokenRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -14,6 +15,10 @@ class AuthInterceptor @Inject constructor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
+
+        if (request.url.encodedPath == AuthService.REFRESH_PATH) {
+            return chain.proceed(request)
+        }
 
         val token = runBlocking {
             tokenRepository.getAccessToken()

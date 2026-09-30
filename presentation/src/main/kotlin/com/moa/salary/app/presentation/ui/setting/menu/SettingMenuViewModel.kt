@@ -148,7 +148,7 @@ class SettingMenuViewModel @Inject constructor(
     private fun logout() {
         suspend {
             val fcmTokenDeferred = FcmTokenManager.getFcmToken()
-            authRepository.logout(fcmTokenDeferred)
+            authRepository.logout(fcmTokenDeferred, tokenRepository.getRefreshToken())
             tokenRepository.clearToken()
         }.execute(
             bus = moaSideEffectBus,
