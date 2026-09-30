@@ -28,8 +28,8 @@ class AuthRepositoryImpl @Inject constructor(
         ).toDomain()
     }
 
-    override suspend fun logout(fcmDeviceToken: String) {
-        authService.logout(LogoutRequest(fcmDeviceToken))
+    override suspend fun logout(fcmDeviceToken: String, refreshToken: String?) {
+        authService.logout(LogoutRequest(fcmDeviceToken, refreshToken))
     }
 
     override suspend fun withdraw(reasons: ImmutableList<WithdrawalReason>) {

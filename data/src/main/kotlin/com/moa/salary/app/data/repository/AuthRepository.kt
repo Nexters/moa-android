@@ -10,7 +10,7 @@ interface AuthRepository {
         fcmDeviceToken: String,
     ): Token
 
-    suspend fun logout(fcmDeviceToken: String)
+    suspend fun logout(fcmDeviceToken: String, refreshToken: String?)
 
     suspend fun withdraw(reasons: ImmutableList<WithdrawalReason>)
 
